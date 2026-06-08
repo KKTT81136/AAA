@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>TOS Shopping</title>
   <!-- ป้องกันบราวเซอร์หมุนค้างด้วยการตั้ง Default Favicon เป็น Data URI แบบโปร่งใส -->
-  <link rel="icon" type="image/x-icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  <link class="favicon-link" rel="icon" type="image/x-icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght=300;400;500;600;700&display=swap" rel="stylesheet">
@@ -165,7 +165,7 @@
     .marquee-text { 
       display: inline-block; 
       white-space: nowrap;
-      animation: marqueeScroll 25s linear infinite; 
+      animation: marqueeScroll 14s linear infinite; /* เร่งรอบเวลาเพิ่มความเร็วขึ้นมาที่ 14 วินาที */
       will-change: transform; 
     }
     .nav-glass { 
@@ -382,8 +382,12 @@
     let userWithdrawalsData = [];
     let userSpecialAssignData = [];
 
+    // ตัวแปรเก็บพอร์ตฟังก์ชันยกเลิก Listener เพื่อสลายคิวขจัดปัญหาโหลดแท็บค้าง
+    let publicUnsubscribers = {
+      configs: null, banners: null, galleries: null, menuIcons: null, products: null, showcaseProducts: null
+    };
+
     let activeListeners = {
-      configs: null, banners: null, galleries: null, menuIcons: null, products: null, showcaseProducts: null,
       userDoc: null, userOrders: null, userWithdrawals: null, userSpecialAssigns: null
     };
 
@@ -608,7 +612,7 @@
       return num.toLocaleString();
     }
 
-    // ฟังก์ชันความปลอดภัยช่วยสลับ URL รูปภาพป้องกันการเรียกซ้ำซ้อนจนเบราว์เซอร์ค้าง
+    // ฟังก์ชันความปลอดภัยสลับ URL รูปภาพป้องกันการเรียกซ้ำซ้อนจนเบราว์เซอร์ค้าง
     function safeImgUrl(url) {
       if (!url || typeof url !== 'string' || url.trim() === '') {
         return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -867,18 +871,18 @@
     }
 
     function stopPublicSubscriptions() {
-      if (activeListeners.configs) { activeListeners.configs(); activeListeners.configs = null; }
-      if (activeListeners.banners) { activeListeners.banners(); activeListeners.banners = null; }
-      if (activeListeners.galleries) { activeListeners.galleries(); activeListeners.galleries = null; }
-      if (activeListeners.menuIcons) { activeListeners.menuIcons(); activeListeners.menuIcons = null; }
-      if (activeListeners.products) { activeListeners.products(); activeListeners.products = null; }
-      if (activeListeners.showcaseProducts) { activeListeners.showcaseProducts(); activeListeners.showcaseProducts = null; }
+      if (publicUnsubscribers.configs) { publicUnsubscribers.configs(); publicUnsubscribers.configs = null; }
+      if (publicUnsubscribers.banners) { publicUnsubscribers.banners(); publicUnsubscribers.banners = null; }
+      if (publicUnsubscribers.galleries) { publicUnsubscribers.galleries(); publicUnsubscribers.galleries = null; }
+      if (publicUnsubscribers.menuIcons) { publicUnsubscribers.menuIcons(); publicUnsubscribers.menuIcons = null; }
+      if (publicUnsubscribers.products) { publicUnsubscribers.products(); publicUnsubscribers.products = null; }
+      if (publicUnsubscribers.showcaseProducts) { publicUnsubscribers.showcaseProducts(); publicUnsubscribers.showcaseProducts = null; }
     }
 
     function startPublicSubscriptions() {
       stopPublicSubscriptions();
 
-      activeListeners.configs = onSnapshot(doc(db, "configs", "system_config"), (docSnap) => {
+      publicUnsubscribers.configs = onSnapshot(doc(db, "configs", "system_config"), (docSnap) => {
         if (docSnap.exists()) {
           const cfgData = { ...docSnap.data(), __backendId: docSnap.id };
           publicData.configs = [cfgData];
@@ -907,7 +911,7 @@
         isConfigsLoaded = true;
       });
 
-      activeListeners.banners = onSnapshot(collection(db, "banners"), (snapshot) => {
+      publicUnsubscribers.banners = onSnapshot(collection(db, "banners"), (snapshot) => {
         let banners = [];
         snapshot.forEach(d => banners.push({ ...d.data(), __backendId: d.id }));
         publicData.banners = banners;
@@ -915,7 +919,7 @@
         refreshUI();
       }, (err) => console.warn(err));
 
-      activeListeners.galleries = onSnapshot(collection(db, "galleries"), (snapshot) => {
+      publicUnsubscribers.galleries = onSnapshot(collection(db, "galleries"), (snapshot) => {
         let galleries = [];
         snapshot.forEach(d => galleries.push({ ...d.data(), __backendId: d.id }));
         publicData.galleries = galleries;
@@ -923,7 +927,7 @@
         refreshUI();
       }, (err) => console.warn(err));
 
-      activeListeners.menuIcons = onSnapshot(collection(db, "menu_icons"), (snapshot) => {
+      publicUnsubscribers.menuIcons = onSnapshot(collection(db, "menu_icons"), (snapshot) => {
         let icons = [];
         snapshot.forEach(d => icons.push({ ...d.data(), __backendId: d.id }));
         publicData.menuIcons = icons.sort((a,b) => parseInt(a.menuOrder||0) - parseInt(b.menuOrder||0));
@@ -931,7 +935,7 @@
         refreshUI();
       }, (err) => console.warn(err));
 
-      activeListeners.products = onSnapshot(collection(db, "products"), (snapshot) => {
+      publicUnsubscribers.products = onSnapshot(collection(db, "products"), (snapshot) => {
         let prods = [];
         snapshot.forEach(d => prods.push({ ...d.data(), __backendId: d.id }));
         publicData.products = prods.sort((a,b) => parseInt(a.productOrder||0) - parseInt(b.productOrder||0));
@@ -939,7 +943,7 @@
         refreshUI();
       }, (err) => console.warn(err));
 
-      activeListeners.showcaseProducts = onSnapshot(collection(db, "showcase_products"), (snapshot) => {
+      publicUnsubscribers.showcaseProducts = onSnapshot(collection(db, "showcase_products"), (snapshot) => {
         let showcase = [];
         snapshot.forEach(d => showcase.push({ ...d.data(), __backendId: d.id }));
         showcase.sort((a, b) => parseInt(a.order || 0) - parseInt(b.order || 0));
@@ -1068,7 +1072,7 @@
       const p = cfg.themePrimary || '#e6399b';
       const mBg = (cfg.themeMarqueeBg && cfg.themeMarqueeBg.trim() !== '') ? cfg.themeMarqueeBg : p;
       
-      // คำนวณสีอัตโนมัติเมื่อเจอกรณีแถบขาว
+      // คำนวณสีอัตโนมัติเมื่อเจอกรณีแถบสว่าง
       const isLightMarquee = isColorLight(mBg);
       const textColorClass = isLightMarquee ? 'text-slate-900' : 'text-white';
       const iconColorClass = isLightMarquee ? 'text-slate-900' : 'text-white';
