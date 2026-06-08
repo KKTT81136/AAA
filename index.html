@@ -605,6 +605,7 @@
     const getGallery = () => publicData.galleries;
     const getMenuIcons = () => publicData.menuIcons;
     
+    // ตั้งค่าฟอลแบ็คป้องกันระบบหยุดทำงานกรณีไม่มีแคชบนอุปกรณ์ใหม่
     const getConfig = () => {
       if (publicData.configs && publicData.configs.length > 0) {
         return publicData.configs[0];
@@ -616,8 +617,8 @@
         } catch (e) {}
       }
       return {
-        themePrimary: '',
-        themeSecondary: '',
+        themePrimary: '#e6399b',
+        themeSecondary: '#4f46e5',
         themeType: 'gradient',
         themeMarqueeBg: '#eb2f96',
         themeMenuBg: '#eb2f96',
@@ -625,8 +626,8 @@
         logoUrl: '',
         loginBgUrl: '',
         userBgUrl: '',
-        marqueeText: '',
-        tabTitle: '',
+        marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
+        tabTitle: 'TOS Shopping',
         tabFaviconUrl: '',
         scheduleText: 'เปิดทำการ 10:00-22:00 น.',
         rewardsList: '095***567:433,000,095***091:2,050,000,088***324:120,500',
@@ -693,7 +694,7 @@
     }
     function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); isOrderProcessing = false; }
 
-    // หน่วงเวลาและคุมจังหวะการเรนเดอร์เพื่อประหยัดหน่วยความจำ
+    // ป้องกันการสะดุดและหน่วงด้วยดีเลย์ต่ำ
     let refreshTimeout = null;
     function refreshUI() {
       if (refreshTimeout) {
@@ -701,7 +702,6 @@
       }
       refreshTimeout = setTimeout(() => {
         if (currentUser && $('dash-content')) {
-          // หากอยู่ในหน้าจอเดิม ให้ดึงการอัปเดตเฉพาะจุดแทนการล้าง DOM ใหม่ทั้งหมด
           if (lastRenderedTab === currentTab) {
             updateDynamicValues();
           } else {
@@ -894,28 +894,40 @@
       });
     }
 
-    // จัดระเบียบการเชื่อมต่อหน้าเว็บไม่ให้ชนกันตอน Refresh หน้าจอ
+    // สวิตช์คุมระบบเรนเดอร์หน้าจอทันทีเพื่อแก้ไขปัญหาหน้าจอขาว
     let isPublicSubscribed = false;
     function initAppFlow() {
+      // 1. เรนเดอร์หน้าจอเริ่มต้นทันทีโดยไม่ต้องรอโหลดฐานข้อมูล (ตัดปัญหาหน้าจอขาว)
+      const cachedUserId = localStorage.getItem('tos_logged_user_id');
+      if (cachedUserId) {
+        currentTab = sessionStorage.getItem('tos_current_tab') || 'home';
+        renderDashboard();
+      } else {
+        renderLogin();
+      }
+
+      // 2. ตรวจสอบเงื่อนไขผู้ใช้และทำการสตรีมมิ่งข้อมูลในเบื้องหลังอย่างรวดเร็ว
       onAuthStateChanged(auth, (user) => {
         if (user) {
           if (!isPublicSubscribed) {
             startPublicSubscriptions();
             isPublicSubscribed = true;
           }
-          const cachedUserId = localStorage.getItem('tos_logged_user_id');
-          if (cachedUserId) {
-            currentTab = sessionStorage.getItem('tos_current_tab') || 'home';
-            startUserSubscriptions(cachedUserId);
-            renderDashboard();
-          } else {
-            renderLogin();
+          const loggedId = localStorage.getItem('tos_logged_user_id');
+          if (loggedId) {
+            startUserSubscriptions(loggedId);
           }
         }
       });
 
-      signInAnonymously(auth).catch(err => {
+      signInAnonymously(auth).then(() => {
+        if (!isPublicSubscribed) {
+          startPublicSubscriptions();
+          isPublicSubscribed = true;
+        }
+      }).catch(err => {
         console.warn("Auth init error: ", err);
+        // กรณีอุปกรณ์ออฟไลน์ หรือบล็อกเกอร์สกัดกั้น ให้ระบบเปิดทำการสตรีมแคชต่อไป
         if (!isPublicSubscribed) {
           startPublicSubscriptions();
           isPublicSubscribed = true;
@@ -1319,7 +1331,6 @@
         updateDynamicValues();
         return;
       }
-      // เคลียร์ Interval เพื่อประหยัด Memory และ CPU
       clearInterval(bannerInterval);
       clearInterval(rewardInterval);
 
@@ -1351,7 +1362,6 @@
       initGalleryObserver();
     }
 
-    // ฟังก์ชัน Patch อัปเดตข้อมูลเฉพาะจุดแบบเบา ไม่ล้าง DOM ทั้งแผ่น
     function updateDynamicValues() {
       const u = currentUser;
       if (!u) return;
