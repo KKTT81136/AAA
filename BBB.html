@@ -639,18 +639,6 @@
       updateHeaderStats();
     }
 
-    function handleSidebarClick(id) {
-      if (id.startsWith('products_')) {
-        adminTab = 'products';
-        adminProductTab = id.replace('products_', '');
-        adminProductPage = 1;
-      } else {
-        adminTab = id;
-      }
-      sessionStorage.setItem('tos_admin_tab', adminTab);
-      renderAdmin();
-    }
-
     function changeAdminProductPage(p) { adminProductPage = p; debouncedRenderAdminTab(); }
 
     function renderAdminTab() {
@@ -1932,7 +1920,7 @@
     
     function showAddGallery() { showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรูปแกลเลอรีประดับ</h3><input id="ag-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded mb-4 text-xs font-mono" placeholder="ระบุลิงก์รูปภาพของคุณที่นี่"><button onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">บันทึกรูปภาพ</button>`); }
     async function doAddGallery() { await windowDataSdk.create({ type:'gallery', id:genId(), galleryUrl:$('ag-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
-    function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
+    function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
     async function doEditGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); await windowDataSdk.update({...g, galleryUrl: $('eg-url').value.trim()}); closeModal(); debouncedRenderAdminTab(); }
     async function deleteGallery(bid) { 
       const result = await Swal.fire({
