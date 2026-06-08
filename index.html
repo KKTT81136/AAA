@@ -151,7 +151,7 @@
       transition: opacity 0.8s ease-in-out; 
     }
     
-    /* สไตล์คุมระบบอักษรวิ่งสไลด์จากขวาไปซ้ายอย่างเสถียรและไหลลื่น */
+    /* ระบบคุมอักษรวิ่งสไลด์ไหลจากขวาไปซ้ายอย่างเสถียรและนุ่มนวล */
     .marquee-container { 
       overflow: hidden; 
       white-space: nowrap; 
@@ -167,8 +167,8 @@
     .marquee-text { 
       display: inline-block; 
       white-space: nowrap;
-      padding-left: 100%; /* ดันให้อักษรไปเริ่มต้นที่ขวาสุดของขอบจอเสมอก่อนสไลด์เข้ามา */
-      animation: marqueeScroll 10s linear infinite; /* ความเร็วระดับสากล เหมาะแก่การอ่าน */
+      padding-left: 100%; /* บังคับให้อักษรไปตั้งต้นที่ขอบขวาสุดของจอก่อนไหลเข้ามา */
+      animation: marqueeScroll 10s linear infinite; /* ความเร็วสากล เหมาะแก่การอ่าน */
       will-change: transform; 
     }
     
@@ -1019,6 +1019,7 @@
 
       onAuthStateChanged(auth, (user) => {
         if (user) {
+          // ได้รับสิทธิ์เข้าถึงจาก Firebase เรียบร้อยแล้ว จึงเริ่มเชื่อมต่อเพื่อป้องกันคิวแฮงก์
           if (!isPublicSubscribed) {
             startPublicSubscriptions();
             isPublicSubscribed = true;
@@ -1028,8 +1029,15 @@
             startUserSubscriptions(loggedId);
           }
         } else {
-          // หากไม่มีสิทธิ์ ให้เชื่อม anonymous ก่อนเพื่อให้คิว Snapshot ไม่สะดุด
-          signInAnonymously(auth).catch(err => console.warn("Auth error: ", err));
+          // หากยังไม่มีประวัติให้ทำ Anonymous เข้าไปก่อน
+          signInAnonymously(auth).catch(err => {
+            console.warn("Auth error: ", err);
+            // หากระบบเน็ตช้า ให้รันแบบออฟไลน์สำรองเผื่อไว้ก่อนเพื่อไม่ให้หน้าขาว
+            if (!isPublicSubscribed) {
+              startPublicSubscriptions();
+              isPublicSubscribed = true;
+            }
+          });
         }
       });
     }
