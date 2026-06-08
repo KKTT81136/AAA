@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>TOS Shopping</title>
-  <!-- ป้องกันบราวเซอร์หมุนค้างด้วยการตั้ง Default Favicon เป็น Data URI แบบโปร่งใส -->
+  
   <link class="favicon-link" rel="icon" type="image/x-icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -21,11 +21,11 @@
     });
   </script>
 
-  <!-- สคริปต์ประมวลผลล่วงหน้าเพื่อจัดเตรียมธีมและป้องกันปัญหาการกระพริบของหน้าจอ -->
+  <!-- ตัวประมวลผลล่วงหน้าแบบ Synchronous เพื่อป้องกันการกระพริบของหน้าจอและสีเก่าเมื่อเปิดหน้าใหม่ -->
   <script>
     (function() {
       var cached = localStorage.getItem('tos_cached_config');
-      var primary = '#FFFFFF'; // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF ตามที่คุณระบุ
+      var primary = '#FFFFFF'; 
       var secondary = '#4f46e5';
       var title = 'TOS Shopping';
       var favicon = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -54,28 +54,27 @@
       link.href = favicon;
       document.head.appendChild(link);
 
-      var styleEl = document.createElement('style');
-      styleEl.id = 'dynamic-theme-style';
       var bgStyle = (themeType === 'single') 
         ? "background: " + primary + " !important;" 
         : "background: linear-gradient(135deg, " + primary + ", " + secondary + ") !important;";
 
-      styleEl.innerHTML = [
-        ":root {",
-        "  --color-primary: " + primary + ";",
-        "  --color-secondary: " + secondary + ";",
-        "  --color-marquee-bg: " + marqueeBg + ";",
-        "}",
-        "body { background-color: #f8fafc; }",
-        ".text-primary { color: " + primary + " !important; }",
-        ".bg-primary { background-color: " + primary + " !important; }",
-        ".border-primary { border-color: " + primary + " !important; }",
-        ".bg-theme-gradient { " + bgStyle + " }",
-        ".fill-blue-100\\/50 { fill: " + primary + "33 !important; }"
-      ].join("\n");
-      document.head.appendChild(styleEl);
+      // เขียนโครงร่าง CSS เข้าไปในระดับสูงสุดทันทีเพื่อขจัดสีพื้นหลังเก่าก่อนเรนเดอร์ DOM
+      document.write([
+        '<style id="dynamic-theme-style">',
+        'html, body { ' + bgStyle + ' }',
+        ':root {',
+        '  --color-primary: ' + primary + ';',
+        '  --color-secondary: ' + secondary + ';',
+        '  --color-marquee-bg: ' + marqueeBg + ';',
+        '}',
+        '.text-primary { color: ' + primary + ' !important; }',
+        '.bg-primary { background-color: ' + primary + ' !important; }',
+        '.border-primary { border-color: ' + primary + ' !important; }',
+        '.bg-theme-gradient { ' + bgStyle + ' }',
+        '.fill-blue-100\\/50 { fill: ' + primary + '33 !important; }',
+        '</style>'
+      ].join('\n'));
 
-      // แสดงภาพโลโก้หลังบ้านที่ตั้งค่าไว้ทันทีที่โหลดหน้าจอ ป้องกันการเห็นโลโก้เก่า (Prevent old logo fallback)
       document.addEventListener("DOMContentLoaded", function() {
         if (logoUrl && logoUrl.trim() !== '') {
           var loginLogoContainer = document.querySelector(".logo-slide-right");
@@ -279,7 +278,6 @@
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
-  <!-- แท็กหลักของแอปพลิเคชัน โหลดแบบไดนามิกแบบปลอดภัย ไม่ค้างหน้าขาว -->
   <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
     <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
       <div class="w-full max-w-[380px] relative z-10 py-1">
@@ -322,7 +320,6 @@
       getAuth, signInAnonymously, signOut, onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    // คอนฟิกเชื่อมตรงคีย์ใหม่
     const firebaseConfig = {
       apiKey: "AIzaSyD8zPV6_vjSKqL7O7T-C-04bNt71QFknBg",
       authDomain: "kk-888-ee224.firebaseapp.com",
@@ -352,7 +349,7 @@
 
     let lastUserLevel = '';
     let lastUsername = '';
-    let lastUserCredit = -1; // ตัวแปรคอยจับตาดูยอดเครดิตสะสมเพื่อ sync แบบลื่นไหล
+    let lastUserCredit = -1;
 
     let publicData = {
       configs: [],
@@ -394,7 +391,6 @@
     let userWithdrawalsData = [];
     let userSpecialAssignData = [];
 
-    // ตัวแปรเก็บพอร์ตฟังก์ชันยกเลิก Listener เพื่อสลายคิวขจัดปัญหาโหลดแท็บค้าง
     let publicUnsubscribers = {
       configs: null, banners: null, galleries: null, menuIcons: null, products: null, showcaseProducts: null
     };
@@ -624,7 +620,6 @@
       return num.toLocaleString();
     }
 
-    // ฟังก์ชันความปลอดภัยสลับ URL รูปภาพป้องกันการเรียกซ้ำซ้อนจนเบราว์เซอร์ค้าง
     function safeImgUrl(url) {
       if (!url || typeof url !== 'string' || url.trim() === '') {
         return 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png';
@@ -632,7 +627,6 @@
       return url.trim();
     }
 
-    // ฟังก์ชันตรวจสอบโทนความสว่างของเฉดสีเพื่อปรับข้อความ Marquee ให้อัตโนมัติ
     function isColorLight(hex) {
       if (!hex || hex.indexOf('#') !== 0) return false;
       const c = hex.substring(1);
@@ -646,7 +640,7 @@
     }
 
     function applyTheme(primary, secondary, themeType) {
-      const p = primary || '#FFFFFF'; // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF
+      const p = primary || '#FFFFFF'; 
       const s = secondary || '#4f46e5';
       const type = themeType || 'gradient';
       const cfg = getConfig();
@@ -668,12 +662,12 @@
         : "background: linear-gradient(135deg, " + p + ", " + s + ") !important;";
 
       styleEl.innerHTML = `
+        html, body { ${bgStyle} }
         :root {
           --color-primary: ${p};
           --color-secondary: ${s};
           --color-marquee-bg: ${mBg};
         }
-        body { background-color: #f8fafc; }
         .text-primary { color: ${p} !important; }
         .bg-primary { background-color: ${p} !important; }
         .border-primary { border-color: ${p} !important; }
@@ -727,7 +721,7 @@
         } catch (e) {}
       }
       return {
-        themePrimary: '#FFFFFF', // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF
+        themePrimary: '#FFFFFF', 
         themeSecondary: '#4f46e5',
         themeType: 'gradient',
         themeMarqueeBg: '#eb2f96',
@@ -746,8 +740,8 @@
 
     const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
     const getLogoUrl = () => { const c = getConfig(); return (c.logoUrl && c.logoUrl.trim() !== '') ? c.logoUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; };
-    const getLoginBgUrl = () => { const c = getConfig(); return c.loginBgUrl || ''; };
-    const getUserBgUrl = () => { const c = getConfig(); return c.userBgUrl || ''; };
+    const getLoginBgUrl = () => { const c = getConfig(); return cfg.loginBgUrl || ''; };
+    const getUserBgUrl = () => { const c = getConfig(); return cfg.userBgUrl || ''; };
     
     const getMarqueeText = () => { 
       const c = getConfig(); 
@@ -808,17 +802,18 @@
     }
     function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); isOrderProcessing = false; }
 
-    let refreshTimeout = null;
+    // ติดตั้งระบบ Throttle หน้าจอผ่าน requestAnimationFrame เพื่อความลื่นไหลระดับโปรและรอบรับคนเยอะ
+    let renderScheduled = false;
     function refreshUI() {
-      if (refreshTimeout) {
-        clearTimeout(refreshTimeout);
-      }
-      refreshTimeout = setTimeout(() => {
+      if (renderScheduled) return;
+      renderScheduled = true;
+      requestAnimationFrame(() => {
         if (currentUser && $('dash-content')) {
           renderTabContent();
           applyDynamicStyles();
         }
-      }, 150);
+        renderScheduled = false;
+      });
     }
 
     function applyDynamicStyles() {
@@ -982,7 +977,6 @@
           const uData = docSnap.data();
           const levelChanged = String(uData.userLevel || '1') !== String(lastUserLevel);
           const nameChanged = (uData.username || '') !== lastUsername;
-          const creditChanged = Number(uData.credit || 0) !== Number(lastUserCredit); // ตรวจจับเครดิตเปลี่ยน
 
           lastUserLevel = uData.userLevel || '1';
           lastUsername = uData.username || '';
@@ -991,23 +985,12 @@
           currentUser = { ...uData, id: docSnap.id, __backendId: docSnap.id };
           localStorage.setItem('tos_cached_user', JSON.stringify(currentUser)); 
           
-          // ระบบอัปเดตและเด้งยอดเงินแบบเรียลไทม์ทันทีโดยไม่มีอาการหมุนค้าง
-          const creditVal = currentUser.credit || 0;
-          const formatted = "฿" + safeFormatNumber(creditVal);
-          ['home-credit-display', 'prod-credit-display', 'hist-credit-display', 'prof-credit-display'].forEach(id => {
-            const el = $(id);
-            if (el) el.innerText = formatted;
-          });
-
-          // อัปเดตแถบเปอร์เซ็นต์และกำไรด่วน
-          updateDynamicValues();
-
-          // เด้งอัปเดตแบบเรียลไทม์หลีกเลี่ยงการเรนเดอร์ใหม่ทั้งหน้าเมื่อเงินเปลี่ยนเท่านั้น เพื่อป้องกันจอแวบกระพริบ
           if (levelChanged || nameChanged || !lastRenderedTab) {
-            refreshUI(); 
+            lastRenderedTab = ''; 
           }
+          refreshUI(); 
         } else {
-          doLogout(); // เด้งออกทันทีหลังโดนลบถาวรจากฐานข้อมูล
+          doLogout(); 
         }
       }, (err) => {
         console.warn("User subscription error: ", err);
@@ -1229,7 +1212,6 @@
               <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
           </div>
-          <!-- รหัส PIN ถอนเงินแบบมีปุ่มเปิด-ปิดลูกตา -->
           <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
               <i data-lucide="lock" class="w-4 h-4"></i>
@@ -1308,6 +1290,7 @@
         localStorage.setItem('tos_logged_user_id', userDoc.id);
         currentUser = userDoc;
         currentTab = 'home';
+        lastRenderedTab = ''; 
         sessionStorage.setItem('tos_current_tab', 'home');
         
         startUserSubscriptions(userDoc.id);
@@ -1404,6 +1387,7 @@
         localStorage.setItem('tos_logged_user_id', newUserId);
         currentUser = newUserDoc;
         currentTab = 'home';
+        lastRenderedTab = ''; 
         sessionStorage.setItem('tos_current_tab', 'home');
 
         startUserSubscriptions(newUserId);
@@ -1422,6 +1406,7 @@
       stopUserSubscriptions();
       currentUser = null; 
       currentTab = 'home'; 
+      lastRenderedTab = ''; 
       localStorage.removeItem('tos_logged_user_id');
       localStorage.removeItem('tos_cached_user');
       sessionStorage.removeItem('tos_current_tab'); 
@@ -1443,7 +1428,7 @@
       if (!$('dash-outer-container')) {
         $('app').innerHTML = `
         <div id="dash-outer-container" class="h-full flex flex-col bg-slate-50 transition-all duration-300">
-          <div id="dash-content" class="flex-1 overflow-auto pb-24 fade-in" style="background-color: transparent;"></div>
+          <div id="dash-content" class="flex-1 overflow-auto pb-24" style="background-color: transparent;"></div>
           <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-100 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] z-50 rounded-t-[28px] nav-glass">
             <div class="flex justify-around py-3 max-w-lg mx-auto px-4">
               ${tabs.map(tData => `
@@ -1493,6 +1478,7 @@
       renderDashboard();
     }
     
+    // ระบบแยกการทำงานโครงสร้างและชุดข้อมูล เพื่อไม่ให้เกิดปัญหากระพริบ (Anti-Flicker)
     function renderTabContent() {
       const c = $('dash-content'); 
       if (!c) return;
@@ -1503,22 +1489,21 @@
         return;
       }
 
-      // ป้องกันการกระพริบโดยใช้เทคนิค Off-screen rendering (Atomic Write)
-      let tempDiv = document.createElement('div');
-      lastRenderedTab = currentTab; 
-      
-      if (currentTab === 'home') renderHome(tempDiv); 
-      else if (currentTab === 'products') renderProducts(tempDiv); 
-      else if (currentTab === 'history') renderHistory(tempDiv); 
-      else if (currentTab === 'profile') renderProfile(tempDiv);
-      
-      if (c.innerHTML !== tempDiv.innerHTML) {
-        c.innerHTML = tempDiv.innerHTML;
+      // 1. วาดโครงสร้างครั้งแรกเท่านั้นเมื่อมีการเปลี่ยนแท็บ
+      if (lastRenderedTab !== currentTab) {
+        lastRenderedTab = currentTab;
+        if (currentTab === 'home') renderHomeStructure(c); 
+        else if (currentTab === 'products') renderProductsStructure(c); 
+        else if (currentTab === 'history') renderHistoryStructure(c); 
+        else if (currentTab === 'profile') renderProfileStructure(c);
+        
+        applyDynamicStyles();
+        safeCreateIcons();
+        initGalleryObserver();
       }
       
-      applyDynamicStyles();
-      safeCreateIcons();
-      initGalleryObserver();
+      // 2. อัปเดตชุดข้อมูลแปรผันแบบเงียบ (Target-specific silent updates)
+      updateDynamicValues();
     }
 
     function updateDynamicValues() {
@@ -1528,24 +1513,30 @@
       const creditVal = u.credit || 0;
       const done = u.runIndex || 0;
       const userLevel = u.userLevel || '1';
+      const formatted = "฿" + safeFormatNumber(creditVal);
 
+      // อัปเดตข้อความเฉพาะจุด (ไม่วาดแผงหลักซ้ำ)
       const homeCredit = $('home-credit-display');
-      if (homeCredit) homeCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+      if (homeCredit && homeCredit.innerText !== formatted) homeCredit.innerText = formatted;
 
       const prodCredit = $('prod-credit-display');
-      if (prodCredit) prodCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+      if (prodCredit && prodCredit.innerText !== formatted) prodCredit.innerText = formatted;
 
       const histCredit = $('hist-credit-display');
-      if (histCredit) histCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+      if (histCredit && histCredit.innerText !== formatted) histCredit.innerText = formatted;
 
       const profCredit = $('prof-credit-display');
-      if (profCredit) profCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+      if (profCredit && profCredit.innerText !== formatted) profCredit.innerText = formatted;
 
+      // อัปเดตคิวจำนวนงาน
       const prodDone = $('prod-done');
       if (prodDone) {
         const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
         const total = availableProducts.length;
-        prodDone.innerText = `${done} / ${total}`;
+        const countText = `${done} / ${total}`;
+        if (prodDone.innerText !== countText) {
+          prodDone.innerText = countText;
+        }
         
         const pct = total === 0 ? 0 : Math.min(100, Math.round((done/total)*100));
         const prodPct = $('prod-pct');
@@ -1554,11 +1545,142 @@
       
       const todayStr = new Date().toDateString();
       const todayComm = getUserOrders()
-        .filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
+        .filter(o => o.createdAt && new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
         .reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
       
       const prodComm = $('prod-comm-display');
-      if (prodComm) prodComm.innerText = `+฿${safeFormatNumber(todayComm)}`;
+      if (prodComm) {
+        const profitText = `+฿${safeFormatNumber(todayComm)}`;
+        if (prodComm.innerText !== profitText) {
+          prodComm.innerText = profitText;
+        }
+      }
+
+      // อัปเดตเฉพาะประวัติธุรกรรม/ประวัติออเดอร์ เพื่อลดทราฟฟิกหลังบ้าน
+      if (currentTab === 'history') {
+        const listContainer = $('hist-list-container');
+        if (listContainer) {
+          let listHtml = '';
+          if (historyTab === 'orders') {
+            const orders = getUserOrders().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            const totalVipProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel)).length;
+            const isAllDone = done >= totalVipProducts && totalVipProducts > 0;
+            const pendingOrder = orders.find(o => o.status === 'pending');
+            let seenOrderIds = new Set();
+            const completedOrders = orders.filter(o => { if (o.status !== 'pending' && o.status !== undefined && !seenOrderIds.has(o.id)) { seenOrderIds.add(o.id); return true; } return false; }); 
+            const allCompleted = [...completedOrders, ...orders.filter(o => o.status === undefined && !seenOrderIds.has(o.id))];
+            
+            let html = '';
+            if (pendingOrder) { 
+              html += `
+              <div class="bg-amber-50/50 p-5 rounded-[28px] shadow-sm border border-amber-200/60 mb-5 relative overflow-hidden font-mono text-left">
+                <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl">${t('pendingPayment')}</div>
+                <div class="flex items-center gap-4 mb-4 mt-2">
+                  <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1">
+                    ${pendingOrder.productImage ? `<img src="${safeImgUrl(pendingOrder.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-bold text-slate-800 line-clamp-2 text-sm leading-snug">${pendingOrder.productName}</p>
+                    <p class="text-xs text-slate-400 mt-1 font-semibold">${new Date(pendingOrder.createdAt).toLocaleString()}</p>
+                  </div>
+                </div>
+                <div class="bg-white p-3.5 rounded-xl border border-slate-100 mb-4 font-mono">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-slate-400">${t('productPrice')}</span>
+                    <span class="font-black text-slate-800 text-sm">฿${(pendingOrder.productPrice||0).toLocaleString()}</span>
+                  </div>
+                  <div class="flex justify-between items-center border-t border-slate-100 pt-2 mt-2">
+                    <span class="text-xs font-bold text-emerald-600">${t('commission')}</span>
+                    <span class="font-black text-emerald-600 text-sm">+฿${(pendingOrder.commission||0).toLocaleString()}</span>
+                  </div>
+                </div>
+                <button id="btn-pay-pending" onclick="if(!isOrderProcessing){ isOrderProcessing=true; this.disabled=true; this.innerHTML='${t('processing')}'; processOrderFlowStep2('${pendingOrder.__backendId}', ${pendingOrder.isSpecial});}" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow transition text-base font-mono">${t('textSettlePending')}</button>
+              </div>`; 
+            }
+            if (allCompleted.length === 0 && !pendingOrder) {
+              html += `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTasksRecorded')}</div>`;
+            } else { 
+              html += allCompleted.map(o => { 
+                const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
+                return `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100 font-mono">
+                  <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
+                    ${o.productImage ? `<img src="${safeImgUrl(o.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
+                  </div>
+                  <div class="flex-1 min-w-0 pr-12 text-left">
+                    <p class="font-bold text-slate-800 truncate text-xs">${o.productName}</p>
+                    <p class="text-xs text-slate-400 mt-0.5 font-semibold">${new Date(o.createdAt).toLocaleString()}</p>
+                    <div class="mt-1"><span class="inline-block text-xs font-bold px-2 py-0.5 rounded-full ${statusConfig.bg}">${statusConfig.text}</span></div>
+                  </div>
+                  <div class="text-right flex-shrink-0">
+                    <p class="font-bold text-slate-800 text-sm">฿${(o.productPrice||0).toLocaleString()}</p>
+                    <p class="text-xs text-emerald-500 font-bold">+฿${(o.commission||0).toLocaleString()}</p>
+                  </div>
+                </div>`; 
+              }).join(''); 
+            }
+            listHtml = html;
+          } else {
+            const wds = getUserWithdrawals().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            listHtml = wds.length === 0 ? `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTransactions')}</div>` : wds.map(w => { 
+              let sc = { color: 'text-slate-500', text: 'Unknown' }; 
+              if (w.status === 'deposit') sc = { color: 'text-emerald-600 bg-emerald-50 border border-emerald-100', text: t('deposit') }; 
+              else if (w.status === 'pending') sc = { color: 'text-amber-600 bg-amber-50 border border-amber-100', text: t('pending') }; 
+              else if (w.status === 'approved') sc = { color: 'text-blue-600 bg-blue-50 border border-blue-100', text: t('approved') }; 
+              else if (w.status === 'rejected') sc = { color: 'text-rose-500 bg-rose-50 border border-rose-100', text: t('rejected') }; 
+              
+              const isDeposit = w.status === 'deposit';
+              const amtContainerClass = isDeposit ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-800';
+
+              return `
+              <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between mb-3.5 hover:shadow-md transition duration-200 font-mono">
+                <div class="space-y-2 text-left">
+                  <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold ${sc.color} inline-block">${sc.text}</span>
+                  <p class="text-[11px] text-slate-400 font-bold block">${new Date(w.createdAt).toLocaleString()}</p>
+                </div>
+                <div class="text-right">
+                  <div class="inline-flex flex-col items-end px-4 py-2 rounded-2xl border ${amtContainerClass} min-w-[120px]">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">${t('amount')}</span>
+                    <span class="font-black text-base">฿${(w.amount||0).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>`; 
+            }).join('');
+          }
+
+          if (listContainer.innerHTML !== listHtml) {
+            listContainer.innerHTML = listHtml;
+            safeCreateIcons();
+          }
+        }
+      }
+
+      // อัปเดตเฉพาะรายละเอียดบัญชีธนาคารในแท็บโปรไฟล์
+      if (currentTab === 'profile') {
+        const bankDetailsContainer = $('prof-bank-details');
+        if (bankDetailsContainer) {
+          const expectedHtml = `
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm font-semibold"><i data-lucide="credit-card" class="text-primary stroke-[2.2]"></i> ${t('bankAccount')}</h3>
+              <button onclick="showEditBank()" class="text-xs text-primary font-bold bg-blue-50 px-3.5 py-1.5 rounded-xl hover:bg-blue-100 transition font-mono">${t('editBank')}</button>
+            </div>
+            ${u.bankName ? `
+              <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/50 text-left font-mono">
+                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('bank')}</p>
+                <p class="font-bold text-slate-800 mb-3 text-sm">${u.bankName}</p>
+                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('accNumber')}</p>
+                <p class="font-mono text-base text-slate-700 tracking-wider font-bold">${u.bankNumber}</p>
+              </div>` : `
+              <div class="bg-rose-50/40 p-4 rounded-2xl border border-rose-100 text-center font-mono">
+                <p class="text-rose-500 font-bold text-xs">${t('noBankDetails')}</p>
+              </div>`}
+          `;
+          if (bankDetailsContainer.innerHTML !== expectedHtml) {
+            bankDetailsContainer.innerHTML = expectedHtml;
+            safeCreateIcons();
+          }
+        }
+      }
     }
 
     function openMenuIconPopup(bid) { 
@@ -1700,28 +1822,22 @@
       }
     }
 
-    function renderHome(c) {
+    // ฟังก์ชันสร้างโครงสร้างแท็บหน้าหลัก (Home Structure)
+    function renderHomeStructure(c) {
       const u = currentUser;
-      if (!u) {
-        c.innerHTML = '';
-        return;
-      }
-      const creditVal = u.credit || 0;
-      const usernameVal = u.username || 'User';
+      const usernameVal = u ? u.username : 'User';
       const cfg = getConfig();
       const scheduleText = cfg.scheduleText || 'เปิดทำการ 10:00-22:00 น.';
-      
       const banners = getBanners(); 
       const gallery = getGallery(); 
       const menus = getMenuIcons();
 
-      // แถบ 4 ไอคอนคู่มือสมาชิกสไตล์สีขาวนวล
       let menuIconsHtml = ''; 
       if (menus.length > 0) {
         menuIconsHtml = `
-        <div class="bg-white rounded-[32px] p-5 border border-slate-100/80 shadow-sm grid grid-cols-4 gap-3 mt-6">
+        <div class="bg-white rounded-[32px] p-5 border border-slate-100/80 shadow-sm grid grid-cols-4 gap-3 mt-6 font-mono">
           ${menus.map(m => `
-            <div onclick="openMenuIconPopup('${m.__backendId}')" class="flex flex-col items-center gap-2.5 cursor-pointer active:scale-95 transition-transform font-mono">
+            <div onclick="openMenuIconPopup('${m.__backendId}')" class="flex flex-col items-center gap-2.5 cursor-pointer active:scale-95 transition-transform">
               <div class="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100/60 shadow-inner overflow-hidden p-1.5">
                 ${m.menuIconUrl ? `<img src="${safeImgUrl(m.menuIconUrl)}" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;">` : `<i data-lucide="info" class="text-primary w-6 h-6"></i>`}
               </div>
@@ -1758,14 +1874,13 @@
         : (publicData.products && publicData.products.length >= 8 ? publicData.products.slice(0, 8) : defaultProducts);
 
       let featuredProductsHtml = `
-      <div id="showcase-section" class="mt-6 bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
+      <div id="showcase-section" class="mt-6 bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm overflow-hidden font-mono">
         <div class="grid grid-cols-4 md:grid-cols-8 gap-1.5 md:gap-3">
           ${activeShowcase.map((p, index) => {
             const fallbackImg = fallbackImages[index % 8];
             const pName = p.productName || p.name;
             const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
             const pImg = safeImgUrl(p.productImage || p.image);
-
             const animationTypeClass = index < 4 ? 'showcase-card-left' : 'showcase-card-right';
 
             return `
@@ -1787,7 +1902,7 @@
       const [firstPhone, firstAmt] = defaultReward.split(':');
 
       let commissionSummaryHtml = `
-      <div class="bg-white rounded-2xl p-4 mt-4 shadow-sm border border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-700 relative overflow-hidden">
+      <div class="bg-white rounded-2xl p-4 mt-4 shadow-sm border border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-700 relative overflow-hidden font-mono">
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-500 font-bold">ค่าตอบแทน</span>
         </div>
@@ -1800,7 +1915,7 @@
       let galleryHtml = ''; 
       if (gallery.length > 0) {
         galleryHtml = `
-        <div class="mt-6">
+        <div class="mt-6 font-mono">
           <div class="grid grid-cols-2 gap-4">
             ${gallery.map(g => `
               <div class="gallery-item w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-slate-100 bg-white p-1.5 flex items-center justify-center">
@@ -1815,12 +1930,11 @@
         <div id="home-container" class="p-4 w-full fade-in">
           ${getBannerHtml()}
           
-          <!-- แถบยินดีต้อนรับและยอดเงิน ยึดตามสไตล์สีไล่ระดับ -->
           <div class="bg-theme-gradient rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden">
             <div class="absolute top-0 right-0 p-4 opacity-15"><i data-lucide="wallet" class="w-24 h-24"></i></div>
             <h2 class="text-sm font-medium text-white/70">${t('welcome')}, <span class="font-bold text-white text-base">${usernameVal}</span></h2>
             <p class="mt-4 text-white/80 text-xs font-semibold uppercase tracking-wider">${t('availBalance')}</p>
-            <p id="home-credit-display" class="text-3xl font-black mt-1 tracking-tight">฿${safeFormatNumber(creditVal)}</p>
+            <p id="home-credit-display" class="text-3xl font-black mt-1 tracking-tight">฿0</p>
           </div>
           
           <div class="grid grid-cols-2 gap-4 mt-6">
@@ -1834,13 +1948,8 @@
             </button>
           </div>
 
-          <!-- โชว์สินค้า 8 ชิ้นขยับมาด้านบนสุดเหนือกล่องค่าตอบแทนและปุ่มสี่คู่มือ -->
           ${featuredProductsHtml}
-
-          <!-- กล่องค่าตอบแทน -->
           ${commissionSummaryHtml}
-
-          <!-- ปุ่มสี่อัน (คู่มือช่วยเหลือ) แสดงผลด้านล่างของแถบค่าตอบแทน -->
           ${menuIconsHtml}
 
           <div class="text-center mt-6 py-2">
@@ -1852,25 +1961,12 @@
         </div>`;
       
       startBannerSlide();
-      setTimeout(initGalleryObserver, 150);
     }
 
-    function renderProducts(c) {
-      const u = currentUser; 
-      if (!u) {
-        c.innerHTML = '';
-        return;
-      }
-      const userLevel = u.userLevel || '1';
-      const creditVal = u.credit || 0;
-      const done = u.runIndex || 0;
-      
-      const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
-      const total = availableProducts.length; 
-      const pct = total === 0 ? 0 : Math.min(100, Math.round((done/total)*100));
-      const todayStr = new Date().toDateString();
-      const todayComm = getUserOrders().filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed').reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
-      
+    // ฟังก์ชันสร้างโครงสร้างแท็บสินค้า/ร้านค้า (Products Structure)
+    function renderProductsStructure(c) {
+      const u = currentUser;
+      const userLevel = u ? u.userLevel : '1';
       let levelText = 'VIP ' + userLevel; 
       if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
       if(userLevel === 'allowwd') levelText = currentLang === 'th' ? 'ปลดล็อกแล้ว' : 'Unblocked';
@@ -1890,10 +1986,10 @@
             <div class="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 text-center">
               <div class="flex justify-between text-sm font-bold text-slate-600 mb-2">
                 <span>${t('completedToday')}</span>
-                <span class="text-primary" id="prod-done">${done} / ${total}</span>
+                <span class="text-primary" id="prod-done">0 / 0</span>
               </div>
               <div class="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden p-0.5">
-                <div id="prod-pct" class="bg-primary h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                <div id="prod-pct" class="bg-primary h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
               <button id="btn-start-run" onclick="startRun(this)" class="w-full py-4 bg-primary hover:opacity-90 text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition duration-200 text-base flex justify-center items-center gap-2">
                 <i data-lucide="play-circle"></i> ${t('startMatch')}
@@ -1903,17 +1999,90 @@
             <div class="grid grid-cols-2 gap-4 mt-5">
               <div class="scroll-reveal-left bg-white p-4 rounded-[24px] shadow-sm border border-slate-100 text-center flex flex-col justify-center">
                 <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('currentCredit')}</p>
-                <p id="prod-credit-display" class="text-lg font-black text-primary truncate">฿${safeFormatNumber(creditVal)}</p>
+                <p id="prod-credit-display" class="text-lg font-black text-primary truncate">฿0</p>
               </div>
               <div class="scroll-reveal-right bg-white p-4 rounded-[24px] shadow-sm border border-slate-100 text-center flex flex-col justify-center">
                 <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('todayProfit')}</p>
-                <p id="prod-comm-display" class="text-lg font-black text-emerald-500 truncate">+฿${safeFormatNumber(todayComm)}</p>
+                <p id="prod-comm-display" class="text-lg font-black text-emerald-500 truncate">+฿0</p>
               </div>
             </div>
           </div>
         </div>`;
       
       startBannerSlide();
+    }
+
+    // ฟังก์ชันสร้างโครงสร้างแท็บประวัติธุรกรรม/ออเดอร์ (History Structure)
+    function renderHistoryStructure(c) {
+      c.innerHTML = `
+        <div id="history-container" class="p-4 fade-in">
+          <input type="hidden" id="hist-tab-state" value="${historyTab}">
+          <div class="bg-theme-gradient text-white rounded-[32px] p-5 mb-5 shadow-lg relative overflow-hidden font-mono">
+            <div class="absolute right-0 top-0 opacity-10"><i data-lucide="wallet" class="w-32 h-32 -mt-4 -mr-4"></i></div>
+            <div class="relative z-10">
+              <p class="text-white/70 text-xs font-semibold mb-1 uppercase tracking-wide">${t('availBalance')}</p>
+              <p id="hist-credit-display" class="text-2xl font-black tracking-tight">฿0</p>
+            </div>
+          </div>
+          <h2 class="text-base font-bold text-slate-800 mb-4 px-1.5 flex items-center gap-2 font-mono"><i data-lucide="activity" class="text-primary"></i> ${t('activityLog')}</h2>
+          
+          <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-5 border border-slate-200/20 backdrop-blur-md font-mono">
+            <button onclick="switchHistoryTab('orders')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'orders' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('orders')}</button>
+            <button onclick="switchHistoryTab('transactions')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'transactions' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('transactions')}</button>
+          </div>
+          <div id="hist-list-container">
+            <div class="text-center py-8"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto text-slate-400"></i></div>
+          </div>
+        </div>`;
+    }
+
+    // ฟังก์ชันสร้างโครงสร้างแท็บข้อมูลผู้ใช้งาน (Profile Structure)
+    function renderProfileStructure(c) {
+      const u = currentUser;
+      const usernameVal = u ? u.username : 'User';
+      const userLevel = u ? u.userLevel : '1';
+      const logoUrl = getLogoUrl();
+      
+      let levelText = 'VIP ' + userLevel; 
+      if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
+      if(userLevel === 'allowwd') levelText = currentLang === 'th' ? 'ปลดล็อกแล้ว' : 'Unblocked';
+
+      const levelBadgeHtml = (userLevel === 'allowwd')
+        ? ''
+        : `<span class="inline-block mt-3 px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-200 shadow-sm font-mono font-semibold">⭐ ${levelText}</span>`;
+
+      c.innerHTML = `
+        <div id="profile-container" class="p-4 space-y-5 fade-in relative font-mono">
+          <div class="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 text-center relative overflow-hidden">
+            <div class="absolute top-4 right-4 z-10">
+              <button onclick="showLanguageSelector()" class="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                <i data-lucide="languages" class="w-4 h-4 text-primary"></i>
+                <span>${currentLang === 'th' ? 'เปลี่ยนภาษา' : 'Change Language'}</span>
+              </button>
+            </div>
+
+            <div class="w-32 h-32 rounded-full mx-auto overflow-hidden mt-6 flex items-center justify-center bg-slate-50 border border-slate-100 shadow-lg">
+              ${logoUrl ? `<img src="${safeImgUrl(logoUrl)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()" onerror="this.onerror=null;">` : `<div class="w-32 h-32 bg-blue-50 text-primary rounded-full flex items-center justify-center cursor-pointer" onclick="handleLogoClick()"><i data-lucide="user" class="w-16 h-16 text-primary"></i></div>`}
+            </div>
+            <h3 class="font-black text-xl text-slate-800 mt-3 font-semibold">${usernameVal}</h3>
+            <p class="text-slate-400 text-sm mt-1 font-semibold">📞 ${u ? u.phone : ''}</p>
+            ${levelBadgeHtml}
+            <div class="mt-5 pt-4 border-t border-slate-100 text-center">
+              <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('availBalance')}</p>
+              <p id="prof-credit-display" class="text-2xl font-black text-primary">฿0</p>
+            </div>
+          </div>
+          
+          <div class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100" id="prof-bank-details">
+            <div class="text-center py-4"><i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto text-slate-400"></i></div>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <button onclick="showTopupModal()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-md flex justify-center items-center gap-2 text-base hover:bg-emerald-600 transition font-mono">${t('deposit')}</button>
+            <button onclick="showWithdrawModal()" class="w-full py-4 bg-theme-gradient text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-2 text-base hover:opacity-95 transition font-mono">${t('withdrawal')}</button>
+            <button onclick="showSupportModal()" class="w-full py-4 bg-white text-slate-700 rounded-2xl font-bold shadow-sm border border-slate-100 flex justify-center items-center gap-2 text-base hover:bg-slate-50 transition font-mono">${t('contactSupport')}</button>
+          </div>
+        </div>`;
     }
 
     function startRun(btnElement) {
@@ -2130,201 +2299,23 @@
       }
     }
 
-    function switchHistoryTab(tab) { historyTab = tab; if($('history-container')) $('history-container').remove(); renderHistory($('dash-content')); }
-
-    function renderHistory(c) {
-      const u = currentUser; 
-      if (!u) {
-        c.innerHTML = '';
-        return;
-      }
-      let listHtml = '';
-      const done = u.runIndex || 0;
-      const userLevel = u.userLevel || '1';
-      const creditVal = u.credit || 0;
+    function switchHistoryTab(tab) { 
+      historyTab = tab; 
+      // สลับข้อมูลในโดมจริงโดยตรง (ไม่ดึงโครงสร้างใหม่) ป้องกันจอแวบ
+      const stateEl = $('hist-tab-state');
+      if (stateEl) stateEl.value = tab;
       
-      if (historyTab === 'orders') {
-        const orders = getUserOrders().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        const totalVipProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel)).length;
-        const isAllDone = done >= totalVipProducts && totalVipProducts > 0;
-        const pendingOrder = orders.find(o => o.status === 'pending');
-        let seenOrderIds = new Set();
-        const completedOrders = orders.filter(o => { if (o.status !== 'pending' && o.status !== undefined && !seenOrderIds.has(o.id)) { seenOrderIds.add(o.id); return true; } return false; }); 
-        const allCompleted = [...completedOrders, ...orders.filter(o => o.status === undefined && !seenOrderIds.has(o.id))];
-        let html = '';
-        
-        if (pendingOrder) { 
-          html += `
-          <div class="bg-amber-50/50 p-5 rounded-[28px] shadow-sm border border-amber-200/60 mb-5 relative overflow-hidden font-mono text-left">
-            <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl">${t('pendingPayment')}</div>
-            <div class="flex items-center gap-4 mb-4 mt-2">
-              <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1">
-                ${pendingOrder.productImage ? `<img src="${safeImgUrl(pendingOrder.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-bold text-slate-800 line-clamp-2 text-sm leading-snug">${pendingOrder.productName}</p>
-                <p class="text-xs text-slate-400 mt-1 font-semibold">${new Date(pendingOrder.createdAt).toLocaleString()}</p>
-              </div>
-            </div>
-            <div class="bg-white p-3.5 rounded-xl border border-slate-100 mb-4 font-mono">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-bold text-slate-400">${t('productPrice')}</span>
-                <span class="font-black text-slate-800 text-sm">฿${(pendingOrder.productPrice||0).toLocaleString()}</span>
-              </div>
-              <div class="flex justify-between items-center border-t border-slate-100 pt-2 mt-2">
-                <span class="text-xs font-bold text-emerald-600">${t('commission')}</span>
-                <span class="font-black text-emerald-600 text-sm">+฿${(pendingOrder.commission||0).toLocaleString()}</span>
-              </div>
-            </div>
-            <button id="btn-pay-pending" onclick="if(!isOrderProcessing){ isOrderProcessing=true; this.disabled=true; this.innerHTML='${t('processing')}'; processOrderFlowStep2('${pendingOrder.__backendId}', ${pendingOrder.isSpecial});}" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow transition text-base font-mono">${t('textSettlePending')}</button>
-          </div>`; 
+      const buttons = document.querySelectorAll('#history-container button');
+      buttons.forEach(btn => {
+        if (btn.innerText === t('orders') && tab === 'orders') {
+          btn.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-white text-primary shadow-md scale-[1.02]";
+        } else if (btn.innerText === t('transactions') && tab === 'transactions') {
+          btn.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-white text-primary shadow-md scale-[1.02]";
+        } else if (btn.innerText === t('orders') || btn.innerText === t('transactions')) {
+          btn.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 text-slate-500 hover:text-slate-700";
         }
-        if (allCompleted.length === 0 && !pendingOrder) {
-          html += `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTasksRecorded')}</div>`;
-        } else { 
-          html += allCompleted.map(o => { 
-            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
-            return `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100 font-mono">
-              <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
-                ${o.productImage ? `<img src="${safeImgUrl(o.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
-              </div>
-              <div class="flex-1 min-w-0 pr-12 text-left">
-                <p class="font-bold text-slate-800 truncate text-xs">${o.productName}</p>
-                <p class="text-xs text-slate-400 mt-0.5 font-semibold">${new Date(o.createdAt).toLocaleString()}</p>
-                <div class="mt-1"><span class="inline-block text-xs font-bold px-2 py-0.5 rounded-full ${statusConfig.bg}">${statusConfig.text}</span></div>
-              </div>
-              <div class="text-right flex-shrink-0">
-                <p class="font-bold text-slate-800 text-sm">฿${(o.productPrice||0).toLocaleString()}</p>
-                <p class="text-xs text-emerald-500 font-bold">+฿${(o.commission||0).toLocaleString()}</p>
-              </div>
-            </div>`; 
-          }).join(''); 
-        }
-        listHtml = html;
-      } else {
-        const wds = getUserWithdrawals().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        listHtml = wds.length === 0 ? `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTransactions')}</div>` : wds.map(w => { 
-          let sc = { color: 'text-slate-500', text: 'Unknown' }; 
-          if (w.status === 'deposit') sc = { color: 'text-emerald-600 bg-emerald-50 border border-emerald-100', text: t('deposit') }; 
-          else if (w.status === 'pending') sc = { color: 'text-amber-600 bg-amber-50 border border-amber-100', text: t('pending') }; 
-          else if (w.status === 'approved') sc = { color: 'text-blue-600 bg-blue-50 border border-blue-100', text: t('approved') }; 
-          else if (w.status === 'rejected') sc = { color: 'text-rose-500 bg-rose-50 border border-rose-100', text: t('rejected') }; 
-          
-          const isDeposit = w.status === 'deposit';
-          const amtContainerClass = isDeposit ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-800';
-
-          return `
-          <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between mb-3.5 hover:shadow-md transition duration-200 font-mono">
-            <div class="space-y-2 text-left">
-              <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold ${sc.color} inline-block">${sc.text}</span>
-              <p class="text-[11px] text-slate-400 font-bold block">${new Date(w.createdAt).toLocaleString()}</p>
-            </div>
-            <div class="text-right">
-              <div class="inline-flex flex-col items-end px-4 py-2 rounded-2xl border ${amtContainerClass} min-w-[120px]">
-                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">${t('amount')}</span>
-                <span class="font-black text-base">฿${(w.amount||0).toLocaleString()}</span>
-              </div>
-            </div>
-          </div>`; 
-        }).join('');
-      }
-      
-      if ($('history-container') && $('hist-tab-state').value === historyTab) { 
-        if ($('hist-credit-display')) $('hist-credit-display').innerText = '฿' + safeFormatNumber(creditVal); 
-        if ($('hist-list-container')) $('hist-list-container').innerHTML = listHtml; 
-        safeCreateIcons(); 
-        return; 
-      }
-      
-      c.innerHTML = `
-        <div id="history-container" class="p-4 fade-in">
-          <input type="hidden" id="hist-tab-state" value="${historyTab}">
-          <div class="bg-theme-gradient text-white rounded-[32px] p-5 mb-5 shadow-lg relative overflow-hidden font-mono">
-            <div class="absolute right-0 top-0 opacity-10"><i data-lucide="wallet" class="w-32 h-32 -mt-4 -mr-4"></i></div>
-            <div class="relative z-10">
-              <p class="text-white/70 text-xs font-semibold mb-1 uppercase tracking-wide">${t('availBalance')}</p>
-              <p id="hist-credit-display" class="text-2xl font-black tracking-tight">฿${safeFormatNumber(creditVal)}</p>
-            </div>
-          </div>
-          <h2 class="text-base font-bold text-slate-800 mb-4 px-1.5 flex items-center gap-2"><i data-lucide="activity" class="text-primary"></i> ${t('activityLog')}</h2>
-          
-          <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-5 border border-slate-200/20 backdrop-blur-md">
-            <button onclick="switchHistoryTab('orders')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'orders' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('orders')}</button>
-            <button onclick="switchHistoryTab('transactions')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'transactions' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('transactions')}</button>
-          </div>
-          <div id="hist-list-container">${listHtml}</div>
-        </div>`;
-      
-      safeCreateIcons();
-    }
-
-    function renderProfile(c) {
-      const u = currentUser;
-      if (!u) {
-        c.innerHTML = '';
-        return;
-      }
-      const creditVal = u.credit || 0;
-      const usernameVal = u.username || 'User';
-      const userLevel = u.userLevel || '1';
-      
-      if ($('profile-container')) { if ($('prof-credit-display')) $('prof-credit-display').innerText = '฿' + safeFormatNumber(creditVal); return; }
-      const logoUrl = getLogoUrl(); 
-      let levelText = 'VIP ' + userLevel; 
-      if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
-      if(userLevel === 'allowwd') levelText = currentLang === 'th' ? 'ปลดล็อกแล้ว' : 'Unblocked';
-
-      const levelBadgeHtml = (userLevel === 'allowwd')
-        ? ''
-        : `<span class="inline-block mt-3 px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-200 shadow-sm font-mono font-semibold">⭐ ${levelText}</span>`;
-
-      c.innerHTML = `
-        <div id="profile-container" class="p-4 space-y-5 fade-in relative font-mono">
-          <div class="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 text-center relative overflow-hidden">
-            
-            <div class="absolute top-4 right-4 z-10">
-              <button onclick="showLanguageSelector()" class="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                <i data-lucide="languages" class="w-4 h-4 text-primary"></i>
-                <span>${currentLang === 'th' ? 'เปลี่ยนภาษา' : 'Change Language'}</span>
-              </button>
-            </div>
-
-            <div class="w-32 h-32 rounded-full mx-auto overflow-hidden mt-6 flex items-center justify-center bg-slate-50 border border-slate-100 shadow-lg">
-              ${logoUrl ? `<img src="${safeImgUrl(logoUrl)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()" onerror="this.onerror=null;">` : `<div class="w-32 h-32 bg-blue-50 text-primary rounded-full flex items-center justify-center cursor-pointer" onclick="handleLogoClick()"><i data-lucide="user" class="w-16 h-16 text-primary"></i></div>`}
-            </div>
-            <h3 class="font-black text-xl text-slate-800 mt-3 font-semibold">${usernameVal}</h3>
-            <p class="text-slate-400 text-sm mt-1 font-semibold">📞 ${u.phone}</p>
-            ${levelBadgeHtml}
-            <div class="mt-5 pt-4 border-t border-slate-100 text-center">
-              <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('availBalance')}</p>
-              <p id="prof-credit-display" class="text-2xl font-black text-primary">฿${safeFormatNumber(creditVal)}</p>
-            </div>
-          </div>
-          <div class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm font-semibold"><i data-lucide="credit-card" class="text-primary stroke-[2.2]"></i> ${t('bankAccount')}</h3>
-              <button onclick="showEditBank()" class="text-xs text-primary font-bold bg-blue-50 px-3.5 py-1.5 rounded-xl hover:bg-blue-100 transition font-mono">${t('editBank')}</button>
-            </div>
-            ${u.bankName ? `
-              <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/50 text-left font-mono">
-                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('bank')}</p>
-                <p class="font-bold text-slate-800 mb-3 text-sm">${u.bankName}</p>
-                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('accNumber')}</p>
-                <p class="font-mono text-base text-slate-700 tracking-wider font-bold">${u.bankNumber}</p>
-              </div>` : `
-              <div class="bg-rose-50/40 p-4 rounded-2xl border border-rose-100 text-center font-mono">
-                <p class="text-rose-500 font-bold text-xs">${t('noBankDetails')}</p>
-              </div>`}
-          </div>
-          <div class="space-y-3 pt-2">
-            <button onclick="showTopupModal()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-md flex justify-center items-center gap-2 text-base hover:bg-emerald-600 transition font-mono">${t('deposit')}</button>
-            <button onclick="showWithdrawModal()" class="w-full py-4 bg-theme-gradient text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-2 text-base hover:opacity-95 transition font-mono">${t('withdrawal')}</button>
-            <button onclick="showSupportModal()" class="w-full py-4 bg-white text-slate-700 rounded-2xl font-bold shadow-sm border border-slate-100 flex justify-center items-center gap-2 text-base hover:bg-slate-50 transition font-mono">${t('contactSupport')}</button>
-          </div>
-        </div>`;
-      
-      safeCreateIcons();
+      });
+      refreshUI();
     }
 
     function showEditBank() {
@@ -2355,7 +2346,9 @@
       
       let userDocRef = doc(db, "users", currentUser.id);
       await setDoc(userDocRef, currentUser);
-      showToast(t('settingsSaved')); closeModal(); if($('profile-container')) $('profile-container').remove(); renderProfile($('dash-content')); 
+      showToast(t('settingsSaved')); 
+      closeModal(); 
+      refreshUI();
     }
 
     function showWithdrawModal() {
