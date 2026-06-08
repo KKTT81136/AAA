@@ -154,7 +154,8 @@
       overflow: hidden; 
       white-space: nowrap; 
       width: 100%; 
-      display: block; 
+      display: flex;
+      align-items: center; 
       position: relative; 
     }
     @keyframes marqueeScroll {
@@ -178,12 +179,7 @@
       background-repeat: no-repeat;
     }
 
-    /* ปลดล็อกเอฟเฟกต์การแสดงผลฝั่งผู้ใช้ */
-    .slide-left-item, .slide-right-item {
-      opacity: 1 !important;
-      transform: none !important;
-    }
-
+    /* สไตล์คุมระบบแอนิเมชันแกลเลอรีด้านล่าง */
     .gallery-item {
       opacity: 0.3;
       filter: brightness(0.6) grayscale(20%);
@@ -224,6 +220,53 @@
     .logo-slide-right {
       animation: slideFromRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
+    /* สไตล์ปรับความลื่นไหลของระบบแอนิเมชันกล่องแนะนำสินค้า 8 รายการ */
+    .showcase-card {
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    @keyframes slideFromLeft {
+      0% {
+        transform: translate3d(-60px, 0, 0);
+        opacity: 0;
+      }
+      100% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideFromRightNew {
+      0% {
+        transform: translate3d(60px, 0, 0);
+        opacity: 0;
+      }
+      100% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+      }
+    }
+
+    /* เปิดใช้งานทันทีเมื่อตรวจสอบพบว่ามีการมองเห็นผ่านระบบแอดมินหรือยูสเซอร์ */
+    .revealed-slide .showcase-card-left {
+      animation: slideFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .revealed-slide .showcase-card-right {
+      animation: slideFromRightNew 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* ทำดีเลย์หน่วงทีละขั้นสำหรับการเลื่อนเข้าอย่างเป็นมิติ (Staggered Animation) */
+    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.1s; }
+    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.25s; }
+    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.4s; }
+    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.55s; }
+
+    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.1s; }
+    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.25s; }
+    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.4s; }
+    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.55s; }
   </style>
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
@@ -592,6 +635,7 @@
           --color-marquee-bg: ${cfg.themeMarqueeBg || '#eb2f96'};
           --color-menu-bg: ${cfg.themeMenuBg || '#eb2f96'};
         }
+        body { background-color: #f8fafc; }
         .text-primary { color: ${p} !important; }
         .bg-primary { background-color: ${p} !important; }
         .border-primary { border-color: ${p} !important; }
@@ -606,7 +650,9 @@
 
     function updateBrowserTab() {
       const title = getTabTitle();
-      document.title = title ? title : "TOS Shopping";
+      if (document.title !== title) {
+        document.title = title ? title : "TOS Shopping";
+      }
       
       const favUrl = getTabFavicon();
       let link = document.querySelector("link[rel~='icon']");
@@ -616,8 +662,12 @@
         document.head.appendChild(link);
       }
       link.type = 'image/x-icon';
-      // ซิงค์การป้อนค่าแอดมิน เพื่อป้องกันบราวเซอร์ส่ง Query ซ้ำจนหมุนค้าง
-      link.href = (favUrl && favUrl.trim() !== '') ? favUrl : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>';
+      
+      // ดึงข้อมูลไอคอนมาซิงค์ พร้อมเช็คค่าซ้ำเพื่อไม่ให้เบราว์เซอร์สแตนด์บายโหลดซ้ำๆ จนหมุนไม่หยุด
+      const targetHref = (favUrl && favUrl.trim() !== '') ? favUrl : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>';
+      if (link.getAttribute('href') !== targetHref) {
+        link.href = targetHref;
+      }
     }
 
     const $ = id => document.getElementById(id);
@@ -770,7 +820,7 @@
         }
       }
 
-      // ปรับลอจิกเขียนค่าทับเพื่อแก้ปัญหากด Refresh แล้วข้อความวิ่งหยุดนิ่ง
+      // ปรับจูนตรวจสอบความสมบูรณ์ในการอัปเดตข้อความวิ่ง (Marquee)
       const marqueeEl = document.getElementById('marquee-text-display');
       if (marqueeEl) {
         const activeText = getMarqueeText();
@@ -1500,6 +1550,7 @@
       }, { threshold: 0.1 });
       document.querySelectorAll('.gallery-item').forEach(el => galleryObserver.observe(el));
 
+      // กำหนด Observer สำหรับตรวจกล่องสินค้าแนะนำ 8 ชิ้น ปรับระดับ Threshold ให้สแกนติดง่ายบนสมาร์ตโฟน
       showcaseObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1508,7 +1559,7 @@
             entry.target.classList.remove('revealed-slide');
           }
         });
-      }, { threshold: 0.15 });
+      }, { threshold: 0.05 });
       const targetSec = document.getElementById('showcase-section');
       if (targetSec) showcaseObserver.observe(targetSec);
 
@@ -1622,6 +1673,7 @@
         ? publicData.showcaseProducts
         : (publicData.products && publicData.products.length >= 8 ? publicData.products.slice(0, 8) : defaultProducts);
 
+      // ทำระบบเขียนคลาสอนิเมชั่นสไลด์ฝั่งซ้าย (4 ตัวแรก) และขวา (4 ตัวหลัง) พร้อมกำหนดดีเลย์ที่สมบูรณ์
       let featuredProductsHtml = `
       <div id="showcase-section" class="mt-6 bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
         <div class="grid grid-cols-4 md:grid-cols-8 gap-1.5 md:gap-3">
@@ -1631,8 +1683,10 @@
             const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
             const pImg = p.productImage || p.image;
 
+            const animationTypeClass = index < 4 ? 'showcase-card-left' : 'showcase-card-right';
+
             return `
-            <div class="bg-slate-50 border border-slate-100 rounded-xl p-2 flex flex-col justify-between text-left relative overflow-hidden shadow-inner">
+            <div class="showcase-card ${animationTypeClass} bg-slate-50 border border-slate-100 rounded-xl p-2 flex flex-col justify-between text-left relative overflow-hidden shadow-inner">
               <div class="w-full aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center p-1 mb-2">
                 <img src="${pImg}" class="w-full h-full object-contain" onerror="this.src='${fallbackImg}'">
               </div>
@@ -1826,7 +1880,7 @@
         if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); }
         showModal(`
           <div class="text-center">
-            <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center shadow-inner p-4 relative">
+            <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
               ${isSpecial ? `<div class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">${t('specialOrder')}</div>` : ''}
               ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
             </div>
