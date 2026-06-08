@@ -33,7 +33,6 @@
     }
   </script>
 
-  <!-- สคริปต์ดึงคอนฟิกแคชก่อนเรนเดอร์ เพื่อจัดเตรียมธีมและป้องกันปัญหาการกระพริบของหน้าจอ -->
   <script>
     (function() {
       var cached = localStorage.getItem('tos_cached_config');
@@ -358,7 +357,7 @@
       const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
       if (totalPages <= 1) return '';
 
-      let html = `<div class="flex items-center justify-center gap-2 mt-6">`;
+      let html = `<div class="flex items-center justify-center gap-2 mt-6 font-mono text-xs">`;
       for (let i = 1; i <= totalPages; i++) {
         const activeClass = i === currentPage ? 'bg-sky-500 text-slate-950 font-medium text-xs' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 text-xs';
         html += `<button onclick="${callbackName}(${i})" class="px-2.5 py-1.5 rounded transition ${activeClass}">${i}</button>`;
@@ -394,7 +393,6 @@
           localStorage.setItem('tos_cached_config', JSON.stringify(cfgData));
           applyTheme(cfgData.themePrimary, cfgData.themeSecondary, cfgData.themeType);
           
-          // ป้องกันอาการส่งคำร้องขอไอคอนเบราว์เซอร์ซ้ำซ้อนจนโหลดค้าง
           const targetTitle = (cfgData.tabTitle || '') + " - แอดมิน";
           if (document.title !== targetTitle) {
             document.title = targetTitle;
@@ -842,9 +840,12 @@
         </div>
 
         <div class="space-y-4 max-h-[65vh] overflow-y-auto pr-1 scrollbar-none text-left font-mono text-xs">
-          <div class="bg-slate-950 p-2.5 rounded border border-slate-800">
-            <span class="text-[9px] text-slate-500 font-medium block uppercase">เครดิตปัจจุบัน</span>
-            <p class="text-xs font-medium text-sky-400">฿${credit.toLocaleString()}</p>
+          <div class="bg-slate-950 p-2.5 rounded border border-slate-800 flex justify-between items-center">
+            <div>
+              <span class="text-[9px] text-slate-500 font-medium block uppercase">เครดิตปัจจุบัน</span>
+              <p class="text-xs font-medium text-sky-400">฿${credit.toLocaleString()}</p>
+            </div>
+            <button onclick="resetUserTasks('${bid}')" class="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-slate-950 font-medium rounded text-[10px] transition uppercase">รีเซ็ตภารกิจเป็น 0</button>
           </div>
 
           <div class="space-y-3">
@@ -895,6 +896,35 @@
         </div>
       `);
       lucide.createIcons();
+    }
+
+    async function resetUserTasks(bid) {
+      const u = adminUsersData.find(d => d.__backendId === bid);
+      if(!u) return;
+
+      const result = await Swal.fire({
+        title: 'ยืนยันการรีเซ็ตภารกิจ?',
+        text: `คุณต้องการเริ่มรีเซ็ตจำนวนภารกิจของ ${u.username} เป็น 0 หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'ใช่, รีเซ็ตเลย',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc',
+        confirmButtonColor: '#d97706',
+        cancelButtonColor: '#64748b'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await setDoc(doc(db, "users", u.id), { ...u, runIndex: 0 });
+          showToast('รีเซ็ตจำนวนภารกิจผู้ใช้รายนี้สำเร็จ');
+          closeModal();
+          debouncedRenderAdminTab();
+        } catch (err) {
+          showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+        }
+      }
     }
 
     function promptUserBalanceUpdate(bid, adjustType) {
@@ -997,7 +1027,21 @@
 
     async function deleteAdminUser(bid) { 
       const u = adminUsersData.find(d => d.__backendId === bid); if(!u) return;
-      if(confirm('🚨 คุณแน่ใจหรือไม่ที่จะลบบัญชีผู้ใช้รายนี้? ข้อมูลธุรกรรมและสิทธิ์ทั้งหมดจะสูญหายอย่างถาวรและไม่สามารถกู้คืนได้')) { 
+
+      const result = await Swal.fire({
+        title: '🚨 คุณแน่ใจหรือไม่ที่จะลบบัญชีผู้ใช้รายนี้?',
+        text: 'ข้อมูลธุรกรรมและสิทธิ์ทั้งหมดจะสูญหายอย่างถาวรและไม่สามารถกู้คืนได้',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ยืนยัน, ลบถาวร',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
         try {
           await deleteDoc(doc(db, "users", bid));
           closeModal(); 
@@ -1167,7 +1211,27 @@
         }
       }
     }
-    async function deleteProduct(bid) { if(confirm('คุณแน่ใจที่จะลบข้อมูลสินค้าชิ้นนี้?')) { await windowDataSdk.delete(publicData.products.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); closeModal(); } }
+
+    async function deleteProduct(bid) { 
+      const result = await Swal.fire({
+        title: 'ยืนยันการลบสินค้า?',
+        text: 'คุณแน่ใจหรือไม่ที่ต้องการนำสินค้าชิ้นนี้ออกจากระบบ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
+        await windowDataSdk.delete(publicData.products.find(d => d.__backendId === bid)); 
+        debouncedRenderAdminTab(); 
+        closeModal();
+      }
+    }
 
     // ==========================================
     // TABS: 3. SPECIAL ASSIGNMENTS
@@ -1235,7 +1299,25 @@
       }
     }
     
-    async function deleteSpecialTemplate(bid) { if(confirm('คุณแน่ใจที่จะถอนเทมเพลตนี้ออกจากสารบบ?')) { await windowDataSdk.delete(adminSpecialTemplatesData.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); } }
+    async function deleteSpecialTemplate(bid) { 
+      const result = await Swal.fire({
+        title: 'ถอนเทมเพลตนี้?',
+        text: 'คุณต้องการนำเทมเพลตพิเศษนี้ออกจากรายการคลังหรือไม่?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
+        await windowDataSdk.delete(adminSpecialTemplatesData.find(d => d.__backendId === bid)); 
+        debouncedRenderAdminTab(); 
+      }
+    }
 
     function assignSpecialOrder(templateBid) {
       const t = adminSpecialTemplatesData.find(d => d.__backendId === templateBid); if(!t) return;
@@ -1427,10 +1509,28 @@
       }
     }
 
-    async function deleteAssignedSpecial(bid) { if(confirm('คุณแน่ใจที่จะลบรายการสุ่มออเดอร์พิเศษนี้?')) { await windowDataSdk.delete(adminSpecialAssignData.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); } }
+    async function deleteAssignedSpecial(bid) { 
+      const result = await Swal.fire({
+        title: 'ลบคิวล็อกออเดอร์พิเศษนี้?',
+        text: 'สมาชิกเป้าหมายจะไม่ติดคิวล็อกออเดอร์นี้เมื่อรับภารกิจรอบหน้า',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
+        await windowDataSdk.delete(adminSpecialAssignData.find(d => d.__backendId === bid)); 
+        debouncedRenderAdminTab(); 
+      }
+    }
 
     // ==========================================
-    // TABS: 4. WITHDRAWALS
+    // TABS: 4. WITHDRAWALS (AND DEPOSITS VERIFY)
     // ==========================================
     function renderAdminWithdrawals(c) {
       const wds = adminWithdrawalsData;
@@ -1469,7 +1569,7 @@
                   <th class="p-3.5">ชื่อบัญชีสมาชิก</th>
                   <th class="p-3.5">ประเภทธุรกรรม</th>
                   <th class="p-3.5">จำนวนยอดชำระ</th>
-                  <th class="p-3.5">บัญชีปลายทางรับเงิน</th>
+                  <th class="p-3.5">บัญชีปลายทาง / สลิปหลักฐาน</th>
                   <th class="p-3.5">สถานะส่งงาน</th>
                   <th class="p-3.5 text-center">จัดการคำขอ</th>
                 </tr>
@@ -1478,19 +1578,34 @@
                 ${filteredWds.map(w => {
                   let statusText = 'รอคิววินิจฉัย';
                   let statusClass = 'text-amber-400 bg-amber-950/40 border-amber-800/40';
-                  if(w.status === 'approved') { statusText = 'อนุมัติจ่ายเสร็จสิ้น'; statusClass = 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'; }
+                  
+                  if(w.status === 'approved') { statusText = 'อนุมัติถอนเสร็จสิ้น'; statusClass = 'text-blue-400 bg-blue-950/40 border-blue-800/40'; }
                   if(w.status === 'rejected') { statusText = 'ปฏิเสธคำขอคืนยอด'; statusClass = 'text-rose-400 bg-rose-950/40 border-rose-800/40'; }
-                  if(w.status === 'deposit') { statusText = 'เติมเครดิตเสร็จสิ้น'; statusClass = 'text-sky-400 bg-sky-950/40 border-sky-800/40'; }
+                  if(w.status === 'deposit') { statusText = 'เติมเครดิตเสร็จสิ้น'; statusClass = 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'; }
+                  if(w.status === 'deposit_pending') { statusText = 'แจ้งฝาก: รอตรวจสลิป'; statusClass = 'text-orange-400 bg-orange-950/40 border-orange-800/40'; }
+                  
+                  let typeText = 'ใบคำขอถอนเงิน';
+                  if (w.status === 'deposit') typeText = 'ใบเติมเครดิตแอดมิน';
+                  else if (w.status === 'deposit_pending') typeText = 'แจ้งโอนฝากเงินเว็บ';
+
+                  let slipDisplay = '-';
+                  if (w.status === 'deposit_pending') {
+                    slipDisplay = `<a href="${w.bankNumber}" target="_blank" class="text-sky-400 hover:underline flex items-center gap-1 font-mono text-[10px]"><i data-lucide="image" class="w-3 h-3"></i> คลิกดูรูปสลิป</a>`;
+                  } else {
+                    slipDisplay = `
+                      <p class="font-medium text-slate-300">${w.bankName || '-'}</p>
+                      <p class="text-slate-500 mt-0.5">${w.bankNumber || '-'}</p>
+                    `;
+                  }
                   
                   return `
                   <tr class="hover:bg-slate-800/40 transition">
                     <td class="p-3.5 text-slate-500 text-xs">${new Date(w.createdAt).toLocaleString()}</td>
                     <td class="p-3.5 font-medium text-slate-200 text-xs">${w.username}</td>
-                    <td class="p-3.5 text-xs text-slate-400">${w.status === 'deposit' ? 'ใบฝากเครดิต' : 'ใบคำขอถอนเงิน'}</td>
-                    <td class="p-3.5 font-medium ${w.status === 'deposit' ? 'text-emerald-400' : 'text-slate-200'} text-xs">฿${w.amount.toLocaleString()}</td>
+                    <td class="p-3.5 text-xs text-slate-400">${typeText}</td>
+                    <td class="p-3.5 font-medium ${w.status === 'deposit' || w.status === 'deposit_pending' ? 'text-emerald-400' : 'text-slate-200'} text-xs">฿${w.amount.toLocaleString()}</td>
                     <td class="p-3.5 text-xs font-mono">
-                      <p class="font-medium text-slate-300">${w.bankName || '-'}</p>
-                      <p class="text-slate-500 mt-0.5">${w.bankNumber || '-'}</p>
+                      ${slipDisplay}
                     </td>
                     <td class="p-3.5"><span class="px-2.5 py-1 border rounded text-[10px] font-medium ${statusClass}">${statusText}</span></td>
                     <td class="p-3.5 text-center">
@@ -1498,6 +1613,10 @@
                         ${w.status === 'pending' ? `
                           <button onclick="approveWithdraw('${w.__backendId}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 rounded text-[10px] font-medium transition uppercase">อนุมัติ</button>
                           <button onclick="rejectWithdraw('${w.__backendId}')" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-rose-300 rounded text-[10px] font-medium transition uppercase">ปฏิเสธ</button>
+                        ` : ''}
+                        ${w.status === 'deposit_pending' ? `
+                          <button onclick="approveDeposit('${w.__backendId}')" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 rounded text-[10px] font-medium transition uppercase">อนุมัติเงินฝาก</button>
+                          <button onclick="rejectDeposit('${w.__backendId}')" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-rose-300 rounded text-[10px] font-medium transition uppercase">ปฏิเสธสลิป</button>
                         ` : ''}
                         <button onclick="deleteWithdrawal('${w.__backendId}')" class="px-2 py-1 bg-slate-100 hover:bg-rose-950 border border-slate-200 hover:border-rose-200 text-slate-500 hover:text-rose-400 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                       </div>
@@ -1511,10 +1630,18 @@
       `;
     }
 
-    async function approveWithdraw(bid) { const w = adminWithdrawalsData.find(d => d.__backendId === bid); w.status = 'approved'; await windowDataSdk.update(w); debouncedRenderAdminTab(); }
+    async function approveWithdraw(bid) { 
+      const w = adminWithdrawalsData.find(d => d.__backendId === bid); 
+      if(!w) return;
+      w.status = 'approved'; 
+      await windowDataSdk.update(w); 
+      showToast('อนุมัติบิลถอนเงินสำเร็จ');
+      debouncedRenderAdminTab(); 
+    }
     
     async function rejectWithdraw(bid) { 
       const w = adminWithdrawalsData.find(d => d.__backendId === bid); 
+      if(!w) return;
       let userDocRef = doc(db, "users", w.userId);
       const wdDocRef = doc(db, getCol('withdrawal'), bid);
 
@@ -1535,8 +1662,53 @@
       }
     }
 
+    async function approveDeposit(bid) {
+      const w = adminWithdrawalsData.find(d => d.__backendId === bid);
+      if(!w) return;
+      let userDocRef = doc(db, "users", w.userId);
+      const wdDocRef = doc(db, getCol('withdrawal'), bid);
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const uSnap = await transaction.get(userDocRef);
+          if (uSnap.exists()) {
+            const currentCredit = uSnap.data().credit || 0;
+            const addedVal = currentCredit + (w.amount || 0);
+            transaction.update(userDocRef, { credit: addedVal });
+          }
+          transaction.update(wdDocRef, { status: 'deposit' });
+        });
+        showToast('อนุมัติยอดฝากและเติมเงินเข้าพอร์ตผู้ใช้สำเร็จ!');
+        debouncedRenderAdminTab();
+      } catch (err) {
+        showToast('เกิดข้อผิดพลาดในการประมวลผลธุรกรรม: ' + err.message, 'error');
+      }
+    }
+
+    async function rejectDeposit(bid) {
+      const w = adminWithdrawalsData.find(d => d.__backendId === bid);
+      if(!w) return;
+      w.status = 'rejected';
+      await windowDataSdk.update(w);
+      showToast('ปฏิเสธสลิปแจ้งยอดฝากเรียบร้อย');
+      debouncedRenderAdminTab();
+    }
+
     async function deleteWithdrawal(bid) {
-      if (confirm('คุณต้องการทำลายประวัติใบบันทึกธุรกรรมถอนเงินนี้จากหลังบ้าน?')) {
+      const result = await Swal.fire({
+        title: 'คุณต้องการลบประวัติธุรกรรมนี้?',
+        text: 'ประวัติทางการเงินชิ้นนี้จะถูกถอนออกจากระบบหลังบ้านถาวร',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
         try {
           await deleteDoc(doc(db, "withdrawals", bid));
           showToast('ทำลายข้อมูลบิลเรียบร้อย');
@@ -1737,13 +1909,50 @@
       closeModal(); 
       debouncedRenderAdminTab(); 
     }
-    async function deleteBanner(bid) { if(confirm('คุณต้องการลบรูปภาพแบนเนอร์สไลด์ชิ้นนี้?')) { await windowDataSdk.delete(publicData.banners.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); } }
+    async function deleteBanner(bid) { 
+      const result = await Swal.fire({
+        title: 'คุณต้องการลบรูปภาพนี้?',
+        text: 'ภาพแบนเนอร์โฆษณาชิ้นนี้จะถูกลบออกจากสไลด์หน้าบ้านผู้ใช้ทันที',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
+        await windowDataSdk.delete(publicData.banners.find(d => d.__backendId === bid)); 
+        debouncedRenderAdminTab(); 
+      }
+    }
     
     function showAddGallery() { showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรูปแกลเลอรีประดับ</h3><input id="ag-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded mb-4 text-xs font-mono" placeholder="ระบุลิงก์รูปภาพของคุณที่นี่"><button onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">บันทึกรูปภาพ</button>`); }
     async function doAddGallery() { await windowDataSdk.create({ type:'gallery', id:genId(), galleryUrl:$('ag-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
     function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
     async function doEditGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); await windowDataSdk.update({...g, galleryUrl: $('eg-url').value.trim()}); closeModal(); debouncedRenderAdminTab(); }
-    async function deleteGallery(bid) { if(confirm('คุณต้องการทำลายรูปภาพนี้จากแกลเลอรี?')) { await windowDataSdk.delete(publicData.galleries.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); } }
+    async function deleteGallery(bid) { 
+      const result = await Swal.fire({
+        title: 'ทำลายรูปภาพแกลเลอรีนี้?',
+        text: 'รูปนี้จะหายไปจากตารางภาพแถวล่างสุดบนหน้าหลักผู้ใช้งาน',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
+        await deleteDoc(doc(db, "galleries", bid));
+        showToast('ลบรูปภาพจากแกลเลอรีเรียบร้อย');
+        debouncedRenderAdminTab();
+      }
+    }
 
     function showAddShowcaseProduct() {
       showModal(`
@@ -1836,7 +2045,20 @@
     }
 
     async function deleteShowcaseProduct(bid) {
-      if (confirm('คุณต้องการลบรายการสินค้านี้จากหน้าหลัก?')) {
+      const result = await Swal.fire({
+        title: 'คุณต้องการลบรายการสินค้านี้จากหน้าหลัก?',
+        text: 'รูปโชว์สินค้าแนะนำดังกล่าวจะถูกยกเลิกการแสดงผลหน้าบ้านของผู้ใช้งานทันที',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก',
+        background: '#1e293b',
+        color: '#f8fafc'
+      });
+
+      if (result.isConfirmed) {
         await windowDataSdk.delete(adminShowcaseData.find(d => d.__backendId === bid));
         showToast('ลบรายการสินค้าแนะนำเรียบร้อย');
         debouncedRenderAdminTab();
@@ -2201,6 +2423,8 @@
     window.deleteAssignedSpecial = deleteAssignedSpecial;
     window.approveWithdraw = approveWithdraw;
     window.rejectWithdraw = rejectWithdraw;
+    window.approveDeposit = approveDeposit;
+    window.rejectDeposit = rejectDeposit;
     window.deleteWithdrawal = deleteWithdrawal;
     window.showAddBanner = showAddBanner;
     window.doAddBanner = doAddBanner;
@@ -2226,6 +2450,7 @@
     window.editShowcaseProduct = editShowcaseProduct;
     window.doEditShowcaseProduct = doEditShowcaseProduct;
     window.deleteShowcaseProduct = deleteShowcaseProduct;
+    window.resetUserTasks = resetUserTasks;
   </script>
  </body>
 </html>
