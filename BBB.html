@@ -376,7 +376,6 @@
       await setDoc(doc(db, "configs", docId), cleanData);
     }
 
-    // สวิตช์คุมระบบ Debounced Render ป้องกันระบบค้างตอนอัปเดตข้อมูลยิบย่อย
     let adminRenderTimeout = null;
     function debouncedRenderAdminTab() {
       if (adminRenderTimeout) clearTimeout(adminRenderTimeout);
@@ -1473,7 +1472,7 @@
                 ${filteredWds.map(w => {
                   let statusText = 'รอคิววินิจฉัย';
                   let statusClass = 'text-amber-400 bg-amber-950/40 border-amber-800/40';
-                  if(w.status === 'approved') { statusText = 'อนุมัติจ่ายเสสิ้น'; statusClass = 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'; }
+                  if(w.status === 'approved') { statusText = 'อนุมัติจ่ายเสร็จสิ้น'; statusClass = 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'; }
                   if(w.status === 'rejected') { statusText = 'ปฏิเสธคำขอคืนยอด'; statusClass = 'text-rose-400 bg-rose-950/40 border-rose-800/40'; }
                   if(w.status === 'deposit') { statusText = 'เติมเครดิตเสร็จสิ้น'; statusClass = 'text-sky-400 bg-sky-950/40 border-sky-800/40'; }
                   
@@ -2122,7 +2121,6 @@
     function doEditMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); windowDataSdk.update({ ...m, menuLabel: $('mi-label').value.trim(), menuContent: $('mi-content').value.trim(), menuIconUrl: $('mi-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
     function deleteMenuIcon(bid) { if(confirm('คุณต้องการลบข้อตกลงแนะนำชิ้นนี้ออกอย่างถาวร?')) { windowDataSdk.delete(publicData.menuIcons.find(d => d.__backendId === bid)); debouncedRenderAdminTab(); } }
 
-    // หน่วงเวลาช่องค้นหาเพื่อประสิทธิภาพการกรอกข้อมูล
     let userSearchTimeout = null;
     function handleAdminUserSearch(value) { 
       adminUserSearch = value; 
@@ -2150,7 +2148,6 @@
       }, 250);
     }
 
-    // ตรวจสอบความปลอดภัยฝั่งสิทธิ์ในการล็อคคิวบอร์ด
     onAuthStateChanged(auth, (user) => {
       if (user && user.email.endsWith('@admin.com')) {
         isAdmin = true;
