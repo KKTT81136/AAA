@@ -393,6 +393,12 @@
           publicData.configs = [cfgData];
           localStorage.setItem('tos_cached_config', JSON.stringify(cfgData));
           applyTheme(cfgData.themePrimary, cfgData.themeSecondary, cfgData.themeType);
+          
+          // ป้องกันอาการส่งคำร้องขอไอคอนเบราว์เซอร์ซ้ำซ้อนจนโหลดค้าง
+          const targetTitle = (cfgData.tabTitle || '') + " - แอดมิน";
+          if (document.title !== targetTitle) {
+            document.title = targetTitle;
+          }
         }
         updateHeaderStats();
       }, (err) => {
