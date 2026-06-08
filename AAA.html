@@ -1,0 +1,2298 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>TOS Shopping</title>
+  <link rel="icon" type="image/x-icon" href="">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', function(e) {
+      if(e.keyCode == 123) { e.preventDefault(); return false; }
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { e.preventDefault(); return false; } 
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { e.preventDefault(); return false; } 
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { e.preventDefault(); return false; } 
+      if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { e.preventDefault(); return false; } 
+    });
+  </script>
+
+  <!-- สคริปต์ประมวลผลล่วงหน้าเพื่อจัดเตรียมธีมและป้องกันปัญหาการกระพริบของหน้าจอ -->
+  <script>
+    (function() {
+      var cached = localStorage.getItem('tos_cached_config');
+      var primary = '#e6399b';
+      var secondary = '#4f46e5';
+      var title = 'TOS Shopping';
+      var favicon = '';
+      var themeType = 'gradient';
+      var marqueeBg = '#eb2f96';
+      var menuBg = '#eb2f96';
+
+      if (cached) {
+        try {
+          var cfg = JSON.parse(cached);
+          primary = cfg.themePrimary || primary;
+          secondary = cfg.themeSecondary || secondary;
+          title = cfg.tabTitle || title;
+          favicon = cfg.tabFaviconUrl || favicon;
+          themeType = cfg.themeType || themeType;
+          marqueeBg = cfg.themeMarqueeBg || marqueeBg;
+          menuBg = cfg.themeMenuBg || menuBg;
+        } catch(e) {}
+      }
+
+      document.title = title;
+
+      var link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+      link.rel = 'icon';
+      if (favicon) {
+        link.type = 'image/x-icon';
+        link.href = favicon;
+      } else {
+        link.remove();
+      }
+      document.head.appendChild(link);
+
+      var styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-theme-style';
+      var bgStyle = (themeType === 'single') 
+        ? "background: " + primary + " !important;" 
+        : "background: linear-gradient(135deg, " + primary + ", " + secondary + ") !important;";
+
+      styleEl.innerHTML = [
+        ":root {",
+        "  --color-primary: " + primary + ";",
+        "  --color-secondary: " + secondary + ";",
+        "  --color-marquee-bg: " + marqueeBg + ";",
+        "  --color-menu-bg: " + menuBg + ";",
+        "}",
+        "body { background-color: #f8fafc; }",
+        ".text-primary { color: " + primary + " !important; }",
+        ".bg-primary { background-color: " + primary + " !important; }",
+        ".border-primary { border-color: " + primary + " !important; }",
+        ".bg-theme-gradient { " + bgStyle + " }",
+        ".fill-blue-100\\/50 { fill: " + primary + "33 !important; }"
+      ].join("\n");
+      document.head.appendChild(styleEl);
+    })();
+  </script>
+
+  <style>
+    * { 
+      font-family: 'Kanit', sans-serif; 
+      -webkit-font-smoothing: antialiased; 
+      user-select: none; 
+      -webkit-user-select: none; 
+      box-sizing: border-box;
+      font-weight: 300;
+    }
+    b, strong, h1, h2, h3, h4, th, .font-bold, .font-black, .font-semibold {
+      font-weight: 500 !important;
+    }
+    input, textarea, select { 
+      user-select: auto; 
+      -webkit-user-select: auto; 
+      font-size: 16px !important; 
+    }
+    html, body { 
+      min-height: 100%; 
+      margin: 0; 
+      touch-action: manipulation; 
+    }
+    .fade-in { 
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(8px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes dots { 
+      0%, 80%, 100% { transform: scale(0); } 
+      40% { transform: scale(1); } 
+    }
+    .dot-anim span { 
+      display: inline-block; 
+      width: 10px; 
+      height: 10px; 
+      border-radius: 50%; 
+      background: var(--color-primary); 
+      margin: 0 4px; 
+      animation: dots 1.2s infinite ease-in-out both; 
+    }
+    .dot-anim span:nth-child(1) { animation-delay: -0.32s; } 
+    .dot-anim span:nth-child(2) { animation-delay: -0.16s; }
+    
+    @keyframes slideIn { 
+      from { transform: scale(0.95) translateY(10px); opacity: 0; } 
+      to { transform: scale(1) translateY(0); opacity: 1; } 
+    }
+    .modal-anim { 
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+    @keyframes toastSlide { 
+      from { opacity: 0; transform: translate(-50%, -15px); } 
+      to { opacity: 1; transform: translate(-50%, 0); } 
+    }
+    .toast-show { 
+      animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+    ::-webkit-scrollbar { 
+      width: 6px; 
+    }
+    ::-webkit-scrollbar-track { 
+      background: transparent; 
+    }
+    ::-webkit-scrollbar-thumb { 
+      background: rgba(203, 213, 225, 0.8); 
+      border-radius: 99px; 
+    }
+    .banner-slide { 
+      transition: opacity 0.8s ease-in-out; 
+    }
+    .marquee-container { 
+      overflow: hidden; 
+      white-space: nowrap; 
+      width: 100%; 
+      display: block; 
+      position: relative; 
+    }
+    .marquee-text { 
+      display: inline-block; 
+      padding-left: 100%; 
+      animation: smoothMarquee 15s linear infinite; 
+      will-change: transform; 
+    }
+    @keyframes smoothMarquee { 
+      0% { transform: translate3d(0, 0, 0); } 
+      100% { transform: translate3d(-100%, 0, 0); } 
+    }
+    .nav-glass { 
+      background: rgba(255, 255, 255, 0.85); 
+      backdrop-filter: blur(12px); 
+      -webkit-backdrop-filter: blur(12px); 
+    }
+    .custom-bg { 
+      background-size: cover; 
+      background-position: center; 
+      background-repeat: no-repeat;
+    }
+
+    /* ปลดล็อกค่าความโปร่งใสของสินค้าแนะนำเพื่อป้องกันแผงสินค้าว่างเปล่าสีขาวอย่างถาวร */
+    .slide-left-item, .slide-right-item {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    .gallery-item {
+      opacity: 0.3;
+      filter: brightness(0.6) grayscale(20%);
+      transform: scale(0.95);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .gallery-item.reveal {
+      opacity: 1;
+      filter: brightness(1.1) grayscale(0%);
+      transform: scale(1);
+    }
+
+    .scroll-reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .scroll-reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .scroll-reveal-active {
+      opacity: 1 !important;
+      transform: translateX(0) !important;
+    }
+
+    /* เอฟเฟกต์โลโก้สไลด์อย่างนุ่มนวลมาจากทางขวา */
+    @keyframes slideFromRight {
+      0% {
+        transform: translate3d(120px, 0, 0);
+        opacity: 0;
+      }
+      100% {
+        transform: translate3d(0, 0, 0);
+        opacity: 1;
+      }
+    }
+    .logo-slide-right {
+      animation: slideFromRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+ </head>
+ <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
+
+  <!-- แท็กหลักของแอปพลิเคชันเปิดแสดงทันที ไม่ใช้คลาส hidden เพื่อความเสถียรและหลีกเลี่ยงจอขาว -->
+  <div id="app" class="h-full w-full overflow-auto relative flex flex-col"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { 
+      getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot, query, where, getDocs, runTransaction 
+    } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { 
+      getAuth, signInAnonymously, signOut, onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+    // คอนฟิกเชื่อมตรงคีย์ใหม่
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8zPV6_vjSKqL7O7T-C-04bNt71QFknBg",
+      authDomain: "kk-888-ee224.firebaseapp.com",
+      projectId: "kk-888-ee224",
+      storageBucket: "kk-888-ee224.firebasestorage.app",
+      messagingSenderId: "135711338514",
+      appId: "1:135711338514:web:6cd8efe2d14cb129aba8cb",
+      measurementId: "G-SS5W16NBYS"
+    };
+
+    const appInstance = initializeApp(firebaseConfig);
+    const db = getFirestore(appInstance);
+    const auth = getAuth(appInstance);
+
+    // ==========================================
+    // STATE ENGINE & DICTIONARY
+    // ==========================================
+    let currentUser = null;
+    let currentTab = 'home';
+    let lastRenderedTab = ''; 
+    let historyTab = 'orders';
+    let bannerInterval = null;
+    let rewardInterval = null;
+    let isOrderProcessing = false;
+    let isConfigsLoaded = false;
+    let currentLang = localStorage.getItem('tos_lang') || 'th';
+
+    let renderedBannersCount = -1;
+    let renderedGalleryCount = -1;
+    let renderedMenuCount = -1;
+    let renderedProductsBannersCount = -1;
+
+    let publicData = {
+      configs: [],
+      banners: [],
+      galleries: [],
+      menuIcons: [],
+      products: [],
+      showcaseProducts: [] 
+    };
+
+    try {
+      const cachedUserStr = localStorage.getItem('tos_cached_user');
+      if (cachedUserStr) currentUser = JSON.parse(cachedUserStr);
+
+      const cachedBanners = localStorage.getItem('tos_cached_banners');
+      if (cachedBanners) publicData.banners = JSON.parse(cachedBanners);
+      
+      const cachedGalleries = localStorage.getItem('tos_cached_galleries');
+      if (cachedGalleries) publicData.galleries = JSON.parse(cachedGalleries);
+
+      const cachedMenuIcons = localStorage.getItem('tos_cached_menu_icons');
+      if (cachedMenuIcons) publicData.menuIcons = JSON.parse(cachedMenuIcons);
+
+      const cachedProducts = localStorage.getItem('tos_cached_products');
+      if (cachedProducts) publicData.products = JSON.parse(cachedProducts);
+
+      const cachedShowcase = localStorage.getItem('tos_cached_showcase');
+      if (cachedShowcase) publicData.showcaseProducts = JSON.parse(cachedShowcase);
+    } catch (e) {
+      console.warn("Error parsing cached public data: ", e);
+    }
+
+    let userOrdersData = [];
+    let userWithdrawalsData = [];
+    let userSpecialAssignData = [];
+
+    let activeListeners = {
+      configs: null, banners: null, galleries: null, menuIcons: null, products: null, showcaseProducts: null,
+      userDoc: null, userOrders: null, userWithdrawals: null, userSpecialAssigns: null
+    };
+
+    const translations = {
+      th: {
+        signIn: "เข้าสู่ระบบ",
+        register: "ลงทะเบียน",
+        phone: "เบอร์โทรศัพท์",
+        password: "รหัสผ่าน",
+        pin: "รหัส PIN ถอนเงิน",
+        inviteCode: "รหัสเชิญ",
+        dontHaveAcc: "ยังไม่มีบัญชีผู้ใช้?",
+        alreadyHaveAcc: "มีบัญชีผู้ใช้งานแล้ว?",
+        registerHere: "ลงทะเบียนที่นี่",
+        signInHere: "เข้าสู่ระบบที่นี่",
+        processing: "กำลังดำเนินการ...",
+        fillAll: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+        invalidInvite: "รหัสเชิญไม่ถูกต้อง",
+        loginSuccess: "เข้าสู่ระบบสำเร็จ!",
+        invalidPass: "รหัสผ่านไม่ถูกต้อง",
+        userNotFound: "ไม่พบข้อมูลผู้ใช้งาน",
+        regSuccess: "ลงทะเบียนสำเร็จ!",
+        regFailed: "ลงทะเบียนไม่สำเร็จ",
+        phoneExists: "เบอร์โทรศัพท์นี้ถูกใช้งานแล้ว",
+        connectionError: "เกิดข้อผิดพลาดในการเชื่อมต่อ: ",
+        username: "ชื่อผู้ใช้",
+        home: "หน้าหลัก",
+        runOrders: "ร้านค้า",
+        history: "ประวัติ",
+        profile: "โปรไฟล์",
+        logout: "ออกจากระบบ",
+        welcome: "ยินดีต้อนรับ",
+        availBalance: "ยอดเงินคงเหลือที่ใช้ได้",
+        orderMatchingSystem: "ระบบจับคู่ออเดอร์",
+        completedToday: "เสร็จสิ้นวันนี้",
+        startMatch: "เริ่มจับคู่ออเดอร์",
+        currentCredit: "เครดิตปัจจุบัน",
+        todayProfit: "กำไรวันนี้",
+        pendingExist: "มีออเดอร์ค้างชำระ",
+        pendingExistSub: "คุณมีออเดอร์ค้างชำระ กรุณาชำระเงินในหน้าประวัติ",
+        viewPending: "ดูออเดอร์ค้างชำระ",
+        insufficientBal: "ยอดเงินคงเหลือไม่เพียงพอ",
+        insufficientSub: "ยอดเครดิตในกระเป๋าของคุณไม่เพียงพอ", 
+        contactSupport: "ติดต่อฝ่ายบริการลูกค้า",
+        close: "ปิด",
+        noProductTier: "ไม่ได้ตั้งค่าสินค้าสำหรับระดับสมาชิกของคุณ",
+        allTasksDone: "🎉 ทำภารกิจทั้งหมดในวันนี้เสร็จสิ้นแล้ว!",
+        matchingOrder: "กำลังจับคู่ออเดอร์...",
+        specialOrder: "ออเดอร์พิเศษ",
+        productPrice: "ราคาสินค้า",
+        submitOrder: "ส่งออเดอร์",
+        processingTx: "กำลังประมวลผลธุรกรรม...",
+        walletBal: "ยอดเงินในกระเป๋า:",
+        amountDue: "ยอดชำระ:",
+        confirmPurchase: "ยืนยันการชำระเงิน",
+        taskCompleted: "ทำภารกิจสำเร็จ",
+        commCredited: "ค่าคอมมิชชันของคุณถูกเพิ่มเข้าระบบเรียบร้อยแล้ว",
+        continueBtn: "ดำเนินการต่อ",
+        errorProcessingOrder: "เกิดข้อผิดพลาดในการประมวลผลออเดอร์",
+        activityLog: "บันทึกกิจกรรม",
+        orders: "ออเดอร์",
+        transactions: "ธุรกรรม",
+        pendingPayment: "รอการชำระเงิน",
+        commission: "ค่าคอมมิชชัน",
+        textSettlePending: "ชำระออเดอร์ค้างจ่าย",
+        noTasksRecorded: "ไม่มีบันทึกภารกิจ",
+        noTransactions: "ไม่มีบันทึกประวัติธุรกรรม",
+        completed: "สำเร็จ",
+        processingStatus: "กำลังดำเนินการ",
+        deposit: "ฝากเงิน",
+        withdrawal: "ถอนเงิน",
+        pending: "รอดำเนินการ",
+        approved: "อนุมัติแล้ว",
+        rejected: "ปฏิเสธแล้ว",
+        amount: "จำนวนเงิน",
+        bankAccount: "บัญชีธนาคารสำหรับรับเงิน",
+        editBank: "แก้ไขธนาคาร",
+        noBankDetails: "ยังไม่ได้ระบุข้อมูลธนาคาร",
+        bank: "ธนาคาร",
+        accNumber: "เลขที่บัญชี",
+        withdrawFunds: "ถอนเงินออกจากระบบ",
+        withdrawable: "ยอดที่ถอนได้:",
+        selectBank: "-- เลือกธนาคาร --",
+        pleaseSelectBank: "กรุณาเลือกธนาคาร",
+        pleaseFillAcc: "กรุณากรอกเลขที่บัญชี",
+        saveSettings: "บันทึกการตั้งค่า",
+        settingsSaved: "บันทึกการตั้งค่าสำเร็จ!",
+        invalidWdBal: "ยอดเงินไม่ถูกต้องหรือยอดคงเหลือไม่เพียงพอ",
+        invalidPIN: "รหัสความปลอดภัย PIN ไม่ถูกต้อง",
+        wdSentSuccess: "ส่งคำขอถอนเงินสำเร็จ! รอดำเนินการอนุมัติจากผู้ดูแลระบบ",
+        wdFailed: "คำขอถอนเงินล้มเหลว",
+        cantWdPending: "ไม่สามารถถอนเงินได้ในขณะที่มีออเดอร์ค้างชำระ",
+        cs: "ฝ่ายบริการลูกค้า",
+        depositAcc: "บัญชีโอนเงิน:",
+        noDepositCfg: "ไม่ได้ตั้งค่าช่องทางการฝากเงิน กรุณาติดต่อฝ่ายบริการลูกค้า",
+        sendSlip: "ส่งสลิป",
+        depositTerms: "* หลังจากโอนเงินเรียบร้อยแล้ว กรุณาส่งหลักฐานการโอนเงิน (สลิป) ให้ฝ่ายบริการลูกค้าเพื่ออนุมัติ",
+        noSupportCfg: "ไม่ได้ตั้งค่าช่องทางการติดต่อฝ่ายบริการลูกค้า",
+        cancel: "ยกเลิก"
+      },
+      en: {
+        signIn: "Sign In",
+        register: "Register",
+        phone: "Phone Number",
+        password: "Password",
+        pin: "Withdraw PIN",
+        inviteCode: "Invite Code",
+        dontHaveAcc: "Don't have an account?",
+        alreadyHaveAcc: "Already have an account?",
+        registerHere: "Register Here",
+        signInHere: "Sign In Here",
+        processing: "Processing...",
+        fillAll: "Please fill in all fields",
+        invalidInvite: "Invalid invite code",
+        loginSuccess: "Login Successful!",
+        invalidPass: "Invalid password",
+        userNotFound: "User not found",
+        regSuccess: "Registration successful!",
+        regFailed: "Registration failed",
+        phoneExists: "This phone number is already registered",
+        connectionError: "Connection error: ",
+        username: "Username",
+        home: "Home",
+        runOrders: "Shop",
+        history: "History",
+        profile: "Profile",
+        logout: "Logout",
+        welcome: "Welcome",
+        availBalance: "Available Balance",
+        orderMatchingSystem: "Order Matching System",
+        completedToday: "Completed Today",
+        startMatch: "Start Match",
+        currentCredit: "Current Credit",
+        todayProfit: "Today's Profit",
+        pendingExist: "Pending Order Exist",
+        pendingExistSub: "You have an outstanding pending order. Please complete it in your history page.",
+        viewPending: "View Pending Order",
+        insufficientBal: "Insufficient Balance",
+        insufficientSub: "Your wallet balance is too low.",
+        contactSupport: "Contact Support",
+        close: "Close",
+        noProductTier: "No products configured for your tier",
+        allTasksDone: "🎉 All tasks completed for today!",
+        matchingOrder: "Matching order...",
+        specialOrder: "Special Order",
+        productPrice: "Product Price",
+        submitOrder: "Submit Order",
+        processingTx: "Processing transaction...",
+        walletBal: "Wallet Balance:",
+        amountDue: "Amount Due:",
+        confirmPurchase: "Confirm Purchase",
+        taskCompleted: "Task Completed",
+        commCredited: "Your commission has been credited successfully.",
+        continueBtn: "Continue",
+        errorProcessingOrder: "Error processing order flow",
+        activityLog: "Activity Log",
+        orders: "Orders",
+        transactions: "Transactions",
+        pendingPayment: "Pending Payment",
+        commission: "Commission",
+        textSettlePending: "Settle Pending Order",
+        noTasksRecorded: "No tasks recorded",
+        noTransactions: "No transaction records",
+        completed: "Completed",
+        processingStatus: "Processing",
+        deposit: "Deposit",
+        withdrawal: "Withdraw",
+        pending: "Pending",
+        approved: "Approved",
+        rejected: "Rejected",
+        amount: "Amount",
+        bankAccount: "Receiving Bank Account",
+        editBank: "Edit Bank",
+        noBankDetails: "No bank details added yet",
+        bank: "Bank",
+        accNumber: "Account Number",
+        withdrawFunds: "Withdraw Funds",
+        withdrawable: "Withdrawable:",
+        selectBank: "-- Select Bank --",
+        pleaseSelectBank: "Please select bank",
+        pleaseFillAcc: "Please fill account number",
+        saveSettings: "Save Settings",
+        settingsSaved: "Settings saved successfully!",
+        invalidWdBal: "Invalid or insufficient balance",
+        invalidPIN: "Invalid security PIN",
+        wdSentSuccess: "Request sent successfully! Pending administrative approval",
+        wdFailed: "Transaction request failed",
+        cantWdPending: "Unable to withdraw while an order is pending",
+        cs: "Customer Support",
+        depositAcc: "Deposit Account:",
+        noDepositCfg: "No deposit method configured. Please contact support.",
+        sendSlip: "Send Slip",
+        depositTerms: "* After transferring, please send the transaction receipt to support",
+        noSupportCfg: "No support channel configured",
+        cancel: "Cancel"
+      }
+    };
+
+    const t = (key) => {
+      return (translations[currentLang] && translations[currentLang][key]) ? translations[currentLang][key] : key;
+    };
+
+    window.toggleLanguage = () => {
+      currentLang = (currentLang === 'th') ? 'en' : 'th';
+      localStorage.setItem('tos_lang', currentLang);
+      lastRenderedTab = '';
+      renderDashboard();
+    };
+
+    function safeCreateIcons() {
+      if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+        lucide.createIcons();
+      }
+    }
+
+    function safeFormatNumber(val) {
+      if (val === undefined || val === null) return "0";
+      const num = Number(val);
+      if (isNaN(num)) {
+        return val.toString();
+      }
+      return num.toLocaleString();
+    }
+
+    function applyTheme(primary, secondary, themeType) {
+      const p = primary || '#e6399b';
+      const s = secondary || '#4f46e5';
+      const type = themeType || 'gradient';
+      const cfg = getConfig();
+
+      document.documentElement.style.setProperty('--color-primary', p);
+      document.documentElement.style.setProperty('--color-secondary', s);
+
+      let styleEl = document.getElementById('dynamic-theme-style');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamic-theme-style';
+        document.head.appendChild(styleEl);
+      }
+
+      const bgStyle = (type === 'single') 
+        ? `background: ${p} !important;` 
+        : `background: linear-gradient(135deg, ${p}, ${s}) !important;`;
+
+      styleEl.innerHTML = `
+        :root {
+          --color-primary: ${p};
+          --color-secondary: ${s};
+          --color-marquee-bg: ${cfg.themeMarqueeBg || '#eb2f96'};
+          --color-menu-bg: ${cfg.themeMenuBg || '#eb2f96'};
+        }
+        .text-primary { color: ${p} !important; }
+        .bg-primary { background-color: ${p} !important; }
+        .border-primary { border-color: ${p} !important; }
+        .bg-theme-gradient { 
+          ${bgStyle}
+        }
+        .fill-blue-100\\/50 {
+          fill: ${p}33 !important;
+        }
+      `;
+    }
+
+    function updateBrowserTab() {
+      const title = getTabTitle();
+      document.title = title ? title : "TOS Shopping";
+      
+      const favUrl = getTabFavicon();
+      let link = document.querySelector("link[rel~='icon']");
+      if (favUrl) {
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.type = 'image/x-icon';
+        link.href = favUrl;
+      } else {
+        if (link) {
+          link.remove();
+        }
+      }
+    }
+
+    const $ = id => document.getElementById(id);
+    const getProducts = () => publicData.products;
+    const getSpecialAssignments = () => userSpecialAssignData;
+    const getBanners = () => publicData.banners;
+    const getGallery = () => publicData.galleries;
+    const getMenuIcons = () => publicData.menuIcons;
+    
+    const getConfig = () => {
+      if (publicData.configs && publicData.configs.length > 0) {
+        return publicData.configs[0];
+      }
+      const cached = localStorage.getItem('tos_cached_config');
+      if (cached) {
+        try {
+          return JSON.parse(cached);
+        } catch (e) {}
+      }
+      return {
+        themePrimary: '',
+        themeSecondary: '',
+        themeType: 'gradient',
+        themeMarqueeBg: '#eb2f96',
+        themeMenuBg: '#eb2f96',
+        inviteCode: '',
+        logoUrl: '',
+        loginBgUrl: '',
+        userBgUrl: '',
+        marqueeText: '',
+        tabTitle: '',
+        tabFaviconUrl: '',
+        scheduleText: 'เปิดทำการ 10:00-22:00 น.',
+        rewardsList: '095***567:433,000,095***091:2,050,000,088***324:120,500',
+        supportedBanks: 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney'
+      };
+    };
+
+    const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
+    const getLogoUrl = () => { const c = getConfig(); return c.logoUrl || ''; };
+    const getLoginBgUrl = () => { const c = getConfig(); return c.loginBgUrl || ''; };
+    const getUserBgUrl = () => { const c = getConfig(); return c.userBgUrl || ''; };
+    const getMarqueeText = () => { const c = getConfig(); return c.marqueeText || ''; };
+    const getLineQrUrl = () => { const c = getConfig(); return c.lineQrUrl || ''; };
+    const getLineId = () => { const c = getConfig(); return c.lineId || ''; };
+    const getTopupQrUrl = () => { const c = getConfig(); return c.topupQrUrl || ''; };
+    const getTopupAccount = () => { const c = getConfig(); return c.topupAccount || ''; };
+    const getTabTitle = () => { const c = getConfig(); return c.tabTitle || ''; };
+    const getTabFavicon = () => { const c = getConfig(); return c.tabFaviconUrl || ''; };
+
+    const getUserOrders = () => userOrdersData;
+    const getUserWithdrawals = () => userWithdrawalsData;
+
+    function genId() {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+      }
+      return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+    }
+
+    function showToast(msg, type='success') {
+      const old = $('toast-container'); if (old) old.remove();
+      const colors = { 
+        success:'bg-emerald-600 border-emerald-700 text-white', 
+        error:'bg-red-600 border-red-700 text-white', 
+        info:'bg-blue-600 border-blue-700 text-white' 
+      };
+      const icons = { success:'check-circle', error:'alert-circle', fillAlert:'info' };
+      const div = document.createElement('div');
+      div.id = 'toast-container';
+      div.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[9999] toast-show w-max max-w-[90vw]';
+      div.innerHTML = `
+        <div class="${colors[type]} px-6 py-3.5 rounded-2xl shadow-lg border flex items-center gap-3 text-sm font-bold tracking-wide">
+          <i data-lucide="${icons[type]}" class="w-5 h-5 flex-shrink-0 text-white"></i>
+          <span class="text-white">${msg}</span>
+        </div>`;
+      document.body.appendChild(div);
+      safeCreateIcons();
+      setTimeout(() => { if(div) div.remove(); }, 2500);
+    }
+
+    function showModal(content) {
+      let m = $('modal-overlay');
+      if (!m) { 
+        m = document.createElement('div'); m.id = 'modal-overlay'; 
+        m.addEventListener('click', function(e) { if (e.target === m) closeModal(); });
+        document.body.appendChild(m); 
+      }
+      m.className = 'fixed inset-0 bg-black/75 z-[100] flex items-center justify-center p-4 cursor-pointer';
+      m.innerHTML = `
+        <div class="bg-white rounded-[24px] p-6 w-full max-w-sm modal-anim shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto cursor-auto text-slate-900" onclick="event.stopPropagation()">
+          ${content}
+        </div>`;
+      safeCreateIcons();
+    }
+    function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); isOrderProcessing = false; }
+
+    // หน่วงเวลาและคุมจังหวะการเรนเดอร์เพื่อประหยัดหน่วยความจำ
+    let refreshTimeout = null;
+    function refreshUI() {
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout);
+      }
+      refreshTimeout = setTimeout(() => {
+        if (currentUser && $('dash-content')) {
+          // หากอยู่ในหน้าจอเดิม ให้ดึงการอัปเดตเฉพาะจุดแทนการล้าง DOM ใหม่ทั้งหมด
+          if (lastRenderedTab === currentTab) {
+            updateDynamicValues();
+          } else {
+            renderTabContent();
+          }
+          applyDynamicStyles();
+        }
+      }, 150);
+    }
+
+    function applyDynamicStyles() {
+      const cfg = getConfig();
+      if (!cfg) return;
+
+      applyTheme(cfg.themePrimary, cfg.themeSecondary, cfg.themeType);
+      updateBrowserTab();
+
+      const loginWrapper = document.getElementById('form-card-wrapper');
+      if (loginWrapper) {
+        const bgUrl = getLoginBgUrl();
+        if (bgUrl) {
+          loginWrapper.style.backgroundImage = `url('${bgUrl}')`;
+          loginWrapper.style.backgroundSize = 'cover';
+          loginWrapper.style.backgroundPosition = 'center';
+          loginWrapper.style.backgroundRepeat = 'no-repeat';
+        } else {
+          const p = cfg.themePrimary || '#e6399b';
+          const s = cfg.themeSecondary || '#4f46e5';
+          loginWrapper.style.backgroundImage = `linear-gradient(135deg, ${p}, ${s})`;
+        }
+      }
+
+      const dashOuter = document.getElementById('dash-outer-container');
+      if (dashOuter) {
+        const userBgUrl = getUserBgUrl();
+        if (userBgUrl) {
+          dashOuter.style.backgroundImage = `url('${userBgUrl}')`;
+          dashOuter.style.backgroundSize = 'cover';
+          dashOuter.style.backgroundPosition = 'center';
+          dashOuter.style.backgroundRepeat = 'no-repeat';
+          dashOuter.classList.remove('bg-slate-50');
+        } else {
+          dashOuter.style.backgroundImage = '';
+          dashOuter.classList.add('bg-slate-50');
+        }
+      }
+
+      const marqueeEl = document.getElementById('marquee-text-display');
+      if (marqueeEl) {
+        marqueeEl.innerText = getMarqueeText();
+      }
+
+      const logos = document.querySelectorAll('.app-logo-img');
+      logos.forEach(img => {
+        const logoUrl = getLogoUrl();
+        if (logoUrl) img.src = logoUrl;
+      });
+    }
+
+    function stopPublicSubscriptions() {
+      if (activeListeners.configs) { activeListeners.configs(); activeListeners.configs = null; }
+      if (activeListeners.banners) { activeListeners.banners(); activeListeners.banners = null; }
+      if (activeListeners.galleries) { activeListeners.galleries(); activeListeners.galleries = null; }
+      if (activeListeners.menuIcons) { activeListeners.menuIcons(); activeListeners.menuIcons = null; }
+      if (activeListeners.products) { activeListeners.products(); activeListeners.products = null; }
+      if (activeListeners.showcaseProducts) { activeListeners.showcaseProducts(); activeListeners.showcaseProducts = null; }
+    }
+
+    function startPublicSubscriptions() {
+      stopPublicSubscriptions();
+
+      activeListeners.configs = onSnapshot(doc(db, "configs", "system_config"), (docSnap) => {
+        if (docSnap.exists()) {
+          const cfgData = { ...docSnap.data(), __backendId: docSnap.id };
+          publicData.configs = [cfgData];
+          localStorage.setItem('tos_cached_config', JSON.stringify(cfgData));
+          applyTheme(cfgData.themePrimary, cfgData.themeSecondary, cfgData.themeType);
+          updateBrowserTab();
+          applyDynamicStyles();
+
+          if (!currentUser) {
+            const loginWrapper = document.getElementById('form-card-wrapper');
+            if (loginWrapper) {
+              const isRegistering = $('inp-phone-reg') !== null;
+              if (isRegistering) {
+                showRegisterForm();
+              } else {
+                showLoginForm();
+              }
+            }
+          } else if ($('dash-content')) {
+            refreshUI();
+          }
+        }
+        isConfigsLoaded = true;
+      }, (err) => {
+        console.warn("Config load error: ", err);
+        isConfigsLoaded = true;
+      });
+
+      activeListeners.banners = onSnapshot(collection(db, "banners"), (snapshot) => {
+        let banners = [];
+        snapshot.forEach(d => banners.push({ ...d.data(), __backendId: d.id }));
+        publicData.banners = banners;
+        localStorage.setItem('tos_cached_banners', JSON.stringify(banners));
+        refreshUI();
+      }, (err) => console.warn(err));
+
+      activeListeners.galleries = onSnapshot(collection(db, "galleries"), (snapshot) => {
+        let galleries = [];
+        snapshot.forEach(d => galleries.push({ ...d.data(), __backendId: d.id }));
+        publicData.galleries = galleries;
+        localStorage.setItem('tos_cached_galleries', JSON.stringify(galleries));
+        refreshUI();
+      }, (err) => console.warn(err));
+
+      activeListeners.menuIcons = onSnapshot(collection(db, "menu_icons"), (snapshot) => {
+        let icons = [];
+        snapshot.forEach(d => icons.push({ ...d.data(), __backendId: d.id }));
+        publicData.menuIcons = icons.sort((a,b) => parseInt(a.menuOrder||0) - parseInt(b.menuOrder||0));
+        localStorage.setItem('tos_cached_menu_icons', JSON.stringify(publicData.menuIcons));
+        refreshUI();
+      }, (err) => console.warn(err));
+
+      activeListeners.products = onSnapshot(collection(db, "products"), (snapshot) => {
+        let prods = [];
+        snapshot.forEach(d => prods.push({ ...d.data(), __backendId: d.id }));
+        publicData.products = prods.sort((a,b) => parseInt(a.productOrder||0) - parseInt(b.productOrder||0));
+        localStorage.setItem('tos_cached_products', JSON.stringify(publicData.products));
+        refreshUI();
+      }, (err) => console.warn(err));
+
+      activeListeners.showcaseProducts = onSnapshot(collection(db, "showcase_products"), (snapshot) => {
+        let showcase = [];
+        snapshot.forEach(d => showcase.push({ ...d.data(), __backendId: d.id }));
+        showcase.sort((a, b) => parseInt(a.order || 0) - parseInt(b.order || 0));
+        publicData.showcaseProducts = showcase;
+        localStorage.setItem('tos_cached_showcase', JSON.stringify(showcase));
+        refreshUI();
+      }, (err) => console.warn(err));
+    }
+
+    function handleLogoClick() {
+      if (currentUser) {
+        switchTab('profile');
+      }
+    }
+
+    function stopUserSubscriptions() {
+      if (activeListeners.userDoc) { activeListeners.userDoc(); activeListeners.userDoc = null; }
+      if (activeListeners.userOrders) { activeListeners.userOrders(); activeListeners.userOrders = null; }
+      if (activeListeners.userWithdrawals) { activeListeners.userWithdrawals(); activeListeners.userWithdrawals = null; }
+      if (activeListeners.userSpecialAssigns) { activeListeners.userSpecialAssigns(); activeListeners.userSpecialAssigns = null; }
+    }
+
+    function startUserSubscriptions(userId) {
+      stopUserSubscriptions();
+
+      activeListeners.userDoc = onSnapshot(doc(db, "users", userId), (docSnap) => {
+        if (docSnap.exists()) {
+          currentUser = { ...docSnap.data(), id: docSnap.id, __backendId: docSnap.id };
+          localStorage.setItem('tos_cached_user', JSON.stringify(currentUser)); 
+          refreshUI();
+        } else {
+          doLogout();
+        }
+      }, () => {
+        doLogout();
+      });
+
+      const ordersQuery = query(collection(db, "orders"), where("userId", "==", userId));
+      activeListeners.userOrders = onSnapshot(ordersQuery, (snapshot) => {
+        userOrdersData = [];
+        snapshot.forEach(d => userOrdersData.push({ ...d.data(), __backendId: d.id }));
+        refreshUI();
+      });
+
+      const withdrawalsQuery = query(collection(db, "withdrawals"), where("userId", "==", userId));
+      activeListeners.userWithdrawals = onSnapshot(withdrawalsQuery, (snapshot) => {
+        userWithdrawalsData = [];
+        snapshot.forEach(d => userWithdrawalsData.push({ ...d.data(), __backendId: d.id }));
+        refreshUI();
+      });
+
+      const specialQuery = query(collection(db, "special_assignments"), where("targetUser", "==", userId));
+      activeListeners.userSpecialAssigns = onSnapshot(specialQuery, (snapshot) => {
+        userSpecialAssignData = [];
+        snapshot.forEach(d => userSpecialAssignData.push({ ...d.data(), __backendId: d.id }));
+        refreshUI();
+      });
+    }
+
+    // จัดระเบียบการเชื่อมต่อหน้าเว็บไม่ให้ชนกันตอน Refresh หน้าจอ
+    let isPublicSubscribed = false;
+    function initAppFlow() {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          if (!isPublicSubscribed) {
+            startPublicSubscriptions();
+            isPublicSubscribed = true;
+          }
+          const cachedUserId = localStorage.getItem('tos_logged_user_id');
+          if (cachedUserId) {
+            currentTab = sessionStorage.getItem('tos_current_tab') || 'home';
+            startUserSubscriptions(cachedUserId);
+            renderDashboard();
+          } else {
+            renderLogin();
+          }
+        }
+      });
+
+      signInAnonymously(auth).catch(err => {
+        console.warn("Auth init error: ", err);
+        if (!isPublicSubscribed) {
+          startPublicSubscriptions();
+          isPublicSubscribed = true;
+        }
+      });
+    }
+
+    // ==========================================
+    // LOGIN / REGISTER
+    // ==========================================
+    function getLogoHtml() {
+      const logoUrl = getLogoUrl();
+      const defaultLogo = "https://cdn-icons-png.flaticon.com/512/3081/5123081.png";
+      return `<img src="${logoUrl || defaultLogo}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">`;
+    }
+
+    function getBannerHtml() {
+      const banners = getBanners(); let html = '';
+      if (banners.length > 0) {
+        html += `
+        <div class="relative w-full aspect-[5/3] md:aspect-[20/10] rounded-[32px] overflow-hidden shadow-md mb-4 bg-slate-200 border border-slate-100">
+          ${banners.map((b, i) => `
+            <picture class="absolute inset-0 w-full h-full banner-slide transition-opacity duration-1000" style="opacity: ${i===0?1:0};">
+              <source media="(min-width: 768px)" srcset="${b.bannerPcUrl || b.bannerUrl || ''}">
+              <img src="${b.bannerUrl || ''}" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;">
+            </picture>
+          `).join('')}
+        </div>`;
+      }
+      const marqueeText = getMarqueeText();
+      
+      html += `
+      <div style="background-color: var(--color-marquee-bg) !important;" class="flex items-center text-white rounded-full pl-3.5 pr-5 py-2.5 shadow-sm mb-6 overflow-hidden relative">
+        <div style="background-color: var(--color-marquee-bg) !important;" class="z-10 flex items-center pr-2">
+          <i data-lucide="volume-2" class="text-white w-5 h-5 flex-shrink-0"></i>
+        </div>
+        <div class="marquee-container w-full">
+          <div id="marquee-text-display" class="marquee-text text-sm font-semibold text-white pt-0.5">${marqueeText}</div>
+        </div>
+      </div>`;
+      
+      return html;
+    }
+
+    function startBannerSlide() {
+      clearInterval(bannerInterval); 
+      const slides = document.querySelectorAll('.banner-slide');
+      if (slides.length > 1) { 
+        slides.forEach((slide, i) => {
+          slide.style.opacity = (i === 0) ? '1' : '0';
+        });
+        let idx = 0; 
+        bannerInterval = setInterval(() => { 
+          const activeSlides = document.querySelectorAll('.banner-slide'); 
+          if(!activeSlides.length) {
+            clearInterval(bannerInterval);
+            return; 
+          }
+          if(activeSlides[idx]) activeSlides[idx].style.opacity = '0'; 
+          idx = (idx + 1) % activeSlides.length; 
+          if(activeSlides[idx]) activeSlides[idx].style.opacity = '1'; 
+        }, 4000); 
+      }
+    }
+
+    function renderLogin() {
+      const app = $('app');
+      const bgUrl = getLoginBgUrl();
+      const bgStyle = bgUrl ? `background-image: url('${bgUrl}'); background-size: cover; background-position: center;` : '';
+
+      app.innerHTML = `
+      <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative ${bgUrl ? '' : 'bg-slate-100'}" style="${bgStyle}">
+        <div class="w-full max-w-[380px] relative z-10 py-1">
+          <div class="text-center mb-4">
+            <div id="logo-click" class="logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100">
+              ${getLogoHtml()}
+            </div>
+          </div>
+          <div id="form-card" class="bg-white rounded-[24px] p-5 shadow-2xl border border-slate-100/80 transition-all duration-300">
+            <div id="form-content" class="fade-in"></div>
+          </div>
+        </div>
+      </div>`;
+      showLoginForm();
+      applyDynamicStyles();
+      safeCreateIcons();
+    }
+
+    function showLoginForm() {
+      const logoBtn = $('logo-click'); 
+      if(logoBtn) { logoBtn.className = "logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100"; }
+      $('form-content').innerHTML = `
+        <h2 class="text-slate-800 font-bold text-xl mb-4 text-center tracking-wide">${t('signIn')}</h2>
+        <div class="w-full max-w-[320px] mx-auto space-y-3">
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-phone-login" type="tel" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="User">
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-pass-login" type="password" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="กรุณาใส่รหัสผ่านเข้าสู่ระบบ">
+            <button type="button" onclick="togglePasswordVisibility('inp-pass-login', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <button onclick="doLogin()" id="btn-login" class="w-full py-2.5 bg-primary hover:opacity-95 text-white font-bold rounded-xl shadow-lg active:scale-[0.98] transition text-sm tracking-wide flex justify-center items-center gap-2">${t('signIn')}</button>
+          <button onclick="showRegisterForm()" class="w-full py-2.5 bg-[#3b3a3a] hover:bg-[#2e2e2e] text-white font-bold rounded-xl shadow-md active:scale-[0.98] transition text-sm tracking-wide flex justify-center items-center gap-2">${t('register')}</button>
+        </div>`;
+      safeCreateIcons();
+    }
+
+    function showRegisterForm() {
+      const logoBtn = $('logo-click'); 
+      if(logoBtn) { logoBtn.className = "logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100"; }
+      $('form-content').innerHTML = `
+        <h2 class="text-slate-800 font-bold text-xl mb-4 text-center tracking-wide">${t('register')}</h2>
+        <div class="w-full max-w-[320px] mx-auto space-y-2.5">
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="phone" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-phone-reg" type="tel" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="User">
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-user-reg" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="${t('username')}">
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-pass-reg" type="password" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="ตั้งรหัสผ่าน">
+            <button type="button" onclick="togglePasswordVisibility('inp-pass-reg', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-pass-confirm-reg" type="password" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="ยืนยันรหัสผ่าน">
+            <button type="button" onclick="togglePasswordVisibility('inp-pass-confirm-reg', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-pin-reg" type="password" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="${t('pin')}">
+          </div>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <i data-lucide="smartphone" class="w-4 h-4"></i>
+            </span>
+            <input id="inp-invite-reg" type="text" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="รหัสเชิญ">
+          </div>
+          
+          <button onclick="doRegister()" id="btn-reg" class="w-full py-2.5 bg-gradient-to-r from-[#ca9eff] to-[#7f5eff] text-white font-bold rounded-xl shadow-lg text-sm tracking-wide hover:opacity-95 transition flex justify-center items-center gap-2">${t('register')}</button>
+          
+          <p class="text-xs text-center pt-2 text-slate-500">
+            มีบัญชีอยู่แล้ว <a href="#" onclick="showLoginForm(); return false" class="text-[#5e4bfa] font-bold hover:underline">เข้าสู่ระบบ</a>
+          </p>
+        </div>`;
+      safeCreateIcons();
+    }
+
+    async function doLogin() {
+      const phoneInput = $('inp-phone-login');
+      const passInput = $('inp-pass-login');
+      if (!phoneInput || !passInput) return;
+
+      const phone = phoneInput.value.trim();
+      const password = passInput.value.trim();
+
+      if (!phone || !password) {
+        showToast(t('fillAll'), 'error');
+        return;
+      }
+
+      const btn = $('btn-login');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ${t('processing')}`;
+        safeCreateIcons();
+      }
+
+      try {
+        const q = query(collection(db, "users"), where("phone", "==", phone));
+        const snap = await getDocs(q);
+        
+        if (snap.empty) {
+          showToast(t('userNotFound'), 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = t('signIn');
+            safeCreateIcons();
+          }
+          return;
+        }
+
+        let userDoc = null;
+        snap.forEach(d => {
+          userDoc = { ...d.data(), id: d.id };
+        });
+
+        if (userDoc.password !== password) {
+          showToast(t('invalidPass'), 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = t('signIn');
+            safeCreateIcons();
+          }
+          return;
+        }
+
+        showToast(t('loginSuccess'), 'success');
+        localStorage.setItem('tos_logged_user_id', userDoc.id);
+        currentUser = userDoc;
+        currentTab = 'home';
+        sessionStorage.setItem('tos_current_tab', 'home');
+        
+        startUserSubscriptions(userDoc.id);
+        renderDashboard();
+      } catch (err) {
+        showToast(t('connectionError') + err.message, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = t('signIn');
+          safeCreateIcons();
+        }
+      }
+    }
+
+    async function doRegister() {
+      const phoneInp = $('inp-phone-reg');
+      const userInp = $('inp-user-reg');
+      const passInp = $('inp-pass-reg');
+      const passConfirmInp = $('inp-pass-confirm-reg');
+      const pinInp = $('inp-pin-reg');
+      const inviteInp = $('inp-invite-reg');
+
+      if (!phoneInp || !userInp || !passInp || !passConfirmInp || !pinInp || !inviteInp) return;
+
+      const phone = phoneInp.value.trim();
+      const username = userInp.value.trim();
+      const password = passInp.value.trim();
+      const passConfirm = passConfirmInp.value.trim();
+      const pin = pinInp.value.trim();
+      const inviteCode = inviteInp.value.trim();
+
+      if (!phone || !username || !password || !passConfirm || !pin || !inviteCode) {
+        showToast(t('fillAll'), 'error');
+        return;
+      }
+
+      if (password !== passConfirm) {
+        showToast(currentLang === 'th' ? 'รหัสผ่านไม่ตรงกัน' : 'Passwords do not match', 'error');
+        return;
+      }
+
+      if (isNaN(pin)) {
+        showToast(currentLang === 'th' ? 'รหัส PIN ต้องเป็นตัวเลขเท่านั้น' : 'PIN must be a number', 'error');
+        return;
+      }
+
+      const sysInvite = getInviteCode();
+      if (sysInvite && inviteCode !== sysInvite) {
+        showToast(t('invalidInvite'), 'error');
+        return;
+      }
+
+      const btn = $('btn-reg');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ${t('processing')}`;
+        safeCreateIcons();
+      }
+
+      try {
+        const q = query(collection(db, "users"), where("phone", "==", phone));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          showToast(t('phoneExists'), 'error');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = t('register');
+            safeCreateIcons();
+          }
+          return;
+        }
+
+        const newUserId = genId();
+        const newUserDoc = {
+          id: newUserId,
+          phone: phone,
+          username: username,
+          password: password,
+          withdrawPassword: pin,
+          credit: 0,
+          userLevel: '1',
+          runIndex: 0,
+          creditScore: 100,
+          bankName: '',
+          bankNumber: '',
+          firstName: '',
+          lastName: '',
+          createdAt: new Date().toISOString()
+        };
+
+        await setDoc(doc(db, "users", newUserId), newUserDoc);
+        
+        showToast(t('regSuccess'), 'success');
+        localStorage.setItem('tos_logged_user_id', newUserId);
+        currentUser = newUserDoc;
+        currentTab = 'home';
+        sessionStorage.setItem('tos_current_tab', 'home');
+
+        startUserSubscriptions(newUserId);
+        renderDashboard();
+      } catch (err) {
+        showToast(t('regFailed') + ": " + err.message, 'error');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = t('register');
+          safeCreateIcons();
+        }
+      }
+    }
+
+    async function doLogout() { 
+      stopUserSubscriptions();
+      currentUser = null; 
+      currentTab = 'home'; 
+      localStorage.removeItem('tos_logged_user_id');
+      localStorage.removeItem('tos_cached_user');
+      sessionStorage.setItem('tos_current_tab', 'home'); 
+      renderLogin();
+    }
+
+    // ==========================================
+    // USER DASHBOARD
+    // ==========================================
+    function renderDashboard() {
+      const tabs = [
+        {id:'home',icon:'home',label:t('home')},
+        {id:'products',icon:'shopping-bag',label:t('runOrders')},
+        {id:'history',icon:'clock',label:t('history')},
+        {id:'profile',icon:'user',label:t('profile')},
+        {id:'logout',icon:'log-out',label:t('logout')}
+      ];
+      
+      if (!$('dash-outer-container')) {
+        $('app').innerHTML = `
+        <div id="dash-outer-container" class="h-full flex flex-col bg-slate-50 transition-all duration-300">
+          <div id="dash-content" class="flex-1 overflow-auto pb-24 fade-in" style="background-color: transparent;"></div>
+          <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-100 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] z-50 rounded-t-[28px] nav-glass">
+            <div class="flex justify-around py-3 max-w-lg mx-auto px-4">
+              ${tabs.map(tData => `
+                <button id="nav-btn-${tData.id}" onclick="${tData.id === 'logout' ? 'doLogout()' : `switchTab('${tData.id}')`}" class="flex flex-col items-center gap-1.5 transition-all text-slate-400 hover:text-slate-600">
+                  <i data-lucide="${tData.icon}" class="w-6 h-6"></i>
+                  <span class="text-xs font-bold tracking-wide">${tData.label}</span>
+                </button>
+              `).join('')}
+            </div>
+          </nav>
+        </div>`;
+      }
+      
+      tabs.forEach(tData => {
+        const btn = $(`nav-btn-${tData.id}`);
+        if (btn) {
+          if (currentTab === tData.id) {
+            btn.className = "flex flex-col items-center gap-1.5 transition-all text-primary scale-105 font-bold";
+            const icon = btn.querySelector('i');
+            if (icon) {
+              icon.classList.add('stroke-[2.5]');
+              icon.classList.remove('fill-blue-100/50'); 
+            }
+          } else {
+            btn.className = "flex flex-col items-center gap-1.5 transition-all text-slate-400 hover:text-slate-600";
+            const icon = btn.querySelector('i');
+            if (icon) {
+              icon.classList.remove('stroke-[2.5]', 'fill-blue-100/50');
+            }
+          }
+        }
+      });
+
+      renderTabContent();
+    }
+
+    function switchTab(tab) {
+      if (currentTab === tab) {
+        updateDynamicValues();
+        return;
+      }
+      // เคลียร์ Interval เพื่อประหยัด Memory และ CPU
+      clearInterval(bannerInterval);
+      clearInterval(rewardInterval);
+
+      currentTab = tab;
+      sessionStorage.setItem('tos_current_tab', tab);
+      renderDashboard();
+    }
+    
+    function renderTabContent() {
+      const c = $('dash-content'); 
+      if (!c) return;
+
+      if (!currentUser) {
+        c.innerHTML = '';
+        lastRenderedTab = '';
+        return;
+      }
+
+      c.innerHTML = ''; 
+      lastRenderedTab = currentTab; 
+      
+      if (currentTab === 'home') renderHome(c); 
+      else if (currentTab === 'products') renderProducts(c); 
+      else if (currentTab === 'history') renderHistory(c); 
+      else if (currentTab === 'profile') renderProfile(c);
+      
+      applyDynamicStyles();
+      safeCreateIcons();
+      initGalleryObserver();
+    }
+
+    // ฟังก์ชัน Patch อัปเดตข้อมูลเฉพาะจุดแบบเบา ไม่ล้าง DOM ทั้งแผ่น
+    function updateDynamicValues() {
+      const u = currentUser;
+      if (!u) return;
+
+      const creditVal = u.credit || 0;
+      const done = u.runIndex || 0;
+      const userLevel = u.userLevel || '1';
+
+      const homeCredit = $('home-credit-display');
+      if (homeCredit) homeCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+
+      const prodCredit = $('prod-credit-display');
+      if (prodCredit) prodCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+
+      const histCredit = $('hist-credit-display');
+      if (histCredit) histCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+
+      const profCredit = $('prof-credit-display');
+      if (profCredit) profCredit.innerText = `฿${safeFormatNumber(creditVal)}`;
+
+      const prodDone = $('prod-done');
+      if (prodDone) {
+        const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
+        const total = availableProducts.length;
+        prodDone.innerText = `${done} / ${total}`;
+        
+        const pct = total === 0 ? 0 : Math.min(100, Math.round((done/total)*100));
+        const prodPct = $('prod-pct');
+        if (prodPct) prodPct.style.width = `${pct}%`;
+      }
+      
+      const todayStr = new Date().toDateString();
+      const todayComm = getUserOrders()
+        .filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
+        .reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
+      
+      const prodComm = $('prod-comm-display');
+      if (prodComm) prodComm.innerText = `+฿${safeFormatNumber(todayComm)}`;
+    }
+
+    function openMenuIconPopup(bid) { 
+      const m = publicData.menuIcons.find(d => d.__backendId === bid); 
+      if(!m) return; 
+      showModal(`
+        <div class="text-center mb-4 border-b border-slate-100 pb-4">
+          ${m.menuIconUrl ? `<img src="${m.menuIconUrl}" class="w-16 h-16 mx-auto rounded-full object-cover mb-3 border border-slate-100 shadow-sm">` : `<div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-3"><i data-lucide="file-text"></i></div>`}
+          <h3 class="text-lg font-bold text-slate-800">${m.menuLabel}</h3>
+        </div>
+        <div class="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed text-left max-h-[50vh] overflow-y-auto px-1">${m.menuContent || ''}</div>
+        <button onclick="closeModal()" class="mt-6 w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition">${t('close')}</button>
+      `); 
+    }
+
+    function showSupportModal() {
+      const qr = getLineQrUrl(); const lineId = getLineId(); let content = '';
+      if (qr) content += `<img src="${qr}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
+      if (lineId) content += `<div class="bg-slate-50 rounded-2xl p-3 flex items-center justify-between border border-slate-200/60"><span class="text-slate-500 font-bold text-xs">LINE ID:</span><span class="font-bold text-primary text-base tracking-wide">${lineId}</span></div>`;
+      if (!qr && !lineId) content = `<p class="text-slate-400 font-medium py-4">${t('noSupportCfg')}</p>`;
+      showModal(`<div class="text-center"><h3 class="font-bold text-lg mb-4 text-primary">${t('cs')}</h3>${content}<button onclick="closeModal()" class="mt-6 w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition">${t('close')}</button></div>`);
+    }
+
+    function showTopupModal() {
+      const qr = getTopupQrUrl(); const acc = getTopupAccount(); let content = '';
+      if (qr) content += `<img src="${qr}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
+      if (acc) content += `<div class="bg-slate-50 rounded-2xl p-4 text-center border border-slate-200/60"><p class="text-slate-400 font-bold text-xs mb-2">${t('depositAcc')}</p><p class="font-bold text-slate-800 text-sm whitespace-pre-wrap leading-relaxed">${acc}</p></div>`;
+      if (!qr && !acc) content = `<p class="text-slate-400 font-medium py-4">${t('noDepositCfg')}</p>`;
+      showModal(`
+        <div class="text-center">
+          <h3 class="font-bold text-lg mb-4 text-primary">${t('deposit')}</h3>
+          ${content}
+          <p class="text-xs text-slate-400 mt-4 font-medium">${t('depositTerms')}</p>
+          <div class="flex gap-3 mt-5">
+            <button onclick="closeModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">${t('close')}</button>
+            <button onclick="closeModal(); showSupportModal();" class="flex-1 py-3 bg-primary text-white font-bold rounded-2xl shadow-md hover:opacity-95 active:scale-[0.98] transition">${t('sendSlip')}</button>
+          </div>
+        </div>`);
+    }
+
+    window.showLanguageSelector = () => {
+      showModal(`
+        <div class="text-center">
+          <h3 class="font-bold text-base mb-4 text-slate-800">${currentLang === 'th' ? 'เลือกภาษา / Select Language' : 'Select Language'}</h3>
+          <div class="space-y-2.5">
+            <button onclick="selectLanguage('th')" class="w-full py-3.5 px-4 rounded-2xl border ${currentLang === 'th' ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 hover:bg-slate-50'} font-bold text-sm transition">ภาษาไทย (Thai)</button>
+            <button onclick="selectLanguage('en')" class="w-full py-3.5 px-4 rounded-2xl border ${currentLang === 'en' ? 'border-primary bg-blue-50 text-primary' : 'border-slate-200 hover:bg-slate-50'} font-bold text-sm transition font-sans">English (English)</button>
+          </div>
+          <button onclick="closeModal()" class="mt-4 w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition text-xs">${t('close')}</button>
+        </div>
+      `);
+    };
+
+    window.selectLanguage = (lang) => {
+      currentLang = lang;
+      localStorage.setItem('tos_lang', lang);
+      lastRenderedTab = '';
+      closeModal();
+      renderDashboard();
+    };
+
+    let galleryObserver = null;
+    let showcaseObserver = null;
+
+    function initGalleryObserver() {
+      if (galleryObserver) galleryObserver.disconnect();
+      if (showcaseObserver) showcaseObserver.disconnect();
+
+      galleryObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('reveal');
+          } else {
+            entry.target.classList.remove('reveal');
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.gallery-item').forEach(el => galleryObserver.observe(el));
+
+      showcaseObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed-slide');
+          } else {
+            entry.target.classList.remove('revealed-slide');
+          }
+        });
+      }, { threshold: 0.15 });
+      const targetSec = document.getElementById('showcase-section');
+      if (targetSec) showcaseObserver.observe(targetSec);
+
+      const revealLefts = document.querySelectorAll('.scroll-reveal-left');
+      const revealRights = document.querySelectorAll('.scroll-reveal-right');
+      
+      const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('scroll-reveal-active');
+          } else {
+            entry.target.classList.remove('scroll-reveal-active');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      revealLefts.forEach(el => scrollObserver.observe(el));
+      revealRights.forEach(el => scrollObserver.observe(el));
+
+      clearInterval(rewardInterval);
+      const cfg = getConfig();
+      const rewardStr = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
+      const items = rewardStr.split(',').map(x => x.trim()).filter(Boolean);
+      let rewardIndex = 0;
+
+      if (items.length > 0) {
+        rewardInterval = setInterval(() => {
+          const elPhone = document.getElementById('reward-phone-display');
+          const elAmt = document.getElementById('reward-amount-display');
+          if (!elPhone || !elAmt) return;
+
+          rewardIndex = (rewardIndex + 1) % items.length;
+          const [phone, amt] = items[rewardIndex].split(':');
+
+          elPhone.style.opacity = '0';
+          elAmt.style.opacity = '0';
+          elPhone.style.transform = 'translateY(-8px)';
+          elAmt.style.transform = 'translateY(-8px)';
+          elPhone.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+          elAmt.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          setTimeout(() => {
+            elPhone.innerText = phone || 'User';
+            elAmt.innerText = (amt || '0') + ' THB';
+            elPhone.style.opacity = '1';
+            elAmt.style.opacity = '1';
+            elPhone.style.transform = 'translateY(0)';
+            elAmt.style.transform = 'translateY(0)';
+          }, 400);
+        }, 3000);
+      }
+    }
+
+    function renderHome(c) {
+      const u = currentUser;
+      if (!u) {
+        c.innerHTML = '';
+        return;
+      }
+      const creditVal = u.credit || 0;
+      const usernameVal = u.username || 'User';
+      const cfg = getConfig();
+      const scheduleText = cfg.scheduleText || 'เปิดทำการ 10:00-22:00 น.';
+      
+      const banners = getBanners(); 
+      const gallery = getGallery(); 
+      const menus = getMenuIcons();
+
+      renderedBannersCount = banners.length;
+      renderedGalleryCount = gallery.length;
+      renderedMenuCount = menus.length;
+
+      let menuIconsHtml = ''; 
+      if (menus.length > 0) {
+        menuIconsHtml = `
+        <div style="background-color: var(--color-menu-bg) !important;" class="grid grid-cols-4 gap-4 mt-6 p-5 rounded-[32px] shadow-sm">
+          ${menus.map(m => `
+            <div onclick="openMenuIconPopup('${m.__backendId}')" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+              <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-slate-100 shadow-sm overflow-hidden p-1.5">
+                ${m.menuIconUrl ? `<img src="${m.menuIconUrl}" class="w-full h-full object-cover rounded-full">` : `<i data-lucide="info" class="text-primary w-6 h-6"></i>`}
+              </div>
+              <span class="text-xs font-bold text-white text-center leading-tight line-clamp-2">${m.menuLabel}</span>
+            </div>
+          `).join('')}
+        </div>`;
+      }
+
+      const defaultProducts = [
+        { name: "นาฬิกา MIDO Belluna Sunray", price: "10,540.00 THB", image: "https://www.midowatches.com/media/catalog/product/M/0/M024.630.11.061.00_1.png" },
+        { name: "กระเป๋า COACH Tabby Top Handle 20", price: "5,150.00 THB", image: "https://img.images.coachetd.com/tabby-top-handle-20.png" },
+        { name: "หูฟัง BOSE QuietComfort® 45", price: "11,900.00 THB", image: "https://assets.bose.com/content/dam/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/images/QC45_black_EC_hero.png" },
+        { name: "ไอแพด APPLE 12.9-inch iPad Pro M2", price: "50,900.00 THB", image: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-12-select-wifi-spacegray-202210?wid=940&hei=1112&fmt=png-alpha" },
+        { name: "กล้อง SONY ZV-E10 - สีขาว", price: "25,990.00 THB", image: "https://www.sony.co.th/image/62b84f33160b741eb5bfdf8b39a3f2d2?fmt=png-alpha" },
+        { name: "น้ำมันหอมระเหย MT.SAPOLA Home Scent", price: "4,390.00 THB", image: "https://www.mtsapola.com/media/catalog/product/h/o/home-scent-tranquil.png" },
+        { name: "เครื่องชงกาแฟ Nespresso Creatista Pro", price: "28,500.00 THB", image: "https://www.nespresso.com/shared_res/manuals/creatista-pro/creatista-pro-hero.png" },
+        { name: "ไอโฟน APPLE iPhone 14 Pro - สี Gold", price: "45,900.00 THB", image: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-gold?wid=5120&hei=2880&fmt=p-jpg" }
+      ];
+
+      const fallbackImages = [
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300",
+        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300",
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300",
+        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300",
+        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300",
+        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=300",
+        "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?w=300",
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300"
+      ];
+
+      const activeShowcase = (publicData.showcaseProducts && publicData.showcaseProducts.length > 0)
+        ? publicData.showcaseProducts
+        : (publicData.products && publicData.products.length >= 8 ? publicData.products.slice(0, 8) : defaultProducts);
+
+      let featuredProductsHtml = `
+      <div id="showcase-section" class="mt-6 bg-white p-4 rounded-[28px] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="grid grid-cols-4 md:grid-cols-8 gap-1.5 md:gap-3">
+          ${activeShowcase.map((p, index) => {
+            const fallbackImg = fallbackImages[index % 8];
+            const pName = p.productName || p.name;
+            const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
+            const pImg = p.productImage || p.image;
+
+            return `
+            <div class="bg-slate-50 border border-slate-100 rounded-xl p-2 flex flex-col justify-between text-left relative overflow-hidden shadow-inner">
+              <div class="w-full aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center p-1 mb-2">
+                <img src="${pImg}" class="w-full h-full object-contain" onerror="this.src='${fallbackImg}'">
+              </div>
+              <p class="text-[9px] font-bold text-slate-700 line-clamp-2 leading-tight">${pName}</p>
+              <div class="mt-2">
+                <p class="text-[10px] font-black text-slate-900">${pPrice}</p>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+
+      const rewardStr = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
+      const defaultReward = rewardStr.split(',')[0] || '095***567:433,000';
+      const [firstPhone, firstAmt] = defaultReward.split(':');
+
+      let commissionSummaryHtml = `
+      <div class="bg-white rounded-2xl p-4 mt-4 shadow-sm border border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-700 relative overflow-hidden">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-500">ค่าตอบแทน</span>
+        </div>
+        <div class="flex gap-4 items-center">
+          <span id="reward-phone-display" class="text-xs text-slate-600 block transition-all duration-300 transform">${firstPhone}</span>
+          <span id="reward-amount-display" class="text-slate-900 font-black transition-all duration-300 transform">${firstAmt} THB</span>
+        </div>
+      </div>`;
+
+      let galleryHtml = ''; 
+      if (gallery.length > 0) {
+        galleryHtml = `
+        <div class="mt-6">
+          <div class="grid grid-cols-2 gap-4">
+            ${gallery.map(g => `
+              <div class="gallery-item w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-slate-100 bg-white p-1.5 flex items-center justify-center">
+                <img src="${g.galleryUrl}" class="w-full h-full object-cover rounded-[18px]" onerror="this.src=''">
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      }
+
+      c.innerHTML = `
+        <div id="home-container" class="p-4 w-full fade-in">
+          ${getBannerHtml()}
+          <div class="bg-theme-gradient rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-15"><i data-lucide="wallet" class="w-24 h-24"></i></div>
+            <h2 class="text-sm font-medium text-white/70">${t('welcome')}, <span class="font-bold text-white text-base">${usernameVal}</span></h2>
+            <p class="mt-4 text-white/80 text-xs font-semibold uppercase tracking-wider">${t('availBalance')}</p>
+            <p id="home-credit-display" class="text-3xl font-black mt-1 tracking-tight">฿${safeFormatNumber(creditVal)}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mt-6">
+            <button onclick="switchTab('products')" class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 hover:shadow-md active:scale-[0.98] transition">
+              <div class="w-14 h-14 bg-blue-50 text-primary rounded-3xl flex items-center justify-center shadow-inner"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div>
+              <span class="font-bold text-slate-700 text-sm">${t('runOrders')}</span>
+            </button>
+            <button onclick="switchTab('history')" class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 hover:shadow-md active:scale-[0.98] transition">
+              <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center shadow-inner"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+              <span class="font-bold text-slate-700 text-sm">${t('history')}</span>
+            </button>
+          </div>
+
+          ${featuredProductsHtml}
+          ${commissionSummaryHtml}
+
+          <div class="text-center mt-6 py-2">
+            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">ตารางงาน</p>
+            <p class="text-sm font-extrabold text-slate-900 mt-1">${scheduleText}</p>
+          </div>
+
+          ${menuIconsHtml}
+          ${galleryHtml}
+        </div>`;
+      
+      startBannerSlide();
+      setTimeout(initGalleryObserver, 150);
+    }
+
+    function renderProducts(c) {
+      const u = currentUser; 
+      if (!u) {
+        c.innerHTML = '';
+        return;
+      }
+      const userLevel = u.userLevel || '1';
+      const creditVal = u.credit || 0;
+      const done = u.runIndex || 0;
+      
+      const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
+      const total = availableProducts.length; 
+      const pct = total === 0 ? 0 : Math.min(100, Math.round((done/total)*100));
+      const todayStr = new Date().toDateString();
+      const todayComm = getUserOrders().filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed').reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
+      
+      let levelText = 'VIP ' + userLevel; 
+      if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
+      if(userLevel === 'allowwd') levelText = currentLang === 'th' ? 'ปลดล็อกแล้ว' : 'Unblocked';
+
+      const levelSubtextHtml = (userLevel === 'allowwd') 
+        ? '' 
+        : `<p class="text-center text-white/80 mt-1 font-medium text-sm">(${levelText})</p>`;
+
+      c.innerHTML = `
+        <div id="products-container" class="fade-in">
+          <div class="p-4 w-full">${getBannerHtml()}</div>
+          <div class="bg-primary text-white p-6 pb-12 rounded-t-[40px] shadow-lg mt-[-20px]">
+            <h2 class="text-xl font-bold text-center">${t('orderMatchingSystem')}</h2>
+            ${levelSubtextHtml}
+          </div>
+          <div class="p-4 -mt-8 relative z-10">
+            <div class="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 text-center">
+              <div class="flex justify-between text-sm font-bold text-slate-600 mb-2">
+                <span>${t('completedToday')}</span>
+                <span class="text-primary" id="prod-done">${done} / ${total}</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden p-0.5">
+                <div id="prod-pct" class="bg-primary h-2 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+              </div>
+              <button id="btn-start-run" onclick="startRun(this)" class="w-full py-4 bg-primary hover:opacity-90 text-white font-bold rounded-2xl shadow-lg active:scale-[0.98] transition duration-200 text-base flex justify-center items-center gap-2">
+                <i data-lucide="play-circle"></i> ${t('startMatch')}
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-5">
+              <div class="scroll-reveal-left bg-white p-4 rounded-[24px] shadow-sm border border-slate-100 text-center flex flex-col justify-center">
+                <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('currentCredit')}</p>
+                <p id="prod-credit-display" class="text-lg font-black text-primary truncate">฿${safeFormatNumber(creditVal)}</p>
+              </div>
+              <div class="scroll-reveal-right bg-white p-4 rounded-[24px] shadow-sm border border-slate-100 text-center flex flex-col justify-center">
+                <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('todayProfit')}</p>
+                <p id="prod-comm-display" class="text-lg font-black text-emerald-500 truncate">+฿${safeFormatNumber(todayComm)}</p>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      
+      startBannerSlide();
+    }
+
+    function startRun(btnElement) {
+      if (isOrderProcessing) return; isOrderProcessing = true;
+      if (btnElement) { btnElement.disabled = true; btnElement.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> ${t('processing')}`; safeCreateIcons(); }
+      const u = currentUser;
+      if (!u) return;
+      const creditVal = u.credit || 0;
+      const done = u.runIndex || 0;
+      const userLevel = u.userLevel || '1';
+
+      if (getUserOrders().find(o => o.status === 'pending')) {
+        showModal(`
+          <div class="text-center py-4">
+            <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-amber-100"><i data-lucide="alert-circle" class="w-10 h-10"></i></div>
+            <h3 class="text-lg font-bold text-slate-800">${t('pendingExist')}</h3>
+            <p class="text-slate-600 text-sm mt-2 leading-relaxed">${t('pendingExistSub')}</p>
+            <button onclick="closeModal(); switchTab('history'); switchHistoryTab('orders');" class="mt-6 w-full py-3.5 bg-primary text-white font-bold rounded-2xl shadow-md text-base hover:opacity-95 active:scale-[0.98] transition">${t('viewPending')}</button>
+          </div>`);
+        if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); } return;
+      }
+
+      if (creditVal <= 0) {
+        showModal(`
+          <div class="text-center py-4">
+            <div class="w-20 h-20 bg-slate-900 text-white rounded-3xl flex items-center justify-center mx-auto mb-4"><i data-lucide="alert-circle" class="w-10 h-10"></i></div>
+            <h3 class="text-lg font-bold text-slate-800">${t('insufficientBal')}</h3>
+            <p class="text-slate-600 text-sm mt-2">${t('insufficientSub')}</p>
+            <button onclick="closeModal(); showSupportModal();" class="mt-6 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl shadow-md flex justify-center items-center gap-2 text-base hover:bg-black transition">${t('contactSupport')}</button>
+            <button onclick="closeModal()" class="mt-3 w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200">${t('close')}</button>
+          </div>`);
+        if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); } return;
+      }
+
+      const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
+      const targetOrderNum = done + 1;
+      
+      const specialProduct = getSpecialAssignments().find(s => s.targetUser === u.id && Number(s.targetIndex) === targetOrderNum);
+      let pToRun = null; let isSpecial = false;
+      
+      if (specialProduct) { 
+        pToRun = specialProduct; isSpecial = true; 
+      } else {
+        if (availableProducts.length === 0) { showToast(t('noProductTier'),'info'); isOrderProcessing = false; if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); } return; }
+        if (done >= availableProducts.length) { showToast(t('allTasksDone'),'info'); isOrderProcessing = false; if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); } return; }
+        pToRun = availableProducts[done];
+      }
+      processOrderFlowStep1(pToRun, isSpecial, btnElement);
+    }
+
+    function processOrderFlowStep1(p, isSpecial, btnElement) {
+      showModal(`<div class="text-center py-8"><div class="dot-anim mb-4 flex justify-center mx-auto"><span></span><span></span><span></span></div><p class="text-slate-600 font-bold mt-4 text-base">${t('matchingOrder')}</p></div>`);
+      setTimeout(() => {
+        if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); }
+        showModal(`
+          <div class="text-center">
+            <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center shadow-inner p-4 relative">
+              ${isSpecial ? `<div class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">${t('specialOrder')}</div>` : ''}
+              ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
+            </div>
+            <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
+            <div class="mt-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60">
+              <p class="text-xs text-slate-400 font-semibold mb-0.5">${t('productPrice')}</p>
+              <p class="font-black text-primary text-xl">฿${(p.productPrice||0).toLocaleString()}</p>
+            </div>
+            <button id="btn-buy-step1" onclick="triggerStep1Delay('${p.__backendId}', ${isSpecial || p.isSpecial || false})" class="mt-5 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-black transition duration-200 text-base">${t('submitOrder')}</button>
+          </div>`);
+      }, 3500); 
+    }
+
+    function triggerStep1Delay(pId, isSpecial) {
+      const btn = $('btn-buy-step1');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="inline-flex items-center gap-2"><i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> ${t('processingTx')}</span>`;
+      safeCreateIcons();
+      setTimeout(() => {
+        processOrderFlowStep2(pId, isSpecial);
+      }, 1500);
+    }
+
+    async function processOrderFlowStep2(productIdOrObj, isSpecial) {
+      const u = currentUser; 
+      if (!u) return;
+      const creditVal = u.credit || 0;
+      const usernameVal = u.username || 'User';
+      
+      let p = typeof productIdOrObj === 'object' ? productIdOrObj : publicData.products.find(d => d.__backendId === productIdOrObj); 
+      
+      if(!p && typeof productIdOrObj === 'string') {
+        p = userSpecialAssignData.find(d => d.__backendId === productIdOrObj);
+      }
+      if(!p && typeof productIdOrObj === 'string') {
+        p = userOrdersData.find(d => d.__backendId === productIdOrObj);
+      }
+      if(!p) return;
+      
+      const isSpecialMode = (isSpecial === true || String(isSpecial) === 'true');
+
+      if (creditVal < (p.productPrice || 0)) { 
+        const existingPending = getUserOrders().find(o => o.status === 'pending');
+        if (p.type !== 'order' && !existingPending) {
+          const orderData = { 
+            type:'order', id:genId(), userId:u.id, username:usernameVal, 
+            productName:p.productName, productPrice:p.productPrice, 
+            commission:p.commission, productImage:p.productImage||'', 
+            status:'pending', isSpecial: isSpecialMode, createdAt: new Date().toISOString() 
+          };
+          await setDoc(doc(db, "orders", orderData.id), orderData);
+          p = orderData; 
+        } else if (existingPending) { 
+          p = existingPending; 
+        }
+        showModal(`
+          <div class="text-center">
+            <div class="w-full h-64 bg-slate-100 rounded-2xl mb-4 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
+              ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain relative z-0">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
+            </div>
+            <p class="text-slate-950 font-bold mt-5 text-center text-sm leading-relaxed uppercase px-2">${t('insufficientSub')}</p>
+            <button onclick="closeModal(); showSupportModal();" class="mt-6 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-black transition shadow-md text-base flex justify-center items-center gap-2">${t('contactSupport')}</button>
+            <button onclick="closeModal(); switchTab('history'); switchHistoryTab('orders');" class="mt-3 w-full py-3 bg-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-300 transition">${t('viewPending')}</button>
+          </div>`);
+        return;
+      }
+
+      showModal(`
+        <div class="text-center">
+          <div class="w-full h-64 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-100 flex items-center justify-center shadow-inner p-4">
+            ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300"></i>`}
+          </div>
+          <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
+          <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 mt-5 text-sm text-left shadow-inner">
+            <div class="flex justify-between mb-2">
+              <span class="text-slate-600 font-bold">${t('walletBal')}</span> 
+              <span class="font-bold text-primary">฿${creditVal.toLocaleString()}</span>
+            </div>
+            <div class="flex justify-between text-base border-t border-slate-200 pt-2 mt-2">
+              <span class="text-slate-950 font-bold">${t('amountDue')}</span> 
+              <span class="font-black text-slate-950">฿${p.productPrice.toLocaleString()}</span>
+            </div>
+          </div>
+          <button onclick="confirmOrderSuccess('${p.__backendId}', ${isSpecialMode})" id="btn-confirm-final" class="mt-6 w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-md active:scale-[0.98] transition text-base">${t('confirmPurchase')}</button>
+        </div>`);
+    }
+
+    async function confirmOrderSuccess(id, isSpecial) {
+      const btn = $('btn-confirm-final'); if(!btn || btn.disabled) return;
+      btn.disabled = true; btn.innerHTML = t('processing');
+      
+      let p = publicData.products.find(d => d.__backendId === id) || userSpecialAssignData.find(d => d.__backendId === id) || userOrdersData.find(d => d.__backendId === id); 
+      if(!p) return;
+
+      let userDocRef = doc(db, "users", currentUser.id);
+
+      try {
+        await runTransaction(db, async (transaction) => {
+          const snap = await transaction.get(userDocRef);
+          if (!snap.exists()) throw "User does not exist!";
+          
+          const userData = snap.data();
+          const currentCredit = userData.credit || 0;
+          const currentRunIndex = userData.runIndex || 0;
+
+          if (currentCredit < p.productPrice) throw "Credit insufficient!";
+
+          let calculatedCredit = currentCredit + p.commission; 
+
+          const updatePayload = {
+            credit: calculatedCredit,
+            runIndex: currentRunIndex + 1
+          };
+
+          transaction.update(userDocRef, updatePayload);
+
+          if (p.type === 'order') {
+            transaction.update(doc(db, "orders", p.id), { status: 'completed' });
+          } else {
+            const newOrderRef = doc(collection(db, "orders"));
+            transaction.set(newOrderRef, {
+              type: 'order',
+              id: newOrderRef.id,
+              userId: userData.id,
+              username: userData.username || 'User',
+              productName: p.productName,
+              productPrice: p.productPrice,
+              commission: p.commission,
+              productImage: p.productImage || '',
+              status: 'completed',
+              isSpecial: isSpecial,
+              createdAt: new Date().toISOString()
+            });
+          }
+
+          if (isSpecial) {
+            const assignment = userSpecialAssignData.find(s => s.targetUser === userData.id && Number(s.targetIndex) === (currentRunIndex + 1));
+            if (assignment) {
+              transaction.delete(doc(db, "special_assignments", assignment.__backendId));
+            }
+          }
+        });
+
+        showModal(`
+          <div class="text-center py-4">
+            <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-emerald-100"><i data-lucide="check-circle" class="w-12 h-12"></i></div>
+            <h3 class="text-lg font-black text-emerald-600 mb-1">${t('taskCompleted')}</h3>
+            <p class="text-slate-500 text-xs font-medium">${t('commCredited')}</p>
+            <button onclick="closeModal(); lastRenderedTab=''; renderTabContent();" class="mt-6 w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition shadow-md text-base">${t('continueBtn')}</button>
+          </div>`);
+
+      } catch (err) {
+        showToast(t('errorProcessingOrder'), 'error');
+        closeModal();
+      }
+    }
+
+    function switchHistoryTab(tab) { historyTab = tab; if($('history-container')) $('history-container').remove(); renderHistory($('dash-content')); }
+
+    function renderHistory(c) {
+      const u = currentUser; 
+      if (!u) {
+        c.innerHTML = '';
+        return;
+      }
+      let listHtml = '';
+      const done = u.runIndex || 0;
+      const userLevel = u.userLevel || '1';
+      const creditVal = u.credit || 0;
+      
+      if (historyTab === 'orders') {
+        const orders = getUserOrders().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const totalVipProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel)).length;
+        const isAllDone = done >= totalVipProducts && totalVipProducts > 0;
+        const pendingOrder = orders.find(o => o.status === 'pending');
+        let seenOrderIds = new Set();
+        const completedOrders = orders.filter(o => { if (o.status !== 'pending' && o.status !== undefined && !seenOrderIds.has(o.id)) { seenOrderIds.add(o.id); return true; } return false; }); 
+        const allCompleted = [...completedOrders, ...orders.filter(o => o.status === undefined && !seenOrderIds.has(o.id))];
+        let html = '';
+        
+        if (pendingOrder) { 
+          html += `
+          <div class="bg-amber-50/50 p-5 rounded-[28px] shadow-sm border border-amber-200/60 mb-5 relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl">${t('pendingPayment')}</div>
+            <div class="flex items-center gap-4 mb-4 mt-2">
+              <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1">
+                ${pendingOrder.productImage ? `<img src="${pendingOrder.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-slate-800 line-clamp-2 text-sm leading-snug">${pendingOrder.productName}</p>
+                <p class="text-xs text-slate-400 mt-1 font-semibold">${new Date(pendingOrder.createdAt).toLocaleString()}</p>
+              </div>
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-slate-100 mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-slate-400">${t('productPrice')}</span>
+                <span class="font-black text-slate-800 text-sm">฿${(pendingOrder.productPrice||0).toLocaleString()}</span>
+              </div>
+              <div class="flex justify-between items-center border-t border-slate-100 pt-2 mt-2">
+                <span class="text-xs font-bold text-emerald-600">${t('commission')}</span>
+                <span class="font-black text-emerald-600 text-sm">+฿${(pendingOrder.commission||0).toLocaleString()}</span>
+              </div>
+            </div>
+            <button id="btn-pay-pending" onclick="if(!isOrderProcessing){ isOrderProcessing=true; this.disabled=true; this.innerHTML='${t('processing')}'; processOrderFlowStep2('${pendingOrder.__backendId}', ${pendingOrder.isSpecial});}" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow transition text-base">${t('textSettlePending')}</button>
+          </div>`; 
+        }
+        if (allCompleted.length === 0 && !pendingOrder) {
+          html += `<div class="text-center text-slate-400 py-12 font-medium text-sm">${t('noTasksRecorded')}</div>`;
+        } else { 
+          html += allCompleted.map(o => { 
+            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
+            return `
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100">
+              <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
+                ${o.productImage ? `<img src="${o.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
+              </div>
+              <div class="flex-1 min-w-0 pr-12">
+                <p class="font-bold text-slate-800 truncate text-xs">${o.productName}</p>
+                <p class="text-xs text-slate-400 mt-0.5 font-semibold">${new Date(o.createdAt).toLocaleString()}</p>
+                <div class="mt-1"><span class="inline-block text-xs font-bold px-2 py-0.5 rounded-full ${statusConfig.bg}">${statusConfig.text}</span></div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="font-bold text-slate-800 text-sm">฿${(o.productPrice||0).toLocaleString()}</p>
+                <p class="text-xs text-emerald-500 font-bold">+฿${(o.commission||0).toLocaleString()}</p>
+              </div>
+            </div>`; 
+          }).join(''); 
+        }
+        listHtml = html;
+      } else {
+        const wds = getUserWithdrawals().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        listHtml = wds.length === 0 ? `<div class="text-center text-slate-400 py-12 font-medium text-sm">${t('noTransactions')}</div>` : wds.map(w => { 
+          let sc = { color: 'text-slate-500', text: 'Unknown' }; 
+          if (w.status === 'deposit') sc = { color: 'text-emerald-600 bg-emerald-50 border border-emerald-100', text: t('deposit') }; 
+          else if (w.status === 'pending') sc = { color: 'text-amber-600 bg-amber-50 border border-amber-100', text: t('pending') }; 
+          else if (w.status === 'approved') sc = { color: 'text-blue-600 bg-blue-50 border border-blue-100', text: t('approved') }; 
+          else if (w.status === 'rejected') sc = { color: 'text-rose-500 bg-rose-50 border border-rose-100', text: t('rejected') }; 
+          
+          const isDeposit = w.status === 'deposit';
+          const amtContainerClass = isDeposit ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600' : 'bg-slate-100 border-slate-200 text-slate-800';
+
+          return `
+          <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between mb-3.5 hover:shadow-md transition duration-200">
+            <div class="space-y-2">
+              <span class="px-3.5 py-1.5 rounded-xl text-xs font-bold ${sc.color} inline-block">${sc.text}</span>
+              <p class="text-[11px] text-slate-400 font-bold block">${new Date(w.createdAt).toLocaleString()}</p>
+            </div>
+            <div class="text-right">
+              <div class="inline-flex flex-col items-end px-4 py-2 rounded-2xl border ${amtContainerClass} min-w-[120px]">
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">${t('amount')}</span>
+                <span class="font-black text-base">฿${(w.amount||0).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>`; 
+        }).join('');
+      }
+      
+      if ($('history-container') && $('hist-tab-state').value === historyTab) { 
+        if ($('hist-credit-display')) $('hist-credit-display').innerText = '฿' + safeFormatNumber(creditVal); 
+        if ($('hist-list-container')) $('hist-list-container').innerHTML = listHtml; 
+        safeCreateIcons(); 
+        return; 
+      }
+      
+      c.innerHTML = `
+        <div id="history-container" class="p-4 fade-in">
+          <input type="hidden" id="hist-tab-state" value="${historyTab}">
+          <div class="bg-theme-gradient text-white rounded-[32px] p-5 mb-5 shadow-lg relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-10"><i data-lucide="wallet" class="w-32 h-32 -mt-4 -mr-4"></i></div>
+            <div class="relative z-10">
+              <p class="text-white/70 text-xs font-semibold mb-1 uppercase tracking-wide">${t('availBalance')}</p>
+              <p id="hist-credit-display" class="text-2xl font-black tracking-tight">฿${safeFormatNumber(creditVal)}</p>
+            </div>
+          </div>
+          <h2 class="text-base font-bold text-slate-800 mb-4 px-1.5 flex items-center gap-2"><i data-lucide="activity" class="text-primary"></i> ${t('activityLog')}</h2>
+          
+          <div class="flex bg-slate-200/50 p-1.5 rounded-2xl mb-5 border border-slate-200/20 backdrop-blur-md">
+            <button onclick="switchHistoryTab('orders')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'orders' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('orders')}</button>
+            <button onclick="switchHistoryTab('transactions')" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${historyTab === 'transactions' ? 'bg-white text-primary shadow-md scale-[1.02]' : 'text-slate-500 hover:text-slate-700'}">${t('transactions')}</button>
+          </div>
+          <div id="hist-list-container">${listHtml}</div>
+        </div>`;
+      
+      safeCreateIcons();
+    }
+
+    function renderProfile(c) {
+      const u = currentUser;
+      if (!u) {
+        c.innerHTML = '';
+        return;
+      }
+      const creditVal = u.credit || 0;
+      const usernameVal = u.username || 'User';
+      const userLevel = u.userLevel || '1';
+      
+      if ($('profile-container')) { if ($('prof-credit-display')) $('prof-credit-display').innerText = '฿' + safeFormatNumber(creditVal); return; }
+      const logoUrl = getLogoUrl(); 
+      let levelText = 'VIP ' + userLevel; 
+      if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
+      if(userLevel === 'allowwd') levelText = currentLang === 'th' ? 'ปลดล็อกแล้ว' : 'Unblocked';
+
+      const levelBadgeHtml = (userLevel === 'allowwd')
+        ? ''
+        : `<span class="inline-block mt-3 px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-200 shadow-sm">⭐ ${levelText}</span>`;
+
+      c.innerHTML = `
+        <div id="profile-container" class="p-4 space-y-5 fade-in relative">
+          <div class="bg-white p-6 rounded-[32px] shadow-sm border border-slate-100 text-center relative overflow-hidden">
+            
+            <div class="absolute top-4 right-4 z-10">
+              <button onclick="showLanguageSelector()" class="px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                <i data-lucide="languages" class="w-4 h-4 text-primary"></i>
+                <span>${currentLang === 'th' ? 'เปลี่ยนภาษา' : 'Change Language'}</span>
+              </button>
+            </div>
+
+            <div class="w-32 h-32 rounded-full mx-auto overflow-hidden mt-6 flex items-center justify-center bg-slate-50 border border-slate-100 shadow-lg">
+              ${logoUrl ? `<img src="${logoUrl}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">` : `<div class="w-32 h-32 bg-blue-50 text-primary rounded-full flex items-center justify-center cursor-pointer" onclick="handleLogoClick()"><i data-lucide="user" class="w-16 h-16 text-primary"></i></div>`}
+            </div>
+            <h3 class="font-black text-xl text-slate-800 mt-3">${usernameVal}</h3>
+            <p class="text-slate-400 text-sm mt-1 font-semibold">📞 ${u.phone}</p>
+            ${levelBadgeHtml}
+            <div class="mt-5 pt-4 border-t border-slate-100 text-center">
+              <p class="text-xs text-slate-400 font-bold uppercase mb-1">${t('availBalance')}</p>
+              <p id="prof-credit-display" class="text-2xl font-black text-primary">฿${safeFormatNumber(creditVal)}</p>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm"><i data-lucide="credit-card" class="text-primary stroke-[2.2]"></i> ${t('bankAccount')}</h3>
+              <button onclick="showEditBank()" class="text-xs text-primary font-bold bg-blue-50 px-3.5 py-1.5 rounded-xl hover:bg-blue-100 transition">${t('editBank')}</button>
+            </div>
+            ${u.bankName ? `
+              <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-200/50">
+                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('bank')}</p>
+                <p class="font-bold text-slate-800 mb-3 text-sm">${u.bankName}</p>
+                <p class="text-xs text-slate-400 font-semibold mb-1 uppercase">${t('accNumber')}</p>
+                <p class="font-mono text-base text-slate-700 tracking-wider font-bold">${u.bankNumber}</p>
+              </div>` : `
+              <div class="bg-rose-50/40 p-4 rounded-2xl border border-rose-100 text-center">
+                <p class="text-rose-500 font-bold text-xs">${t('noBankDetails')}</p>
+              </div>`}
+          </div>
+          <div class="space-y-3 pt-2">
+            <button onclick="showTopupModal()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold shadow-md flex justify-center items-center gap-2 text-base hover:bg-emerald-600 transition">${t('deposit')}</button>
+            <button onclick="showWithdrawModal()" class="w-full py-4 bg-theme-gradient text-white rounded-2xl font-bold shadow-lg flex justify-center items-center gap-2 text-base hover:opacity-95 transition">${t('withdrawal')}</button>
+            <button onclick="showSupportModal()" class="w-full py-4 bg-white text-slate-700 rounded-2xl font-bold shadow-sm border border-slate-100 flex justify-center items-center gap-2 text-base hover:bg-slate-50 transition">${t('contactSupport')}</button>
+          </div>
+        </div>`;
+      
+      safeCreateIcons();
+    }
+
+    function showEditBank() {
+      const u = currentUser;
+      if (!u) return;
+      const cfg = getConfig();
+      const bankString = cfg.supportedBanks || 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney';
+      const bankList = bankString.split(',').map(b => b.trim()).filter(Boolean);
+
+      showModal(`
+        <h3 class="font-bold text-lg mb-4 text-slate-800">${t('bankAccount')}</h3>
+        <select id="inp-bank" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-3 outline-none text-slate-700 font-medium text-sm">
+          <option value="" disabled ${!u.bankName ? 'selected' : ''}>${t('selectBank')}</option>
+          ${bankList.map(bank => `<option value="${bank}" ${u.bankName===bank?'selected':''}>${bank}</option>`).join('')}
+        </select>
+        <input id="inp-bank-num" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-5 outline-none font-semibold text-sm" placeholder="${t('accNumber')}" value="${u.bankNumber||''}">
+        <div class="flex gap-3">
+          <button onclick="closeModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200">${t('cancel')}</button>
+          <button onclick="saveBank()" class="flex-1 py-3 bg-primary text-white rounded-2xl font-bold shadow-md">${t('saveSettings')}</button>
+        </div>`);
+    }
+
+    async function saveBank() {
+      if (!currentUser) return;
+      const bankName = $('inp-bank').value; if (!bankName) return showToast(t('pleaseSelectBank'), 'error');
+      const bankNum = $('inp-bank-num').value.trim(); if (!bankNum) return showToast(t('pleaseFillAcc'), 'error');
+      currentUser.bankName = bankName; currentUser.bankNumber = bankNum;
+      
+      let userDocRef = doc(db, "users", currentUser.id);
+      await setDoc(userDocRef, currentUser);
+      showToast(t('settingsSaved')); closeModal(); if($('profile-container')) $('profile-container').remove(); renderProfile($('dash-content')); 
+    }
+
+    function showWithdrawModal() {
+      const u = currentUser;
+      if (!u) return;
+      const creditVal = u.credit || 0;
+      if (!u.bankName || !u.bankNumber) return showToast(t('noBankDetails'),'error');
+      if (getUserOrders().find(o => o.status === 'pending')) return showToast(t('cantWdPending'),'error');
+      showModal(`
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-50 text-primary rounded-3xl flex items-center justify-center mx-auto mb-2 border border-blue-100"><i data-lucide="arrow-down-to-line" class="w-8 h-8"></i></div>
+          <h3 class="font-bold text-lg text-slate-800 mb-1">${t('withdrawFunds')}</h3>
+          <p class="text-xs text-slate-500 mb-5">${t('withdrawable')} <span class="font-bold text-primary">฿${creditVal.toLocaleString()}</span></p>
+          <input id="inp-wd-amount" type="number" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-3 outline-none text-center font-bold text-lg" placeholder="${t('amount')}">
+          <input id="inp-wd-pin" type="password" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-6 outline-none text-center tracking-widest font-semibold text-sm" placeholder="${t('pin')}">
+          <div class="flex gap-3">
+            <button onclick="closeModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200">${t('cancel')}</button>
+            <button onclick="doWithdraw()" id="btn-wd" class="flex-1 py-3 bg-primary text-white rounded-2xl font-bold shadow-md">${t('withdrawal')}</button>
+          </div>
+        </div>`);
+    }
+
+    async function doWithdraw() {
+      const u = currentUser; 
+      if (!u) return;
+      const amt = parseFloat($('inp-wd-amount').value); const pin = $('inp-wd-pin').value.trim();
+      const creditVal = u.credit || 0;
+      const withdrawPassword = u.withdrawPassword;
+      const usernameVal = u.username || 'User';
+      
+      if (!amt || amt <= 0 || creditVal < amt) return showToast(t('invalidWdBal'),'error');
+      if (String(pin) !== String(withdrawPassword)) return showToast(t('invalidPIN'),'error');
+      
+      $('btn-wd').disabled = true; $('btn-wd').textContent = t('processing');
+      
+      let userDocRef = doc(db, "users", u.id);
+      let wdCol = collection(db, "withdrawals");
+      try {
+        await runTransaction(db, async (transaction) => {
+          const snap = await transaction.get(userDocRef);
+          const currentCredit = snap.data().credit || 0;
+          if (currentCredit < amt) throw "Insufficient Balance";
+
+          const updatePayload = {
+            credit: currentCredit - amt
+          };
+
+          transaction.update(userDocRef, updatePayload);
+          
+          const newWdRef = doc(wdCol);
+          transaction.set(newWdRef, {
+            type: 'withdrawal',
+            id: newWdRef.id,
+            userId: u.id,
+            username: usernameVal,
+            amount: amt,
+            bankName: u.bankName,
+            bankNumber: u.bankNumber,
+            status: 'pending',
+            createdAt: new Date().toISOString()
+          });
+        });
+
+        showToast(t('wdSentSuccess'));
+        closeModal();
+      } catch (err) {
+        showToast(t('wdFailed'), 'error');
+        closeModal();
+      }
+    }
+
+    window.togglePasswordVisibility = (inputId, btnEl) => {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const icon = btnEl.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        if (icon) icon.setAttribute('data-lucide', 'eye');
+      }
+      safeCreateIcons();
+    };
+
+    // ==========================================
+    // INITIALIZATION RUN
+    // ==========================================
+    initAppFlow();
+
+    // ==========================================
+    // WINDOW GLOBAL EXPORTS
+    // ==========================================
+    window.doLogin = doLogin;
+    window.doRegister = doRegister;
+    window.showRegisterForm = showRegisterForm;
+    window.showLoginForm = showLoginForm;
+    window.doLogout = doLogout;
+    window.switchTab = switchTab;
+    window.showSupportModal = showSupportModal; 
+    window.showTopupModal = showTopupModal;
+    window.showWithdrawModal = showWithdrawModal;
+    window.showEditBank = showEditBank;
+    window.saveBank = saveBank;
+    window.doWithdraw = doWithdraw;
+    window.startRun = startRun;
+    window.triggerStep1Delay = triggerStep1Delay;
+    window.confirmOrderSuccess = confirmOrderSuccess;
+    window.processOrderFlowStep2 = processOrderFlowStep2;
+    window.switchHistoryTab = switchHistoryTab;
+    window.closeModal = closeModal;
+    window.openMenuIconPopup = openMenuIconPopup;
+    window.handleLogoClick = handleLogoClick;
+  </script>
+ </body>
+</html>
