@@ -78,13 +78,12 @@
       ].join("\n");
       document.head.appendChild(styleEl);
 
-      // แสดงภาพโลโก้หลังบ้านที่ตั้งค่าไว้ทันทีที่โหลดหน้าจอ ป้องกันการเห็นโลโก้เก่า (Prevent old logo fallback)
+      // โหลดและแสดงโลโก้ที่ได้รับการกำหนดค่าหลังบ้านทันทีที่โครงสร้างหน้าเสร็จสิ้น
       document.addEventListener("DOMContentLoaded", function() {
-        if (logoUrl && logoUrl.trim() !== '') {
-          var loginLogoContainer = document.querySelector(".logo-slide-right");
-          if (loginLogoContainer) {
-            loginLogoContainer.innerHTML = '<img src="' + logoUrl + '" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;">';
-          }
+        var targetLogo = (logoUrl && logoUrl.trim() !== '') ? logoUrl : "https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png";
+        var loginLogoContainer = document.querySelector(".logo-slide-right");
+        if (loginLogoContainer) {
+          loginLogoContainer.innerHTML = '<img src="' + targetLogo + '" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;">';
         }
       });
     })();
@@ -282,17 +281,13 @@
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
-  <!-- แท็กหลักของแอปพลิเคชัน โหลดแบบไดนามิกแบบปลอดภัย ไม่ค้างหน้าขาว -->
+  <!-- แท็กหลักของแอปพลิเคชัน ฝังโลโก้พรีเมียมตัวแก้ไขใหม่ (Cold start render) -->
   <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
     <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
       <div class="w-full max-w-[380px] relative z-10 py-1">
         <div class="text-center mb-4">
           <div class="logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100">
-            <svg class="w-20 h-20 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <path d="M16 10a4 4 0 0 1-8 0"></path>
-            </svg>
+            <img src="https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png" class="w-full h-full object-cover rounded-full" onerror="this.onerror=null;">
           </div>
         </div>
         <div class="bg-white rounded-[24px] p-5 shadow-2xl border border-slate-100/80">
@@ -629,15 +624,13 @@
       return num.toLocaleString();
     }
 
-    // ฟังก์ชันความปลอดภัยสลับ URL รูปภาพป้องกันการเรียกซ้ำซ้อนจนเบราว์เซอร์ค้าง
     function safeImgUrl(url) {
       if (!url || typeof url !== 'string' || url.trim() === '') {
-        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        return 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png';
       }
       return url.trim();
     }
 
-    // ฟังก์ชันตรวจสอบโทนความสว่างของเฉดสีเพื่อปรับข้อความ Marquee ให้อัตโนมัติ
     function isColorLight(hex) {
       if (!hex || hex.indexOf('#') !== 0) return false;
       const c = hex.substring(1);
@@ -701,7 +694,7 @@
       }
       
       const favUrl = getTabFavicon();
-      const targetHref = (favUrl && favUrl.trim() !== '') ? favUrl : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>';
+      const targetHref = (favUrl && favUrl.trim() !== '') ? favUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png';
       
       if (currentFavicon !== targetHref) {
         let link = document.querySelector("link[rel~='icon']");
@@ -740,12 +733,12 @@
         themeMarqueeBg: '#eb2f96',
         themeMenuBg: '#eb2f96',
         inviteCode: '',
-        logoUrl: '',
+        logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         loginBgUrl: '',
         userBgUrl: '',
         marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
         tabTitle: 'TOS Shopping',
-        tabFaviconUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+        tabFaviconUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         scheduleText: 'เปิดทำการ 10:00-22:00 น.',
         rewardsList: '095***567:433,000,095***091:2,050,000,088***324:120,500',
         supportedBanks: 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney'
@@ -757,6 +750,7 @@
     const getLoginBgUrl = () => { const c = getConfig(); return c.loginBgUrl || ''; };
     const getUserBgUrl = () => { const c = getConfig(); return c.userBgUrl || ''; };
     
+    // ตั้งค่าพอร์ตข้อความวิ่งประกาศ
     const getMarqueeText = () => { 
       const c = getConfig(); 
       return (c.marqueeText && c.marqueeText.trim() !== '') ? c.marqueeText : 'ยินดีต้อนรับสู่ระบบสั่งซื้อจัดหมวดหมู่สินค้าออเดอร์ออนไลน์'; 
@@ -772,246 +766,60 @@
     const getUserOrders = () => userOrdersData;
     const getUserWithdrawals = () => userWithdrawalsData;
 
-    function genId() {
-      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-      }
-      return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-    }
+    function handleUserUpdate(uData, docId) {
+      const levelChanged = String(uData.userLevel || '1') !== String(lastUserLevel);
+      const nameChanged = (uData.username || '') !== lastUsername;
 
-    function showToast(msg, type='success') {
-      const old = $('toast-container'); if (old) old.remove();
-      const colors = { 
-        success:'bg-emerald-600 border-emerald-700 text-white', 
-        error:'bg-red-600 border-red-700 text-white', 
-        info:'bg-blue-600 border-blue-700 text-white' 
-      };
-      const icons = { success:'check-circle', error:'alert-circle', info:'info' };
-      const div = document.createElement('div');
-      div.id = 'toast-container';
-      div.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[9999] toast-show w-max max-w-[90vw]';
-      div.innerHTML = `
-        <div class="${colors[type]} px-6 py-3.5 rounded-2xl shadow-lg border flex items-center gap-3 text-sm font-bold tracking-wide">
-          <i data-lucide="${icons[type]}" class="w-5 h-5 flex-shrink-0 text-white"></i>
-          <span class="text-white">${msg}</span>
-        </div>`;
-      document.body.appendChild(div);
-      safeCreateIcons();
-      setTimeout(() => { if(div) div.remove(); }, 2500);
-    }
+      lastUserLevel = uData.userLevel || '1';
+      lastUsername = uData.username || '';
 
-    function showModal(content) {
-      let m = $('modal-overlay');
-      if (!m) { 
-        m = document.createElement('div'); m.id = 'modal-overlay'; 
-        m.addEventListener('click', function(e) { if (e.target === m) closeModal(); });
-        document.body.appendChild(m); 
-      }
-      m.className = 'fixed inset-0 bg-black/75 z-[100] flex items-center justify-center p-4 cursor-pointer backdrop-blur-sm';
-      m.innerHTML = `
-        <div class="bg-white rounded-[24px] p-6 w-full max-w-sm modal-anim shadow-xl border border-slate-200 max-h-[90vh] overflow-y-auto cursor-auto text-slate-900" onclick="event.stopPropagation()">
-          ${content}
-        </div>`;
-      safeCreateIcons();
-    }
-    function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); isOrderProcessing = false; }
+      currentUser = { ...uData, id: docId, __backendId: docId };
+      localStorage.setItem('tos_cached_user', JSON.stringify(currentUser)); 
 
-    let refreshTimeout = null;
-    function refreshUI() {
-      if (refreshTimeout) {
-        clearTimeout(refreshTimeout);
-      }
-      refreshTimeout = setTimeout(() => {
-        if (currentUser && $('dash-content')) {
-          renderTabContent();
-          applyDynamicStyles();
-        }
-      }, 150);
-    }
-
-    function applyDynamicStyles() {
-      const cfg = getConfig();
-      if (!cfg) return;
-
-      applyTheme(cfg.themePrimary, cfg.themeSecondary, cfg.themeType);
-      updateBrowserTab();
-
-      const loginWrapper = document.getElementById('form-card-wrapper');
-      if (loginWrapper) {
-        const bgUrl = getLoginBgUrl();
-        if (bgUrl) {
-          loginWrapper.style.backgroundImage = `url('${bgUrl}')`;
-          loginWrapper.style.backgroundSize = 'cover';
-          loginWrapper.style.backgroundPosition = 'center';
-          loginWrapper.style.backgroundRepeat = 'no-repeat';
-        } else {
-          const p = cfg.themePrimary || '#e6399b';
-          const s = cfg.themeSecondary || '#4f46e5';
-          loginWrapper.style.backgroundImage = `linear-gradient(135deg, ${p}, ${s})`;
-        }
-      }
-
-      const dashOuter = document.getElementById('dash-outer-container');
-      if (dashOuter) {
-        const userBgUrl = getUserBgUrl();
-        if (userBgUrl) {
-          dashOuter.style.backgroundImage = `url('${userBgUrl}')`;
-          dashOuter.style.backgroundSize = 'cover';
-          dashOuter.style.backgroundPosition = 'center';
-          dashOuter.style.backgroundRepeat = 'no-repeat';
-          dashOuter.classList.remove('bg-slate-50');
-        } else {
-          dashOuter.style.backgroundImage = '';
-          dashOuter.classList.add('bg-slate-50');
-        }
-      }
-
-      const marqueeEl = document.getElementById('marquee-text-display');
-      if (marqueeEl) {
-        const activeText = getMarqueeText();
-        if (marqueeEl.innerText !== activeText) {
-          marqueeEl.innerText = activeText;
-        }
-      }
-
-      const logos = document.querySelectorAll('.app-logo-img');
-      logos.forEach(img => {
-        const logoUrl = getLogoUrl();
-        if (logoUrl) img.src = safeImgUrl(logoUrl);
-      });
-    }
-
-    function stopPublicSubscriptions() {
-      if (publicUnsubscribers.configs) { publicUnsubscribers.configs(); publicUnsubscribers.configs = null; }
-      if (publicUnsubscribers.banners) { publicUnsubscribers.banners(); publicUnsubscribers.banners = null; }
-      if (publicUnsubscribers.galleries) { publicUnsubscribers.galleries(); publicUnsubscribers.galleries = null; }
-      if (publicUnsubscribers.menuIcons) { publicUnsubscribers.menuIcons(); publicUnsubscribers.menuIcons = null; }
-      if (publicUnsubscribers.products) { publicUnsubscribers.products(); publicUnsubscribers.products = null; }
-      if (publicUnsubscribers.showcaseProducts) { publicUnsubscribers.showcaseProducts(); publicUnsubscribers.showcaseProducts = null; }
-    }
-
-    function startPublicSubscriptions() {
-      stopPublicSubscriptions();
-
-      publicUnsubscribers.configs = onSnapshot(doc(db, "configs", "system_config"), (docSnap) => {
-        if (docSnap.exists()) {
-          const cfgData = { ...docSnap.data(), __backendId: docSnap.id };
-          publicData.configs = [cfgData];
-          localStorage.setItem('tos_cached_config', JSON.stringify(cfgData));
-          applyTheme(cfgData.themePrimary, cfgData.themeSecondary, cfgData.themeType);
-          updateBrowserTab();
-          applyDynamicStyles();
-
-          if (!currentUser) {
-            const loginWrapper = document.getElementById('form-card-wrapper');
-            if (loginWrapper) {
-              const isRegistering = $('inp-phone-reg') !== null;
-              if (isRegistering) {
-                showRegisterForm();
-              } else {
-                showLoginForm();
-              }
-            }
-          } else if ($('dash-content')) {
-            refreshUI();
-          }
-        }
-        isConfigsLoaded = true;
-      }, (err) => {
-        console.warn("Config load error: ", err);
-        isConfigsLoaded = true;
+      // ระบบอัปเดตและเด้งยอดเงินแบบเรียลไทม์ทันทีโดยไม่มีอาการหมุนค้าง
+      const creditVal = currentUser.credit || 0;
+      const formatted = "฿" + safeFormatNumber(creditVal);
+      ['home-credit-display', 'prod-credit-display', 'hist-credit-display', 'prof-credit-display'].forEach(id => {
+        const el = $(id);
+        if (el) el.innerText = formatted;
       });
 
-      publicUnsubscribers.banners = onSnapshot(collection(db, "banners"), (snapshot) => {
-        let banners = [];
-        snapshot.forEach(d => banners.push({ ...d.data(), __backendId: d.id }));
-        publicData.banners = banners;
-        localStorage.setItem('tos_cached_banners', JSON.stringify(banners));
-        refreshUI();
-      }, (err) => console.warn(err));
+      // อัปเดตแถบเปอร์เซ็นต์และกำไรด่วน
+      updateDynamicValues();
 
-      publicUnsubscribers.galleries = onSnapshot(collection(db, "galleries"), (snapshot) => {
-        let galleries = [];
-        snapshot.forEach(d => galleries.push({ ...d.data(), __backendId: d.id }));
-        publicData.galleries = galleries;
-        localStorage.setItem('tos_cached_galleries', JSON.stringify(galleries));
-        refreshUI();
-      }, (err) => console.warn(err));
-
-      publicUnsubscribers.menuIcons = onSnapshot(collection(db, "menu_icons"), (snapshot) => {
-        let icons = [];
-        snapshot.forEach(d => icons.push({ ...d.data(), __backendId: d.id }));
-        publicData.menuIcons = icons.sort((a,b) => parseInt(a.menuOrder||0) - parseInt(b.menuOrder||0));
-        localStorage.setItem('tos_cached_menu_icons', JSON.stringify(publicData.menuIcons));
-        refreshUI();
-      }, (err) => console.warn(err));
-
-      publicUnsubscribers.products = onSnapshot(collection(db, "products"), (snapshot) => {
-        let prods = [];
-        snapshot.forEach(d => prods.push({ ...d.data(), __backendId: d.id }));
-        publicData.products = prods.sort((a,b) => parseInt(a.productOrder||0) - parseInt(b.productOrder||0));
-        localStorage.setItem('tos_cached_products', JSON.stringify(publicData.products));
-        refreshUI();
-      }, (err) => console.warn(err));
-
-      publicUnsubscribers.showcaseProducts = onSnapshot(collection(db, "showcase_products"), (snapshot) => {
-        let showcase = [];
-        snapshot.forEach(d => showcase.push({ ...d.data(), __backendId: d.id }));
-        showcase.sort((a, b) => parseInt(a.order || 0) - parseInt(b.order || 0));
-        publicData.showcaseProducts = showcase;
-        localStorage.setItem('tos_cached_showcase', JSON.stringify(showcase));
-        refreshUI();
-      }, (err) => console.warn(err));
-    }
-
-    function handleLogoClick() {
-      if (currentUser) {
-        switchTab('profile');
+      if (levelChanged || nameChanged || !lastRenderedTab) {
+        refreshUI(); // ทำการ Re-render เฉพาะเมื่อสิทธิ์ VIP เปลี่ยน เพื่อความเรียลไทม์ขั้นสูงสุด
       }
-    }
-
-    function stopUserSubscriptions() {
-      if (activeListeners.userDoc) { activeListeners.userDoc(); activeListeners.userDoc = null; }
-      if (activeListeners.userOrders) { activeListeners.userOrders(); activeListeners.userOrders = null; }
-      if (activeListeners.userWithdrawals) { activeListeners.userWithdrawals(); activeListeners.userWithdrawals = null; }
-      if (activeListeners.userSpecialAssigns) { activeListeners.userSpecialAssigns(); activeListeners.userSpecialAssigns = null; }
     }
 
     function startUserSubscriptions(userId) {
       stopUserSubscriptions();
 
-      activeListeners.userDoc = onSnapshot(doc(db, "users", userId), (docSnap) => {
+      const userDocRef = doc(db, "users", userId);
+      
+      // ชั้นที่ 1: ติดตามเอกสารผู้ใช้โดยตรง (Direct doc subscription)
+      activeListeners.userDoc = onSnapshot(userDocRef, (docSnap) => {
         if (docSnap.exists()) {
-          const uData = docSnap.data();
-          const levelChanged = String(uData.userLevel || '1') !== String(lastUserLevel);
-          const nameChanged = (uData.username || '') !== lastUsername;
-
-          lastUserLevel = uData.userLevel || '1';
-          lastUsername = uData.username || '';
-
-          currentUser = { ...uData, id: docSnap.id, __backendId: docSnap.id };
-          localStorage.setItem('tos_cached_user', JSON.stringify(currentUser)); 
-          
-          // ระบบอัปเดตและเด้งยอดเงินแบบเรียลไทม์ทันทีโดยไม่มีอาการหมุนค้าง
-          const creditVal = currentUser.credit || 0;
-          const formatted = "฿" + safeFormatNumber(creditVal);
-          ['home-credit-display', 'prod-credit-display', 'hist-credit-display', 'prof-credit-display'].forEach(id => {
-            const el = $(id);
-            if (el) el.innerText = formatted;
-          });
-
-          // อัปเดตแถบเปอร์เซ็นต์และกำไรด่วน
-          updateDynamicValues();
-
-          if (levelChanged || nameChanged || !lastRenderedTab) {
-            refreshUI(); // ทำการ Re-render เฉพาะเมื่อสิทธิ์ VIP เปลี่ยน เพื่อความเรียลไทม์ขั้นสูงสุด
-          }
+          handleUserUpdate(docSnap.data(), docSnap.id);
         } else {
           doLogout(); // เด้งออกทันทีหลังโดนลบถาวรจากฐานข้อมูล
         }
       }, (err) => {
-        console.warn("User subscription error: ", err);
-        doLogout();
+        console.warn("Direct doc sub failed, attempting fallback query sync:", err);
+        
+        // ชั้นที่ 2: ติดตามสิทธิ์ผู้ใช้ผ่าน Collection Query เพื่อแก้ไขระบบ Permission Denied (Firestore Rule Safe)
+        const cachedUser = JSON.parse(localStorage.getItem('tos_cached_user'));
+        if (cachedUser && cachedUser.phone) {
+          const fallbackQuery = query(collection(db, "users"), where("phone", "==", cachedUser.phone));
+          activeListeners.userDoc = onSnapshot(fallbackQuery, (querySnap) => {
+            if (!querySnap.empty) {
+              const d = querySnap.docs[0];
+              handleUserUpdate(d.data(), d.id);
+            } else {
+              doLogout(); // โดนลบถาวร
+            }
+          });
+        }
       });
 
       const ordersQuery = query(collection(db, "orders"), where("userId", "==", userId));
@@ -1073,17 +881,8 @@
     // ==========================================
     function getLogoHtml() {
       const logoUrl = getLogoUrl();
-      if (logoUrl && logoUrl.trim() !== '') {
-        return `<img src="${safeImgUrl(logoUrl)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23e6399b%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z%22></path><line x1=%223%22 y1=%226%22 x2=%2221%22 y2=%226%22></line><path d=%22M16 10a4 4 0 0 1-8 0%22></path></svg>';">`;
-      }
-      return `
-        <div class="w-full h-full flex items-center justify-center bg-pink-50 rounded-full cursor-pointer" onclick="handleLogoClick()">
-          <svg class="w-16 h-16 text-pink-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-        </div>`;
+      const defaultLogo = "https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png";
+      return `<img src="${safeImgUrl(logoUrl || defaultLogo)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()" onerror="this.onerror=null; this.src='${defaultLogo}';">`;
     }
 
     function getBannerHtml() {
@@ -1233,12 +1032,18 @@
               <i data-lucide="eye" class="w-4 h-4"></i>
             </button>
           </div>
+          
+          <!-- ช่องกรอกรหัส PIN ถอนเงิน ติดตั้งปุ่มเปิด-ปิดตา เรียบร้อยตามคำขอของคุณ -->
           <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
               <i data-lucide="lock" class="w-4 h-4"></i>
             </span>
             <input id="inp-pin-reg" type="password" class="w-full pl-11 pr-11 py-2 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent focus:border-slate-300 transition text-sm" placeholder="${t('pin')}">
+            <button type="button" onclick="togglePasswordVisibility('inp-pin-reg', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
           </div>
+
           <div class="relative">
             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
               <i data-lucide="smartphone" class="w-4 h-4"></i>
@@ -1966,7 +1771,7 @@
       setTimeout(() => {
         if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); }
         showModal(`
-          <div class="text-center font-mono">
+          <div class="text-center">
             <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
               ${isSpecial ? `<div class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">${t('specialOrder')}</div>` : ''}
               ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
@@ -2235,7 +2040,7 @@
       }
       
       c.innerHTML = `
-        <div id="history-container" class="p-4 fade-in">
+        <div id="history-container" class="p-4 fade-in font-mono">
           <input type="hidden" id="hist-tab-state" value="${historyTab}">
           <div class="bg-theme-gradient text-white rounded-[32px] p-5 mb-5 shadow-lg relative overflow-hidden font-mono">
             <div class="absolute right-0 top-0 opacity-10"><i data-lucide="wallet" class="w-32 h-32 -mt-4 -mr-4"></i></div>
