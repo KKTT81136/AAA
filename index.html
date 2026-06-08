@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>TOS Shopping</title>
-  <link rel="icon" type="image/x-icon" href="">
+  <!-- ป้องกันบราวเซอร์หมุนค้างด้วยการตั้ง Default Favicon เป็น Data URI แบบโปร่งใส -->
+  <link rel="icon" type="image/x-icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght=300;400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +28,7 @@
       var primary = '#e6399b';
       var secondary = '#4f46e5';
       var title = 'TOS Shopping';
-      var favicon = '';
+      var favicon = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
       var themeType = 'gradient';
       var marqueeBg = '#eb2f96';
       var menuBg = '#eb2f96';
@@ -49,12 +50,8 @@
 
       var link = document.querySelector("link[rel~='icon']") || document.createElement('link');
       link.rel = 'icon';
-      if (favicon) {
-        link.type = 'image/x-icon';
-        link.href = favicon;
-      } else {
-        link.remove();
-      }
+      link.type = 'image/x-icon';
+      link.href = favicon;
       document.head.appendChild(link);
 
       var styleEl = document.createElement('style');
@@ -181,7 +178,7 @@
       background-repeat: no-repeat;
     }
 
-    /* ปลดล็อกค่าความโปร่งใสของสินค้าแนะนำเพื่อป้องกันแผงสินค้าว่างเปล่าสีขาวอย่างถาวร */
+    /* ปรับปรุงโครงสร้างอนิเมชั่น */
     .slide-left-item, .slide-right-item {
       opacity: 1 !important;
       transform: none !important;
@@ -214,7 +211,6 @@
       transform: translateX(0) !important;
     }
 
-    /* เอฟเฟกต์โลโก้สไลด์อย่างนุ่มนวลมาจากทางขวา */
     @keyframes slideFromRight {
       0% {
         transform: translate3d(120px, 0, 0);
@@ -232,8 +228,13 @@
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
-  <!-- แท็กหลักของแอปพลิเคชันเปิดแสดงทันที ไม่ใช้คลาส hidden เพื่อความเสถียรและหลีกเลี่ยงจอขาว -->
-  <div id="app" class="h-full w-full overflow-auto relative flex flex-col"></div>
+  <!-- ฝังโครงสร้าง Splash Loader ชั่วคราว ป้องกันอาการค้างหน้าขาวในขณะเปิดบราวเซอร์ครั้งแรก -->
+  <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
+    <div class="flex-1 flex flex-col items-center justify-center bg-slate-50 p-4">
+      <div class="dot-anim mb-4 flex justify-center mx-auto"><span></span><span></span><span></span></div>
+      <p class="text-slate-400 text-xs font-semibold tracking-wider">กำลังเชื่อมต่อช่องสัญญาณ...</p>
+    </div>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -593,7 +594,8 @@
         link.href = favUrl;
       } else {
         if (link) {
-          link.remove();
+          // หากไม่มี Favicon ให้ตั้งค่าเป็นภาพใสแทนค่าว่าง ป้องกันระบบบราวเซอร์ร้องขอข้อมูลซ้ำจนไอคอนหมุนค้าง
+          link.href = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
         }
       }
     }
@@ -628,7 +630,7 @@
         userBgUrl: '',
         marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
         tabTitle: 'TOS Shopping',
-        tabFaviconUrl: '',
+        tabFaviconUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         scheduleText: 'เปิดทำการ 10:00-22:00 น.',
         rewardsList: '095***567:433,000,095***091:2,050,000,088***324:120,500',
         supportedBanks: 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney'
@@ -694,7 +696,6 @@
     }
     function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); isOrderProcessing = false; }
 
-    // ป้องกันการสะดุดและหน่วงด้วยดีเลย์ต่ำ
     let refreshTimeout = null;
     function refreshUI() {
       if (refreshTimeout) {
@@ -750,7 +751,8 @@
       }
 
       const marqueeEl = document.getElementById('marquee-text-display');
-      if (marqueeEl) {
+      // ตรวจสอบเงื่อนไขข้อความประกาศ เพื่อแก้ปัญหา Reset CSS Animation ของข้อความวิ่งด่วน
+      if (marqueeEl && marqueeEl.innerText !== getMarqueeText()) {
         marqueeEl.innerText = getMarqueeText();
       }
 
@@ -894,10 +896,8 @@
       });
     }
 
-    // สวิตช์คุมระบบเรนเดอร์หน้าจอทันทีเพื่อแก้ไขปัญหาหน้าจอขาว
     let isPublicSubscribed = false;
     function initAppFlow() {
-      // 1. เรนเดอร์หน้าจอเริ่มต้นทันทีโดยไม่ต้องรอโหลดฐานข้อมูล (ตัดปัญหาหน้าจอขาว)
       const cachedUserId = localStorage.getItem('tos_logged_user_id');
       if (cachedUserId) {
         currentTab = sessionStorage.getItem('tos_current_tab') || 'home';
@@ -906,7 +906,6 @@
         renderLogin();
       }
 
-      // 2. ตรวจสอบเงื่อนไขผู้ใช้และทำการสตรีมมิ่งข้อมูลในเบื้องหลังอย่างรวดเร็ว
       onAuthStateChanged(auth, (user) => {
         if (user) {
           if (!isPublicSubscribed) {
@@ -927,7 +926,6 @@
         }
       }).catch(err => {
         console.warn("Auth init error: ", err);
-        // กรณีอุปกรณ์ออฟไลน์ หรือบล็อกเกอร์สกัดกั้น ให้ระบบเปิดทำการสตรีมแคชต่อไป
         if (!isPublicSubscribed) {
           startPublicSubscriptions();
           isPublicSubscribed = true;
@@ -1359,6 +1357,8 @@
       
       applyDynamicStyles();
       safeCreateIcons();
+      
+      // เรียกใช้งานแผงควบคุมสไลด์ทันทีเมื่อเปลี่ยนหน้า ป้องกันการค้างว่างเปล่าสีขาวอย่างถาวร
       initGalleryObserver();
     }
 
@@ -1646,7 +1646,7 @@
           <div class="grid grid-cols-2 gap-4">
             ${gallery.map(g => `
               <div class="gallery-item w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-slate-100 bg-white p-1.5 flex items-center justify-center">
-                <img src="${g.galleryUrl}" class="w-full h-full object-cover rounded-[18px]" onerror="this.src=''">
+                <img src="${g.galleryUrl}" class="w-full h-full object-cover rounded-[18px]" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
               </div>
             `).join('')}
           </div>
@@ -2017,9 +2017,9 @@
           html += `<div class="text-center text-slate-400 py-12 font-medium text-sm">${t('noTasksRecorded')}</div>`;
         } else { 
           html += allCompleted.map(o => { 
-            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
+            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border-amber-100 border' }; 
             return `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50">
               <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
                 ${o.productImage ? `<img src="${o.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
               </div>
