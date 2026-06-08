@@ -157,15 +157,15 @@
       display: block; 
       position: relative; 
     }
+    @keyframes marqueeScroll {
+      0% { transform: translate3d(100%, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
     .marquee-text { 
       display: inline-block; 
-      padding-left: 100%; 
-      animation: smoothMarquee 15s linear infinite; 
+      white-space: nowrap;
+      animation: marqueeScroll 25s linear infinite; 
       will-change: transform; 
-    }
-    @keyframes smoothMarquee { 
-      0% { transform: translate3d(0, 0, 0); } 
-      100% { transform: translate3d(-100%, 0, 0); } 
     }
     .nav-glass { 
       background: rgba(255, 255, 255, 0.85); 
@@ -178,7 +178,7 @@
       background-repeat: no-repeat;
     }
 
-    /* ปรับปรุงโครงสร้างอนิเมชั่น */
+    /* ปลดล็อกเอฟเฟกต์การแสดงผลฝั่งผู้ใช้ */
     .slide-left-item, .slide-right-item {
       opacity: 1 !important;
       transform: none !important;
@@ -228,11 +228,37 @@
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
-  <!-- ฝังโครงสร้าง Splash Loader ชั่วคราว ป้องกันอาการค้างหน้าขาวในขณะเปิดบราวเซอร์ครั้งแรก -->
+  <!-- แท็กหลักของแอปพลิเคชัน ฝังฟอร์มเข้าใช้เวอร์ชันคงที่ (Static Skeleton) เพื่อให้หน้าเว็บเปิดปุ๊บเจอหน้าล็อกอินทันทีขจัดปัญหาหน้าขาวนาน -->
   <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
-    <div class="flex-1 flex flex-col items-center justify-center bg-slate-50 p-4">
-      <div class="dot-anim mb-4 flex justify-center mx-auto"><span></span><span></span><span></span></div>
-      <p class="text-slate-400 text-xs font-semibold tracking-wider">กำลังเชื่อมต่อช่องสัญญาณ...</p>
+    <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
+      <div class="w-full max-w-[380px] relative z-10 py-1">
+        <div class="text-center mb-4">
+          <div class="logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/3081/5123081.png" class="w-full h-full object-cover rounded-full">
+          </div>
+        </div>
+        <div class="bg-white rounded-[24px] p-5 shadow-2xl border border-slate-100/80">
+          <div class="fade-in">
+            <h2 class="text-slate-800 font-bold text-xl mb-4 text-center tracking-wide">เข้าสู่ระบบ</h2>
+            <div class="w-full max-w-[320px] mx-auto space-y-3">
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                  <i data-lucide="user" class="w-4 h-4"></i>
+                </span>
+                <input type="tel" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent text-sm" placeholder="User" disabled>
+              </div>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+                  <i data-lucide="lock" class="w-4 h-4"></i>
+                </span>
+                <input type="password" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent text-sm" placeholder="กรุณาใส่รหัสผ่านเข้าสู่ระบบ" disabled>
+              </div>
+              <button class="w-full py-2.5 bg-pink-500 text-white font-bold rounded-xl shadow-lg text-sm tracking-wide" disabled>เข้าสู่ระบบ</button>
+              <button class="w-full py-2.5 bg-[#3b3a3a] text-white font-bold rounded-xl shadow-md text-sm tracking-wide" disabled>ลงทะเบียน</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -584,20 +610,14 @@
       
       const favUrl = getTabFavicon();
       let link = document.querySelector("link[rel~='icon']");
-      if (favUrl) {
-        if (!link) {
-          link = document.createElement('link');
-          link.rel = 'icon';
-          document.head.appendChild(link);
-        }
-        link.type = 'image/x-icon';
-        link.href = favUrl;
-      } else {
-        if (link) {
-          // หากไม่มี Favicon ให้ตั้งค่าเป็นภาพใสแทนค่าว่าง ป้องกันระบบบราวเซอร์ร้องขอข้อมูลซ้ำจนไอคอนหมุนค้าง
-          link.href = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-        }
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
       }
+      link.type = 'image/x-icon';
+      // ซิงค์การป้อนค่าแอดมิน เพื่อป้องกันบราวเซอร์ส่ง Query ซ้ำจนหมุนค้าง
+      link.href = (favUrl && favUrl.trim() !== '') ? favUrl : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>';
     }
 
     const $ = id => document.getElementById(id);
@@ -750,10 +770,13 @@
         }
       }
 
+      // ปรับลอจิกเขียนค่าทับเพื่อแก้ปัญหากด Refresh แล้วข้อความวิ่งหยุดนิ่ง
       const marqueeEl = document.getElementById('marquee-text-display');
-      // ตรวจสอบเงื่อนไขข้อความประกาศ เพื่อแก้ปัญหา Reset CSS Animation ของข้อความวิ่งด่วน
-      if (marqueeEl && marqueeEl.innerText !== getMarqueeText()) {
-        marqueeEl.innerText = getMarqueeText();
+      if (marqueeEl) {
+        const activeText = getMarqueeText();
+        if (marqueeEl.innerText !== activeText) {
+          marqueeEl.innerText = activeText;
+        }
       }
 
       const logos = document.querySelectorAll('.app-logo-img');
@@ -1357,8 +1380,6 @@
       
       applyDynamicStyles();
       safeCreateIcons();
-      
-      // เรียกใช้งานแผงควบคุมสไลด์ทันทีเมื่อเปลี่ยนหน้า ป้องกันการค้างว่างเปล่าสีขาวอย่างถาวร
       initGalleryObserver();
     }
 
@@ -2017,9 +2038,9 @@
           html += `<div class="text-center text-slate-400 py-12 font-medium text-sm">${t('noTasksRecorded')}</div>`;
         } else { 
           html += allCompleted.map(o => { 
-            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border-amber-100 border' }; 
+            const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
             return `
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100">
               <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
                 ${o.productImage ? `<img src="${o.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
               </div>
