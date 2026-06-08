@@ -249,7 +249,7 @@
       }
     }
 
-    /* เปิดใช้งานทันทีเมื่อตรวจสอบพบว่ามีการมองเห็นผ่านระบบแอดมินหรือยูสเซอร์ */
+    /* เปิดใช้งานทันทีเมื่อตรวจสอบพบว่ามีการมองเห็น */
     .revealed-slide .showcase-card-left {
       animation: slideFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -608,6 +608,27 @@
       return num.toLocaleString();
     }
 
+    // ฟังก์ชันความปลอดภัยช่วยสลับ URL รูปภาพป้องกันการเรียกซ้ำซ้อนจนเบราว์เซอร์ค้าง
+    function safeImgUrl(url) {
+      if (!url || typeof url !== 'string' || url.trim() === '') {
+        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      }
+      return url.trim();
+    }
+
+    // ฟังก์ชันตรวจสอบโทนความสว่างของเฉดสีเพื่อปรับข้อความ Marquee ให้อัตโนมัติ
+    function isColorLight(hex) {
+      if (!hex || hex.indexOf('#') !== 0) return false;
+      const c = hex.substring(1);
+      if (c.length !== 6) return false;
+      const rgb = parseInt(c, 16);
+      const r = (rgb >> 16) & 0xff;
+      const g = (rgb >>  8) & 0xff;
+      const b = (rgb >>  0) & 0xff;
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return luma > 180; 
+    }
+
     function applyTheme(primary, secondary, themeType) {
       const p = primary || '#e6399b';
       const s = secondary || '#4f46e5';
@@ -624,6 +645,9 @@
         document.head.appendChild(styleEl);
       }
 
+      const mBg = (cfg.themeMarqueeBg && cfg.themeMarqueeBg.trim() !== '') ? cfg.themeMarqueeBg : p;
+      const mMenuBg = (cfg.themeMenuBg && cfg.themeMenuBg.trim() !== '') ? cfg.themeMenuBg : p;
+
       const bgStyle = (type === 'single') 
         ? `background: ${p} !important;` 
         : `background: linear-gradient(135deg, ${p}, ${s}) !important;`;
@@ -632,8 +656,8 @@
         :root {
           --color-primary: ${p};
           --color-secondary: ${s};
-          --color-marquee-bg: ${cfg.themeMarqueeBg || '#eb2f96'};
-          --color-menu-bg: ${cfg.themeMenuBg || '#eb2f96'};
+          --color-marquee-bg: ${mBg};
+          --color-menu-bg: ${mMenuBg};
         }
         body { background-color: #f8fafc; }
         .text-primary { color: ${p} !important; }
@@ -648,25 +672,26 @@
       `;
     }
 
+    let currentFavicon = '';
     function updateBrowserTab() {
-      const title = getTabTitle();
+      const title = getTabTitle() || "TOS Shopping";
       if (document.title !== title) {
-        document.title = title ? title : "TOS Shopping";
+        document.title = title;
       }
       
       const favUrl = getTabFavicon();
-      let link = document.querySelector("link[rel~='icon']");
-      if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.head.appendChild(link);
-      }
-      link.type = 'image/x-icon';
-      
-      // ดึงข้อมูลไอคอนมาซิงค์ พร้อมเช็คค่าซ้ำเพื่อไม่ให้เบราว์เซอร์สแตนด์บายโหลดซ้ำๆ จนหมุนไม่หยุด
       const targetHref = (favUrl && favUrl.trim() !== '') ? favUrl : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛍️</text></svg>';
-      if (link.getAttribute('href') !== targetHref) {
+      
+      if (currentFavicon !== targetHref) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.type = 'image/x-icon';
         link.href = targetHref;
+        currentFavicon = targetHref;
       }
     }
 
@@ -677,7 +702,6 @@
     const getGallery = () => publicData.galleries;
     const getMenuIcons = () => publicData.menuIcons;
     
-    // ตั้งค่าฟอลแบ็คป้องกันระบบหยุดทำงานกรณีไม่มีแคชบนอุปกรณ์ใหม่
     const getConfig = () => {
       if (publicData.configs && publicData.configs.length > 0) {
         return publicData.configs[0];
@@ -711,7 +735,13 @@
     const getLogoUrl = () => { const c = getConfig(); return c.logoUrl || ''; };
     const getLoginBgUrl = () => { const c = getConfig(); return c.loginBgUrl || ''; };
     const getUserBgUrl = () => { const c = getConfig(); return c.userBgUrl || ''; };
-    const getMarqueeText = () => { const c = getConfig(); return c.marqueeText || ''; };
+    
+    // ตั้งค่าพอร์ตข้อความวิ่งสำรองเสมอ ป้องกันแถบขาวโล่ง
+    const getMarqueeText = () => { 
+      const c = getConfig(); 
+      return (c.marqueeText && c.marqueeText.trim() !== '') ? c.marqueeText : 'ยินดีต้อนรับสู่ระบบสั่งซื้อจัดหมวดหมู่สินค้าออเดอร์ออนไลน์'; 
+    };
+    
     const getLineQrUrl = () => { const c = getConfig(); return c.lineQrUrl || ''; };
     const getLineId = () => { const c = getConfig(); return c.lineId || ''; };
     const getTopupQrUrl = () => { const c = getConfig(); return c.topupQrUrl || ''; };
@@ -820,7 +850,7 @@
         }
       }
 
-      // ปรับจูนตรวจสอบความสมบูรณ์ในการอัปเดตข้อความวิ่ง (Marquee)
+      // ปรับลูปการเขียนข้อความสไลด์
       const marqueeEl = document.getElementById('marquee-text-display');
       if (marqueeEl) {
         const activeText = getMarqueeText();
@@ -832,7 +862,7 @@
       const logos = document.querySelectorAll('.app-logo-img');
       logos.forEach(img => {
         const logoUrl = getLogoUrl();
-        if (logoUrl) img.src = logoUrl;
+        if (logoUrl) img.src = safeImgUrl(logoUrl);
       });
     }
 
@@ -1012,7 +1042,7 @@
     function getLogoHtml() {
       const logoUrl = getLogoUrl();
       const defaultLogo = "https://cdn-icons-png.flaticon.com/512/3081/5123081.png";
-      return `<img src="${logoUrl || defaultLogo}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">`;
+      return `<img src="${safeImgUrl(logoUrl || defaultLogo)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">`;
     }
 
     function getBannerHtml() {
@@ -1020,23 +1050,36 @@
       if (banners.length > 0) {
         html += `
         <div class="relative w-full aspect-[5/3] md:aspect-[20/10] rounded-[32px] overflow-hidden shadow-md mb-4 bg-slate-200 border border-slate-100">
-          ${banners.map((b, i) => `
-            <picture class="absolute inset-0 w-full h-full banner-slide transition-opacity duration-1000" style="opacity: ${i===0?1:0};">
-              <source media="(min-width: 768px)" srcset="${b.bannerPcUrl || b.bannerUrl || ''}">
-              <img src="${b.bannerUrl || ''}" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;">
-            </picture>
-          `).join('')}
+          ${banners.map((b, i) => {
+            const bUrl = safeImgUrl(b.bannerUrl);
+            const bPcUrl = b.bannerPcUrl && b.bannerPcUrl.trim() !== '' ? b.bannerPcUrl.trim() : bUrl;
+            return `
+              <picture class="absolute inset-0 w-full h-full banner-slide transition-opacity duration-1000" style="opacity: ${i===0?1:0};">
+                <source media="(min-width: 768px)" srcset="${bPcUrl}">
+                <img src="${bUrl}" alt="Banner" style="width: 100%; height: 100%; object-fit: cover;">
+              </picture>
+            `;
+          }).join('')}
         </div>`;
       }
-      const marqueeText = getMarqueeText();
       
+      const marqueeText = getMarqueeText();
+      const cfg = getConfig();
+      const p = cfg.themePrimary || '#e6399b';
+      const mBg = (cfg.themeMarqueeBg && cfg.themeMarqueeBg.trim() !== '') ? cfg.themeMarqueeBg : p;
+      
+      // คำนวณสีอัตโนมัติเมื่อเจอกรณีแถบขาว
+      const isLightMarquee = isColorLight(mBg);
+      const textColorClass = isLightMarquee ? 'text-slate-900' : 'text-white';
+      const iconColorClass = isLightMarquee ? 'text-slate-900' : 'text-white';
+
       html += `
-      <div style="background-color: var(--color-marquee-bg) !important;" class="flex items-center text-white rounded-full pl-3.5 pr-5 py-2.5 shadow-sm mb-6 overflow-hidden relative">
-        <div style="background-color: var(--color-marquee-bg) !important;" class="z-10 flex items-center pr-2">
-          <i data-lucide="volume-2" class="text-white w-5 h-5 flex-shrink-0"></i>
+      <div style="background-color: ${mBg} !important;" class="flex items-center rounded-full pl-3.5 pr-5 py-2.5 shadow-sm mb-6 overflow-hidden relative">
+        <div class="z-10 flex items-center pr-2">
+          <i data-lucide="volume-2" class="${iconColorClass} w-5 h-5 flex-shrink-0"></i>
         </div>
         <div class="marquee-container w-full">
-          <div id="marquee-text-display" class="marquee-text text-sm font-semibold text-white pt-0.5">${marqueeText}</div>
+          <div id="marquee-text-display" class="marquee-text text-sm font-semibold ${textColorClass} pt-0.5">${marqueeText}</div>
         </div>
       </div>`;
       
@@ -1478,7 +1521,7 @@
       if(!m) return; 
       showModal(`
         <div class="text-center mb-4 border-b border-slate-100 pb-4">
-          ${m.menuIconUrl ? `<img src="${m.menuIconUrl}" class="w-16 h-16 mx-auto rounded-full object-cover mb-3 border border-slate-100 shadow-sm">` : `<div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-3"><i data-lucide="file-text"></i></div>`}
+          ${m.menuIconUrl ? `<img src="${safeImgUrl(m.menuIconUrl)}" class="w-16 h-16 mx-auto rounded-full object-cover mb-3 border border-slate-100 shadow-sm">` : `<div class="w-16 h-16 bg-blue-50 text-primary rounded-full flex items-center justify-center mx-auto mb-3"><i data-lucide="file-text"></i></div>`}
           <h3 class="text-lg font-bold text-slate-800">${m.menuLabel}</h3>
         </div>
         <div class="text-slate-600 text-sm whitespace-pre-wrap leading-relaxed text-left max-h-[50vh] overflow-y-auto px-1">${m.menuContent || ''}</div>
@@ -1488,7 +1531,7 @@
 
     function showSupportModal() {
       const qr = getLineQrUrl(); const lineId = getLineId(); let content = '';
-      if (qr) content += `<img src="${qr}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
+      if (qr) content += `<img src="${safeImgUrl(qr)}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
       if (lineId) content += `<div class="bg-slate-50 rounded-2xl p-3 flex items-center justify-between border border-slate-200/60"><span class="text-slate-500 font-bold text-xs">LINE ID:</span><span class="font-bold text-primary text-base tracking-wide">${lineId}</span></div>`;
       if (!qr && !lineId) content = `<p class="text-slate-400 font-medium py-4">${t('noSupportCfg')}</p>`;
       showModal(`<div class="text-center"><h3 class="font-bold text-lg mb-4 text-primary">${t('cs')}</h3>${content}<button onclick="closeModal()" class="mt-6 w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition">${t('close')}</button></div>`);
@@ -1496,7 +1539,7 @@
 
     function showTopupModal() {
       const qr = getTopupQrUrl(); const acc = getTopupAccount(); let content = '';
-      if (qr) content += `<img src="${qr}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
+      if (qr) content += `<img src="${safeImgUrl(qr)}" class="w-48 h-48 object-cover mx-auto rounded-[28px] border border-slate-300 shadow-none mb-4" onerror="this.outerHTML='<p class=\\'text-rose-400 text-sm mb-3 font-semibold\\'>Failed to load QR Code</p>'">`;
       if (acc) content += `<div class="bg-slate-50 rounded-2xl p-4 text-center border border-slate-200/60"><p class="text-slate-400 font-bold text-xs mb-2">${t('depositAcc')}</p><p class="font-bold text-slate-800 text-sm whitespace-pre-wrap leading-relaxed">${acc}</p></div>`;
       if (!qr && !acc) content = `<p class="text-slate-400 font-medium py-4">${t('noDepositCfg')}</p>`;
       showModal(`
@@ -1639,7 +1682,7 @@
           ${menus.map(m => `
             <div onclick="openMenuIconPopup('${m.__backendId}')" class="flex flex-col items-center gap-2 cursor-pointer active:scale-95 transition-transform">
               <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center border border-slate-100 shadow-sm overflow-hidden p-1.5">
-                ${m.menuIconUrl ? `<img src="${m.menuIconUrl}" class="w-full h-full object-cover rounded-full">` : `<i data-lucide="info" class="text-primary w-6 h-6"></i>`}
+                ${m.menuIconUrl ? `<img src="${safeImgUrl(m.menuIconUrl)}" class="w-full h-full object-cover rounded-full">` : `<i data-lucide="info" class="text-primary w-6 h-6"></i>`}
               </div>
               <span class="text-xs font-bold text-white text-center leading-tight line-clamp-2">${m.menuLabel}</span>
             </div>
@@ -1681,7 +1724,7 @@
             const fallbackImg = fallbackImages[index % 8];
             const pName = p.productName || p.name;
             const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
-            const pImg = p.productImage || p.image;
+            const pImg = safeImgUrl(p.productImage || p.image);
 
             const animationTypeClass = index < 4 ? 'showcase-card-left' : 'showcase-card-right';
 
@@ -1721,7 +1764,7 @@
           <div class="grid grid-cols-2 gap-4">
             ${gallery.map(g => `
               <div class="gallery-item w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-slate-100 bg-white p-1.5 flex items-center justify-center">
-                <img src="${g.galleryUrl}" class="w-full h-full object-cover rounded-[18px]" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
+                <img src="${safeImgUrl(g.galleryUrl)}" class="w-full h-full object-cover rounded-[18px]" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
               </div>
             `).join('')}
           </div>
@@ -1882,7 +1925,7 @@
           <div class="text-center">
             <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
               ${isSpecial ? `<div class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">${t('specialOrder')}</div>` : ''}
-              ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
+              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
             </div>
             <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
             <div class="mt-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60">
@@ -1940,7 +1983,7 @@
         showModal(`
           <div class="text-center">
             <div class="w-full h-64 bg-slate-100 rounded-2xl mb-4 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
-              ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain relative z-0">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
+              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain relative z-0">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
             </div>
             <p class="text-slate-950 font-bold mt-5 text-center text-sm leading-relaxed uppercase px-2">${t('insufficientSub')}</p>
             <button onclick="closeModal(); showSupportModal();" class="mt-6 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl hover:bg-black transition shadow-md text-base flex justify-center items-center gap-2">${t('contactSupport')}</button>
@@ -1952,7 +1995,7 @@
       showModal(`
         <div class="text-center">
           <div class="w-full h-64 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-100 flex items-center justify-center shadow-inner p-4">
-            ${p.productImage ? `<img src="${p.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300"></i>`}
+            ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300"></i>`}
           </div>
           <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
           <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 mt-5 text-sm text-left shadow-inner">
@@ -2068,7 +2111,7 @@
             <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl">${t('pendingPayment')}</div>
             <div class="flex items-center gap-4 mb-4 mt-2">
               <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1">
-                ${pendingOrder.productImage ? `<img src="${pendingOrder.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
+                ${pendingOrder.productImage ? `<img src="${safeImgUrl(pendingOrder.productImage)}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
               </div>
               <div class="flex-1 min-w-0">
                 <p class="font-bold text-slate-800 line-clamp-2 text-sm leading-snug">${pendingOrder.productName}</p>
@@ -2096,7 +2139,7 @@
             return `
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100">
               <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
-                ${o.productImage ? `<img src="${o.productImage}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
+                ${o.productImage ? `<img src="${safeImgUrl(o.productImage)}" class="w-full h-full object-contain">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
               </div>
               <div class="flex-1 min-w-0 pr-12">
                 <p class="font-bold text-slate-800 truncate text-xs">${o.productName}</p>
@@ -2200,7 +2243,7 @@
             </div>
 
             <div class="w-32 h-32 rounded-full mx-auto overflow-hidden mt-6 flex items-center justify-center bg-slate-50 border border-slate-100 shadow-lg">
-              ${logoUrl ? `<img src="${logoUrl}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">` : `<div class="w-32 h-32 bg-blue-50 text-primary rounded-full flex items-center justify-center cursor-pointer" onclick="handleLogoClick()"><i data-lucide="user" class="w-16 h-16 text-primary"></i></div>`}
+              ${logoUrl ? `<img src="${safeImgUrl(logoUrl)}" class="app-logo-img w-full h-full object-cover rounded-full cursor-pointer" onclick="handleLogoClick()">` : `<div class="w-32 h-32 bg-blue-50 text-primary rounded-full flex items-center justify-center cursor-pointer" onclick="handleLogoClick()"><i data-lucide="user" class="w-16 h-16 text-primary"></i></div>`}
             </div>
             <h3 class="font-black text-xl text-slate-800 mt-3">${usernameVal}</h3>
             <p class="text-slate-400 text-sm mt-1 font-semibold">📞 ${u.phone}</p>
