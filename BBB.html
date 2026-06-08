@@ -37,7 +37,7 @@
   <script>
     (function() {
       var cached = localStorage.getItem('tos_cached_config');
-      var p = '#2563eb';
+      var p = '#FFFFFF'; // ตั้งค่าสีเริ่มต้นเป็นสีขาว #FFFFFF
       var s = '#4f46e5';
       var type = 'gradient';
       if (cached) {
@@ -193,13 +193,12 @@
         } catch (e) {}
       }
       return {
-        themePrimary: '',
-        themeSecondary: '',
+        themePrimary: '#FFFFFF', // ตั้งค่าเริ่มต้นสีหลักเป็นสีขาว #FFFFFF
+        themeSecondary: '#4f46e5',
         themeType: 'gradient',
         themeMarqueeBg: '#eb2f96',
-        themeMenuBg: '#eb2f96',
         inviteCode: '',
-        logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png', // ตั้งค่ารูปโลโก้หลักเริ่มต้น
+        logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         loginBgUrl: '',
         userBgUrl: '',
         marqueeText: '',
@@ -267,7 +266,7 @@
     function closeModal() { const m = $('modal-overlay'); if (m) m.remove(); }
 
     function applyTheme(primary, secondary, themeType) {
-      const p = primary || '#2563eb';
+      const p = primary || '#FFFFFF'; // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF
       const s = secondary || '#4f46e5';
       const type = themeType || 'gradient';
       
@@ -1316,7 +1315,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(adminSpecialTemplatesData.find(d => d.__backendId === bid)); 
+        await windowDataSdk.delete(publicData.special_templates.find(d => d.__backendId === bid)); 
         debouncedRenderAdminTab(); 
       }
     }
@@ -1581,7 +1580,7 @@
                   let statusText = 'รอคิววินิจฉัย';
                   let statusClass = 'text-amber-400 bg-amber-950/40 border-amber-800/40';
                   
-                  if(w.status === 'approved') { statusText = 'อนุมัติถอนเสสิ้น'; statusClass = 'text-blue-400 bg-blue-950/40 border-blue-800/40'; }
+                  if(w.status === 'approved') { statusText = 'อนุมัติถอนเสร็จสิ้น'; statusClass = 'text-blue-400 bg-blue-950/40 border-blue-800/40'; }
                   if(w.status === 'rejected') { statusText = 'ปฏิเสธคำขอคืนยอด'; statusClass = 'text-rose-400 bg-rose-950/40 border-rose-800/40'; }
                   if(w.status === 'deposit') { statusText = 'เติมเครดิตเสร็จสิ้น'; statusClass = 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'; }
                   if(w.status === 'deposit_pending') { statusText = 'แจ้งฝาก: รอตรวจสลิป'; statusClass = 'text-orange-400 bg-orange-950/40 border-orange-800/40'; }
@@ -2088,7 +2087,7 @@
     // ==========================================
     function renderAdminSettings(c) {
       const cfg = getConfig() || {}; const logoUrl = getLogoUrl(); const inviteCode = getInviteCode(); const marqueeText = getMarqueeText(); const lineQrUrl = getLineQrUrl(); const lineId = getLineId(); const topupQrUrl = getTopupQrUrl(); const topupAccount = getTopupAccount(); 
-      const tP = cfg.themePrimary || '#e6399b'; 
+      const tP = cfg.themePrimary || '#FFFFFF'; 
       const tS = cfg.themeSecondary || '#4f46e5';
       const themeType = cfg.themeType || 'gradient';
       const loginBgUrl = cfg.loginBgUrl || '';
@@ -2096,7 +2095,6 @@
       const banks = cfg.supportedBanks || 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney';
 
       const themeMarqueeBg = cfg.themeMarqueeBg || '#eb2f96';
-      const themeMenuBg = cfg.themeMenuBg || '#eb2f96';
       const scheduleText = cfg.scheduleText || 'เปิดทำการ 10:00-22:00 น.';
       const rewardsList = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
       
@@ -2192,13 +2190,6 @@
                   <div class="flex gap-2">
                     <input type="color" id="cfg-theme-marquee-picker" class="w-10 h-10 bg-transparent cursor-pointer rounded border border-slate-700 p-1" value="${themeMarqueeBg}" oninput="$('cfg-theme-marquee-text').value=this.value;">
                     <input type="text" id="cfg-theme-marquee-text" class="flex-1 px-3 py-1.5 text-xs border border-slate-800 rounded bg-slate-950 text-slate-300 font-mono text-center" value="${themeMarqueeBg}">
-                  </div>
-                </div>
-                <div>
-                  <label class="text-[10px] text-slate-400 mb-1 block uppercase">รหัสสีพื้นหลังกล่องไอคอนเมนูทั้งสี่ (Menu Background)</label>
-                  <div class="flex gap-2">
-                    <input type="color" id="cfg-theme-menu-picker" class="w-10 h-10 bg-transparent cursor-pointer rounded border border-slate-700 p-1" value="${themeMenuBg}" oninput="$('cfg-theme-menu-text').value=this.value;">
-                    <input type="text" id="cfg-theme-menu-text" class="flex-1 px-3 py-1.5 text-xs border border-slate-800 rounded bg-slate-950 text-slate-300 font-mono text-center" value="${themeMenuBg}">
                   </div>
                 </div>
               </div>
@@ -2312,12 +2303,11 @@
     }
 
     async function saveAdminTheme() {
-      const p = ($('cfg-theme-p-text') ? $('cfg-theme-p-text').value.trim() : '') || ($('cfg-theme-p-picker') ? $('cfg-theme-p-picker').value : '#2563eb');
+      const p = ($('cfg-theme-p-text') ? $('cfg-theme-p-text').value.trim() : '') || ($('cfg-theme-p-picker') ? $('cfg-theme-p-picker').value : '#FFFFFF');
       const s = ($('cfg-theme-s-text') ? $('cfg-theme-s-text').value.trim() : '') || ($('cfg-theme-s-picker') ? $('cfg-theme-s-picker').value : '#4f46e5');
       const t = $('cfg-theme-type').value;
 
       const mBg = $('cfg-theme-marquee-text').value.trim();
-      const uMenuBg = $('cfg-theme-menu-text').value.trim();
 
       let config = getConfig() || {};
       
@@ -2326,8 +2316,7 @@
         themePrimary: p,
         themeSecondary: s,
         themeType: t,
-        themeMarqueeBg: mBg,
-        themeMenuBg: uMenuBg
+        themeMarqueeBg: mBg
       };
       
       publicData.configs = [updatePayload];
