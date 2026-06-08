@@ -25,14 +25,13 @@
   <script>
     (function() {
       var cached = localStorage.getItem('tos_cached_config');
-      var primary = '#e6399b';
+      var primary = '#FFFFFF'; // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF ตามที่คุณระบุ
       var secondary = '#4f46e5';
       var title = 'TOS Shopping';
       var favicon = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
       var themeType = 'gradient';
       var marqueeBg = '#eb2f96';
-      var menuBg = '#eb2f96';
-      var logoUrl = 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; // ตั้งค่ารูปภาพเริ่มต้นตามที่คุณส่งมา
+      var logoUrl = 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png';
 
       if (cached) {
         try {
@@ -43,7 +42,6 @@
           favicon = cfg.tabFaviconUrl || favicon;
           themeType = cfg.themeType || themeType;
           marqueeBg = cfg.themeMarqueeBg || marqueeBg;
-          menuBg = cfg.themeMenuBg || menuBg;
           logoUrl = cfg.logoUrl || logoUrl;
         } catch(e) {}
       }
@@ -67,7 +65,6 @@
         "  --color-primary: " + primary + ";",
         "  --color-secondary: " + secondary + ";",
         "  --color-marquee-bg: " + marqueeBg + ";",
-        "  --color-menu-bg: " + menuBg + ";",
         "}",
         "body { background-color: #f8fafc; }",
         ".text-primary { color: " + primary + " !important; }",
@@ -355,7 +352,7 @@
 
     let lastUserLevel = '';
     let lastUsername = '';
-    let lastUserCredit = -1; // เพิ่มตัวแปรเช็คการเปลี่ยนแปลงของยอดเครดิตเพื่อ sync แบบเรียลไทม์
+    let lastUserCredit = -1; // ตัวแปรคอยจับตาดูยอดเครดิตสะสมเพื่อ sync แบบลื่นไหล
 
     let publicData = {
       configs: [],
@@ -649,7 +646,7 @@
     }
 
     function applyTheme(primary, secondary, themeType) {
-      const p = primary || '#e6399b';
+      const p = primary || '#FFFFFF'; // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF
       const s = secondary || '#4f46e5';
       const type = themeType || 'gradient';
       const cfg = getConfig();
@@ -665,7 +662,6 @@
       }
 
       const mBg = (cfg.themeMarqueeBg && cfg.themeMarqueeBg.trim() !== '') ? cfg.themeMarqueeBg : p;
-      const mMenuBg = (cfg.themeMenuBg && cfg.themeMenuBg.trim() !== '') ? cfg.themeMenuBg : p;
 
       const bgStyle = (type === 'single') 
         ? "background: " + p + " !important;" 
@@ -676,7 +672,6 @@
           --color-primary: ${p};
           --color-secondary: ${s};
           --color-marquee-bg: ${mBg};
-          --color-menu-bg: ${mMenuBg};
         }
         body { background-color: #f8fafc; }
         .text-primary { color: ${p} !important; }
@@ -732,13 +727,12 @@
         } catch (e) {}
       }
       return {
-        themePrimary: '#e6399b',
+        themePrimary: '#FFFFFF', // ตั้งค่าสีหลักเริ่มต้นเป็นสีขาว #FFFFFF
         themeSecondary: '#4f46e5',
         themeType: 'gradient',
         themeMarqueeBg: '#eb2f96',
-        themeMenuBg: '#eb2f96',
         inviteCode: '',
-        logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png', // ตั้งค่ารูปภาพเริ่มต้น
+        logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         loginBgUrl: '',
         userBgUrl: '',
         marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
@@ -843,9 +837,14 @@
           loginWrapper.style.backgroundPosition = 'center';
           loginWrapper.style.backgroundRepeat = 'no-repeat';
         } else {
-          const p = cfg.themePrimary || '#e6399b';
+          const p = cfg.themePrimary || '#FFFFFF';
           const s = cfg.themeSecondary || '#4f46e5';
-          loginWrapper.style.backgroundImage = `linear-gradient(135deg, ${p}, ${s})`;
+          if (cfg.themeType === 'single') {
+            loginWrapper.style.backgroundImage = 'none';
+            loginWrapper.style.backgroundColor = p;
+          } else {
+            loginWrapper.style.backgroundImage = `linear-gradient(135deg, ${p}, ${s})`;
+          }
         }
       }
 
@@ -1003,8 +1002,8 @@
           // อัปเดตแถบเปอร์เซ็นต์และกำไรด่วน
           updateDynamicValues();
 
-          // เด้งอัปเดตแบบเรียลไทม์ทันทีที่ เครดิต / VIP / ชื่อ มีการเปลี่ยนแปลง
-          if (levelChanged || nameChanged || creditChanged || !lastRenderedTab) {
+          // เด้งอัปเดตแบบเรียลไทม์หลีกเลี่ยงการเรนเดอร์ใหม่ทั้งหน้าเมื่อเงินเปลี่ยนเท่านั้น เพื่อป้องกันจอแวบกระพริบ
+          if (levelChanged || nameChanged || !lastRenderedTab) {
             refreshUI(); 
           }
         } else {
@@ -1103,7 +1102,7 @@
       
       const marqueeText = getMarqueeText();
       const cfg = getConfig();
-      const p = cfg.themePrimary || '#e6399b';
+      const p = cfg.themePrimary || '#FFFFFF';
       const mBg = (cfg.themeMarqueeBg && cfg.themeMarqueeBg.trim() !== '') ? cfg.themeMarqueeBg : p;
       
       const isLightMarquee = isColorLight(mBg);
@@ -1504,13 +1503,18 @@
         return;
       }
 
-      c.innerHTML = ''; 
+      // ป้องกันการกระพริบโดยใช้เทคนิค Off-screen rendering (Atomic Write)
+      let tempDiv = document.createElement('div');
       lastRenderedTab = currentTab; 
       
-      if (currentTab === 'home') renderHome(c); 
-      else if (currentTab === 'products') renderProducts(c); 
-      else if (currentTab === 'history') renderHistory(c); 
-      else if (currentTab === 'profile') renderProfile(c);
+      if (currentTab === 'home') renderHome(tempDiv); 
+      else if (currentTab === 'products') renderProducts(tempDiv); 
+      else if (currentTab === 'history') renderHistory(tempDiv); 
+      else if (currentTab === 'profile') renderProfile(tempDiv);
+      
+      if (c.innerHTML !== tempDiv.innerHTML) {
+        c.innerHTML = tempDiv.innerHTML;
+      }
       
       applyDynamicStyles();
       safeCreateIcons();
