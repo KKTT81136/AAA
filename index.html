@@ -150,6 +150,8 @@
     .banner-slide { 
       transition: opacity 0.8s ease-in-out; 
     }
+    
+    /* สไตล์คุมระบบอักษรวิ่งสไลด์จากขวาไปซ้ายอย่างเสถียรและไหลลื่น */
     .marquee-container { 
       overflow: hidden; 
       white-space: nowrap; 
@@ -159,15 +161,17 @@
       position: relative; 
     }
     @keyframes marqueeScroll {
-      0% { transform: translate3d(100%, 0, 0); }
+      0% { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-100%, 0, 0); }
     }
     .marquee-text { 
       display: inline-block; 
       white-space: nowrap;
-      animation: marqueeScroll 14s linear infinite; /* เร่งรอบเวลาเพิ่มความเร็วขึ้นมาที่ 14 วินาที */
+      padding-left: 100%; /* ดันให้อักษรไปเริ่มต้นที่ขวาสุดของขอบจอเสมอก่อนสไลด์เข้ามา */
+      animation: marqueeScroll 10s linear infinite; /* ความเร็วระดับสากล เหมาะแก่การอ่าน */
       will-change: transform; 
     }
+    
     .nav-glass { 
       background: rgba(255, 255, 255, 0.85); 
       backdrop-filter: blur(12px); 
@@ -1023,19 +1027,9 @@
           if (loggedId) {
             startUserSubscriptions(loggedId);
           }
-        }
-      });
-
-      signInAnonymously(auth).then(() => {
-        if (!isPublicSubscribed) {
-          startPublicSubscriptions();
-          isPublicSubscribed = true;
-        }
-      }).catch(err => {
-        console.warn("Auth init error: ", err);
-        if (!isPublicSubscribed) {
-          startPublicSubscriptions();
-          isPublicSubscribed = true;
+        } else {
+          // หากไม่มีสิทธิ์ ให้เชื่อม anonymous ก่อนเพื่อให้คิว Snapshot ไม่สะดุด
+          signInAnonymously(auth).catch(err => console.warn("Auth error: ", err));
         }
       });
     }
@@ -1694,26 +1688,27 @@
         </div>`;
       }
 
+      // ปรับปรุงลิงก์เป็น Unsplash CDN ความละเอียดสูง โหลดเสร็จสิ้นทันทีและไม่ติดบล็อก Hotlinking เพื่อแก้ปัญหาแท็บเบราว์เซอร์หมุนไม่หยุด
       const defaultProducts = [
-        { name: "นาฬิกา MIDO Belluna Sunray", price: "10,540.00 THB", image: "https://www.midowatches.com/media/catalog/product/M/0/M024.630.11.061.00_1.png" },
-        { name: "กระเป๋า COACH Tabby Top Handle 20", price: "5,150.00 THB", image: "https://img.images.coachetd.com/tabby-top-handle-20.png" },
-        { name: "หูฟัง BOSE QuietComfort® 45", price: "11,900.00 THB", image: "https://assets.bose.com/content/dam/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc45/images/QC45_black_EC_hero.png" },
-        { name: "ไอแพด APPLE 12.9-inch iPad Pro M2", price: "50,900.00 THB", image: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-12-select-wifi-spacegray-202210?wid=940&hei=1112&fmt=png-alpha" },
-        { name: "กล้อง SONY ZV-E10 - สีขาว", price: "25,990.00 THB", image: "https://www.sony.co.th/image/62b84f33160b741eb5bfdf8b39a3f2d2?fmt=png-alpha" },
-        { name: "น้ำมันหอมระเหย MT.SAPOLA Home Scent", price: "4,390.00 THB", image: "https://www.mtsapola.com/media/catalog/product/h/o/home-scent-tranquil.png" },
-        { name: "เครื่องชงกาแฟ Nespresso Creatista Pro", price: "28,500.00 THB", image: "https://www.nespresso.com/shared_res/manuals/creatista-pro/creatista-pro-hero.png" },
-        { name: "ไอโฟน APPLE iPhone 14 Pro - สี Gold", price: "45,900.00 THB", image: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-pro-finish-select-202209-6-7inch-gold?wid=5120&hei=2880&fmt=p-jpg" }
+        { name: "นาฬิกาสปอร์ตเรือนหรูระดับพรีเมียม", price: "10,540.00 THB", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80" },
+        { name: "กระเป๋าถือแฟชั่นผู้หญิงดีไซน์โมเดิร์น", price: "5,150.00 THB", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80" },
+        { name: "หูฟังครอบหัวบลูทูธพลังเสียงรอบทิศทาง", price: "11,900.00 THB", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80" },
+        { name: "แท็บเล็ตหน้าจอสีสันสดใสประสิทธิภาพสูง", price: "50,900.00 THB", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80" },
+        { name: "กล้องถ่ายภาพดิจิทัลไร้มิลเลอร์พร้อมเลนส์", price: "25,990.00 THB", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80" },
+        { name: "น้ำหอมสูตรเข้มข้นกลิ่นหอมหรูติดทนนาน", price: "4,390.00 THB", image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=300&q=80" },
+        { name: "เครื่องชงกาแฟเอสเปรสโซอัตโนมัติประจำบ้าน", price: "28,500.00 THB", image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=300&q=80" },
+        { name: "โทรศัพท์มือถือสมาร์ตโฟนเชื่อมต่อ 5G ยุคใหม่", price: "45,900.00 THB", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80" }
       ];
 
       const fallbackImages = [
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300",
-        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300",
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300",
-        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300",
-        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300",
-        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=300",
-        "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?w=300",
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300"
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=150&q=80",
+        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=150&q=80"
       ];
 
       const activeShowcase = (publicData.showcaseProducts && publicData.showcaseProducts.length > 0)
