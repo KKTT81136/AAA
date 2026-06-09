@@ -204,7 +204,9 @@
         inviteCode: '',
         logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         loginBgUrl: '',
+        loginBgUrlMobile: '',
         userBgUrl: '',
+        userBgUrlMobile: '',
         marqueeText: '',
         tabTitle: '',
         tabFaviconUrl: '',
@@ -725,7 +727,7 @@
     }
 
     // ==========================================
-    // TABS: 1. USERS LIST & EDIT (Persistent Search Input Mode)
+    // TABS: 1. USERS LIST & EDIT
     // ==========================================
     function renderAdminUsers(c) {
       const usersData = getUsers();
@@ -1097,30 +1099,68 @@
       }
     }
 
+    // ลบผู้ใช้งานแบบ Cascade (ลบประวัติการเงิน, ประวัติคำสั่งซื้อ และออเดอร์ล็อกคิวที่พ่วงไว้ทั้งหมด)
     async function deleteAdminUser(bid) { 
       const u = adminUsersData.find(d => d.__backendId === bid); if(!u) return;
 
       const result = await Swal.fire({
-        title: '🚨 คุณแน่ใจหรือไม่ที่จะลบบัญชีผู้ใช้รายนี้?',
-        text: 'ข้อมูลธุรกรรมและสิทธิ์ทั้งหมดจะสูญหายอย่างถาวรและไม่สามารถกู้คืนได้',
+        title: '🚨 ยืนยันการลบบัญชีผู้ใช้ถาวร?',
+        text: 'คำเตือน: ประวัติการเงิน (ฝาก-ถอน), ประวัติการทำภารกิจสินค้า และคิวล็อกออเดอร์พิเศษทั้งหมดของสมาชิกรายนี้จะถูกล้างออกโดยอัตโนมัติ!',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#64748b',
-        confirmButtonText: 'ยืนยัน, ลบถาวร',
+        confirmButtonText: 'ยืนยัน, ลบข้อมูลทั้งหมดถาวร',
         cancelButtonText: 'ยกเลิก',
         background: '#1e293b',
         color: '#f8fafc'
       });
 
       if (result.isConfirmed) {
+        Swal.fire({
+          title: 'กำลังล้างทำลายข้อมูลในระบบ...',
+          allowOutsideClick: false,
+          didOpen: () => { Swal.showLoading(); }
+        });
+
         try {
+          // 1. ค้นหาและลบประวัติคำสั่งซื้อทั้งหมดของยูสเซอร์
+          const qOrders = query(collection(db, "orders"), where("userId", "==", bid));
+          const snapOrders = await getDocs(qOrders);
+          const oDeletePromises = [];
+          snapOrders.forEach(docSnap => {
+            oDeletePromises.push(deleteDoc(doc(db, "orders", docSnap.id)));
+          });
+          await Promise.all(oDeletePromises);
+
+          // 2. ค้นหาและลบประวัติธุรกรรม (การฝาก/การถอน) ทั้งหมดของยูสเซอร์
+          const qWds = query(collection(db, "withdrawals"), where("userId", "==", bid));
+          const snapWds = await getDocs(qWds);
+          const wDeletePromises = [];
+          snapWds.forEach(docSnap => {
+            wDeletePromises.push(deleteDoc(doc(db, "withdrawals", docSnap.id)));
+          });
+          await Promise.all(wDeletePromises);
+
+          // 3. ค้นหาและลบคิวออเดอร์พิเศษที่ล็อกคิวไว้ของยูสเซอร์
+          const qSpecial = query(collection(db, "special_assignments"), where("targetUser", "==", bid));
+          const snapSpecial = await getDocs(qSpecial);
+          const sDeletePromises = [];
+          snapSpecial.forEach(docSnap => {
+            sDeletePromises.push(deleteDoc(doc(db, "special_assignments", docSnap.id)));
+          });
+          await Promise.all(sDeletePromises);
+
+          // 4. ลบเอกสารผู้ใช้งานหลัก
           await deleteDoc(doc(db, "users", bid));
+
+          Swal.close();
           closeModal(); 
-          showToast('บัญชีสมาชิกดังกล่าวถูกทำลายเรียบร้อยแล้ว');
+          showToast('บัญชีสมาชิกดังกล่าวรวมถึงประวัติการเงินและสินค้าถูกทำลายหมดจดแล้ว');
           debouncedRenderAdminTab();
         } catch (e) {
-          showToast('ล้มเหลวในการส่งคำขอทำลายบัญชี: ' + e.message, 'error');
+          Swal.close();
+          showToast('เกิดข้อผิดพลาดในการล้างข้อมูล: ' + e.message, 'error');
         }
       } 
     }
@@ -1602,7 +1642,7 @@
     }
 
     // ==========================================
-    // TABS: 4. WITHDRAWALS (Persistent Input Mode)
+    // TABS: 4. WITHDRAWALS
     // ==========================================
     function renderAdminWithdrawals(c) {
       const wds = adminWithdrawalsData;
@@ -1792,7 +1832,7 @@
     }
 
     // ==========================================
-    // TABS: 5. SYSTEM ORDER LOGS (Persistent Input Mode)
+    // TABS: 5. SYSTEM ORDER LOGS
     // ==========================================
     function renderAdminOrders(c) {
       const orders = allUserOrdersData;
@@ -2165,7 +2205,9 @@
       const tS = cfg.themeSecondary || '#4f46e5';
       const themeType = cfg.themeType || 'gradient';
       const loginBgUrl = cfg.loginBgUrl || '';
+      const loginBgUrlMobile = cfg.loginBgUrlMobile || '';
       const userBgUrl = cfg.userBgUrl || '';
+      const userBgUrlMobile = cfg.userBgUrlMobile || '';
       const banks = cfg.supportedBanks || 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney';
 
       const themeMarqueeBg = cfg.themeMarqueeBg || '#eb2f96';
@@ -2279,12 +2321,20 @@
             </button>
             <div id="sec-wallpapers" class="hidden p-5 border-t border-slate-800 space-y-4">
               <div>
-                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอินหน้าบ้าน</label>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอินหน้าบ้าน (จอ PC / Desktop)</label>
                 <input id="cfg-login-bg" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs text-center" placeholder="วางลิงก์วอลเปเปอร์หน้าล็อกอิน" value="${loginBgUrl}">
               </div>
               <div>
-                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านในของสมาชิก</label>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอินหน้าบ้าน (จอมือถือ / Mobile)</label>
+                <input id="cfg-login-bg-mobile" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs text-center" placeholder="วางลิงก์วอลเปเปอร์หน้าล็อกอินบนมือถือ" value="${loginBgUrlMobile}">
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านในของสมาชิก (จอ PC / Desktop)</label>
                 <input id="cfg-user-bg" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs text-center" placeholder="วางลิงก์วอลเปเปอร์สำหรับด้านในระบบ" value="${userBgUrl}">
+              </div>
+              <div>
+                <label class="text-[10px] text-slate-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านในของสมาชิก (จอมือถือ / Mobile)</label>
+                <input id="cfg-user-bg-mobile" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs text-center" placeholder="วางลิงก์วอลเปเปอร์แดชบอร์ดด้านในบนมือถือ" value="${userBgUrlMobile}">
               </div>
               <button onclick="saveAdminSettings('bgs')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium text-xs rounded transition uppercase tracking-wider">บันทึกวอลเปเปอร์สมาชิกระบบ</button>
             </div>
@@ -2346,7 +2396,7 @@
               </div>
               
               <div>
-                <label class="text-[10px] text-amber-400 block mb-1 font-medium">รายการเบอร์โทรศัพท์คู่เงินรางวัลสลับวนโชว์หน้าบ้าน (คั่นรายการด้วยคอมมา , และแบ่งค่าด้วย : )</label>
+                <label class="text-[10px] text-slate-400 block mb-1 font-medium">รายการเบอร์โทรศัพท์คู่เงินรางวัลสลับวนโชว์หน้าบ้าน (คั่นรายการด้วยคอมมา , และแบ่งค่าด้วย : )</label>
                 <textarea id="cfg-rewards-list" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs h-20 text-center" placeholder="เช่น 095***567:433,000,095***091:2,050,000">${rewardsList}</textarea>
               </div>
 
@@ -2415,7 +2465,9 @@
       }
       else if (type === 'bgs') { 
         updatePayload.loginBgUrl = $('cfg-login-bg').value.trim(); 
+        updatePayload.loginBgUrlMobile = $('cfg-login-bg-mobile').value.trim(); 
         updatePayload.userBgUrl = $('cfg-user-bg').value.trim(); 
+        updatePayload.userBgUrlMobile = $('cfg-user-bg-mobile').value.trim(); 
       }
       else if (type === 'marquee') {
         updatePayload.marqueeText = $('cfg-marquee').value.trim();
