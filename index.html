@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <title>TOS Shopping</title>
-  <!-- ป้องกันบราวเซอร์หมุนค้างด้วยการตั้ง Default Favicon เป็น Data URI แบบโปร่งใส -->
+  <!-- Default Favicon -->
   <link class="favicon-link" rel="icon" type="image/x-icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -21,7 +21,7 @@
     });
   </script>
 
-  <!-- สคริปต์ประมวลผลแบบบล็อกกิ้ง เพื่อตั้งค่าธีมทันที ป้องกันการกระพริบของสีเริ่มต้น -->
+  <!-- สคริปต์ประมวลผลทันทีเพื่อป้องกันสี/ภาพพื้นหลังกระพริบและกระตุกช่วงเริ่มต้นโหลดหน้า -->
   <script>
     (function() {
       var cached = localStorage.getItem('tos_cached_config');
@@ -30,6 +30,10 @@
       var title = 'TOS Shopping';
       var themeType = 'gradient';
       var marqueeBg = '#eb2f96';
+      var loginBg = '';
+      var loginBgMobile = '';
+      var userBg = '';
+      var userBgMobile = '';
 
       if (cached) {
         try {
@@ -39,6 +43,10 @@
           title = cfg.tabTitle || title;
           themeType = cfg.themeType || themeType;
           marqueeBg = cfg.themeMarqueeBg || marqueeBg;
+          loginBg = cfg.loginBgUrl || '';
+          loginBgMobile = cfg.loginBgUrlMobile || '';
+          userBg = cfg.userBgUrl || '';
+          userBgMobile = cfg.userBgUrlMobile || '';
         } catch(e) {}
       }
 
@@ -60,9 +68,30 @@
         ".border-primary { border-color: " + primary + " !important; }",
         ".bg-theme-gradient { " + bgStyle + " }",
         ".fill-blue-100\\/50 { fill: " + primary + "33 !important; }"
-      ].join("\n");
+      ];
 
-      document.write('<style id="dynamic-theme-style">' + cssRules + '</style>');
+      // จัดการภาพพื้นหลังหน้าล็อกอินด้วย CSS ป้องกันการกระตุกช่วงเวลาโหลดภาพ
+      if (loginBg) {
+        cssRules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; }");
+      }
+      if (loginBgMobile) {
+        cssRules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
+      }
+
+      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน
+      if (userBg) {
+        cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+      } else {
+        cssRules.push("#dash-outer-container { background-color: #f8fafc !important; }");
+      }
+      if (userBgMobile) {
+        cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+      }
+
+      var styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-theme-style';
+      styleEl.innerHTML = cssRules.join("\n");
+      document.head.appendChild(styleEl);
     })();
   </script>
 
@@ -89,10 +118,10 @@
       touch-action: manipulation; 
     }
     .fade-in { 
-      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+      animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
     }
     @keyframes fadeIn { 
-      from { opacity: 0; transform: translateY(8px); } 
+      from { opacity: 0; transform: translateY(5px); } 
       to { opacity: 1; transform: translateY(0); } 
     }
     @keyframes dots { 
@@ -112,18 +141,18 @@
     .dot-anim span:nth-child(2) { animation-delay: -0.16s; }
     
     @keyframes slideIn { 
-      from { transform: scale(0.95) translateY(10px); opacity: 0; } 
+      from { transform: scale(0.97) translateY(5px); opacity: 0; } 
       to { transform: scale(1) translateY(0); opacity: 1; } 
     }
     .modal-anim { 
-      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+      animation: slideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
     }
     @keyframes toastSlide { 
-      from { opacity: 0; transform: translate(-50%, -15px); } 
+      from { opacity: 0; transform: translate(-50%, -10px); } 
       to { opacity: 1; transform: translate(-50%, 0); } 
     }
     .toast-show { 
-      animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+      animation: toastSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
     }
     ::-webkit-scrollbar { 
       width: 6px; 
@@ -136,7 +165,7 @@
       border-radius: 99px; 
     }
     .banner-slide { 
-      transition: opacity 0.8s ease-in-out; 
+      transition: opacity 0.6s ease-in-out; 
     }
     
     .marquee-container { 
@@ -155,7 +184,7 @@
       display: inline-block; 
       white-space: nowrap;
       padding-left: 100%; 
-      animation: marqueeScroll 10s linear infinite; 
+      animation: marqueeScroll 12s linear infinite; 
       will-change: transform; 
     }
     
@@ -168,8 +197,8 @@
     .gallery-item {
       opacity: 0.3;
       filter: brightness(0.6) grayscale(20%);
-      transform: scale(0.95);
-      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(0.97);
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .gallery-item.reveal {
       opacity: 1;
@@ -179,13 +208,13 @@
 
     .scroll-reveal-left {
       opacity: 0;
-      transform: translateX(-40px);
-      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-20px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-right {
       opacity: 0;
-      transform: translateX(40px);
-      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(20px);
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-active {
       opacity: 1 !important;
@@ -194,7 +223,7 @@
 
     @keyframes slideFromRight {
       0% {
-        transform: translate3d(120px, 0, 0);
+        transform: translate3d(50px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -203,7 +232,7 @@
       }
     }
     .logo-slide-right {
-      animation: slideFromRight 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .showcase-card {
@@ -213,7 +242,7 @@
 
     @keyframes slideFromLeft {
       0% {
-        transform: translate3d(-60px, 0, 0);
+        transform: translate3d(-30px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -224,7 +253,7 @@
 
     @keyframes slideFromRightNew {
       0% {
-        transform: translate3d(60px, 0, 0);
+        transform: translate3d(30px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -234,26 +263,26 @@
     }
 
     .revealed-slide .showcase-card-left {
-      animation: slideFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .revealed-slide .showcase-card-right {
-      animation: slideFromRightNew 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromRightNew 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.1s; }
-    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.4s; }
-    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.55s; }
+    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.05s; }
+    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.15s; }
+    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.25s; }
+    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.35s; }
 
-    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.1s; }
-    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.4s; }
-    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.55s; }
+    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.05s; }
+    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.15s; }
+    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.25s; }
+    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.35s; }
   </style>
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
-  <!-- แท็กหลักของแอปพลิเคชัน โหลดแบบไดนามิกแบบปลอดภัย ไม่ค้างหน้าขาว -->
+  <!-- โครงสร้างแอปพลิเคชันหลัก -->
   <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
     <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
       <div class="w-full max-w-[380px] relative z-10 py-1">
@@ -327,7 +356,7 @@
     let lastUsername = '';
     let lastUserCredit = -1;
 
-    // Cache Serializer เพื่อป้องกัน Redundant Re-render ภายใต้ High Load
+    // Cache Serializer เพื่อป้องกัน Redundant Re-render และอาการสั่นไหวของ DOM
     let lastSerialized = {
       configs: '', banners: '', galleries: '', menuIcons: '', products: '', showcaseProducts: '',
       userOrders: '', userWithdrawals: '', userSpecialAssign: ''
@@ -642,23 +671,41 @@
         ? "background: " + p + " !important;" 
         : "background: linear-gradient(135deg, " + p + ", " + s + ") !important;";
 
-      styleEl.innerHTML = `
-        :root {
-          --color-primary: ${p};
-          --color-secondary: ${s};
-          --color-marquee-bg: ${mBg};
-        }
-        body { background-color: #f8fafc !important; }
-        .text-primary { color: ${p} !important; }
-        .bg-primary { background-color: ${p} !important; }
-        .border-primary { border-color: ${p} !important; }
-        .bg-theme-gradient { 
-          ${bgStyle}
-        }
-        .fill-blue-100\\/50 {
-          fill: ${p}33 !important;
-        }
-      `;
+      const loginBg = cfg.loginBgUrl || '';
+      const loginBgMobile = cfg.loginBgUrlMobile || '';
+      const userBg = cfg.userBgUrl || '';
+      const userBgMobile = cfg.userBgUrlMobile || '';
+
+      const rules = [
+        ":root {",
+        "  --color-primary: " + p + ";",
+        "  --color-secondary: " + s + ";",
+        "  --color-marquee-bg: " + mBg + ";",
+        "}",
+        "body { background-color: #f8fafc !important; }",
+        ".text-primary { color: " + p + " !important; }",
+        ".bg-primary { background-color: " + p + " !important; }",
+        ".border-primary { border-color: " + p + " !important; }",
+        ".bg-theme-gradient { " + bgStyle + " }",
+        ".fill-blue-100\\/50 { fill: " + p + "33 !important; }"
+      ];
+
+      if (loginBg) {
+        rules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; }");
+      }
+      if (loginBgMobile) {
+        rules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
+      }
+      if (userBg) {
+        rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+      } else {
+        rules.push("#dash-outer-container { background-color: #f8fafc !important; background-image: none !important; }");
+      }
+      if (userBgMobile) {
+        rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+      }
+
+      styleEl.innerHTML = rules.join("\n");
     }
 
     let currentFavicon = '';
@@ -709,7 +756,9 @@
         inviteCode: '',
         logoUrl: 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png',
         loginBgUrl: '',
+        loginBgUrlMobile: '',
         userBgUrl: '',
+        userBgUrlMobile: '',
         marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
         tabTitle: 'TOS Shopping',
         tabFaviconUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
@@ -721,8 +770,6 @@
 
     const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
     const getLogoUrl = () => { const c = getConfig(); return (c.logoUrl && c.logoUrl.trim() !== '') ? c.logoUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; };
-    const getLoginBgUrl = () => { const c = getConfig(); return c.loginBgUrl || ''; };
-    const getUserBgUrl = () => { const c = getConfig(); return c.userBgUrl || ''; };
     
     const getMarqueeText = () => { 
       const c = getConfig(); 
@@ -793,7 +840,7 @@
           renderTabContent();
           applyDynamicStyles();
         }
-      }, 30);
+      }, 20); // ปรับแต่งเวลาเพื่อลดการตอบสนองดีเลย์
     }
 
     function applyDynamicStyles() {
@@ -802,41 +849,6 @@
 
       applyTheme(cfg.themePrimary, cfg.themeSecondary, cfg.themeType);
       updateBrowserTab();
-
-      const loginWrapper = document.getElementById('form-card-wrapper');
-      if (loginWrapper) {
-        const bgUrl = getLoginBgUrl();
-        if (bgUrl) {
-          loginWrapper.style.backgroundImage = `url('${bgUrl}')`;
-          loginWrapper.style.backgroundSize = 'cover';
-          loginWrapper.style.backgroundPosition = 'center';
-          loginWrapper.style.backgroundRepeat = 'no-repeat';
-        } else {
-          const p = cfg.themePrimary || '#FFFFFF';
-          const s = cfg.themeSecondary || '#4f46e5';
-          if (cfg.themeType === 'single') {
-            loginWrapper.style.backgroundImage = 'none';
-            loginWrapper.style.backgroundColor = p;
-          } else {
-            loginWrapper.style.backgroundImage = `linear-gradient(135deg, ${p}, ${s})`;
-          }
-        }
-      }
-
-      const dashOuter = document.getElementById('dash-outer-container');
-      if (dashOuter) {
-        const userBgUrl = getUserBgUrl();
-        if (userBgUrl) {
-          dashOuter.style.backgroundImage = `url('${userBgUrl}')`;
-          dashOuter.style.backgroundSize = 'cover';
-          dashOuter.style.backgroundPosition = 'center';
-          dashOuter.style.backgroundRepeat = 'no-repeat';
-          dashOuter.classList.remove('bg-slate-50');
-        } else {
-          dashOuter.style.backgroundImage = '';
-          dashOuter.classList.add('bg-slate-50');
-        }
-      }
 
       const marqueeEl = document.getElementById('marquee-text-display');
       if (marqueeEl) {
@@ -991,13 +1003,13 @@
           currentUser = { ...uData, id: docSnap.id, __backendId: docSnap.id };
           localStorage.setItem('tos_cached_user', JSON.stringify(currentUser)); 
           
-          // เปลี่ยนแปลงแบบ Targeted Node เพื่อลดและป้องกันการรีเฟรชหน้าจอกระพริบ
           updateDynamicValues();
 
           if (levelChanged || nameChanged || !lastRenderedTab) {
             refreshUI(); 
           }
         } else {
+          // หากยูสเซอร์โดนลบ ประวัติในระบบฝั่งหน้าบ้านจะทำการอัปเดตออกจาก Local และส่งกลับสู่หน้าล็อกอินอย่างปลอดภัย
           doLogout(); 
         }
       }, (err) => {
@@ -1018,6 +1030,8 @@
             refreshUI();
           }
         }
+      }, (err) => {
+        console.warn("Orders load error: ", err);
       });
 
       const withdrawalsQuery = query(collection(db, "withdrawals"), where("userId", "==", userId));
@@ -1033,6 +1047,8 @@
             refreshUI();
           }
         }
+      }, (err) => {
+        console.warn("Withdrawals load error: ", err);
       });
 
       const specialQuery = query(collection(db, "special_assignments"), where("targetUser", "==", userId));
@@ -1045,6 +1061,8 @@
           userSpecialAssignData = sList;
           refreshUI();
         }
+      }, (err) => {
+        console.warn("Special assignments load error: ", err);
       });
     }
 
@@ -1157,11 +1175,8 @@
 
     function renderLogin() {
       const app = $('app');
-      const bgUrl = getLoginBgUrl();
-      const bgStyle = bgUrl ? `background-image: url('${bgUrl}'); background-size: cover; background-position: center;` : '';
-
       app.innerHTML = `
-      <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative ${bgUrl ? '' : 'bg-slate-100'}" style="${bgStyle}">
+      <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
         <div class="w-full max-w-[380px] relative z-10 py-1">
           <div class="text-center mb-4">
             <div id="logo-click" class="logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100">
@@ -1453,8 +1468,8 @@
       
       if (!$('dash-outer-container')) {
         $('app').innerHTML = `
-        <div id="dash-outer-container" class="h-full flex flex-col bg-slate-50 transition-all duration-300">
-          <div id="dash-content" class="flex-1 overflow-auto pb-24 fade-in" style="background-color: transparent;"></div>
+        <div id="dash-outer-container" class="h-full flex flex-col relative transition-all duration-300">
+          <div id="dash-content" class="flex-1 overflow-auto pb-24" style="background-color: transparent;"></div>
           <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-100 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] z-50 rounded-t-[28px] nav-glass">
             <div class="flex justify-around py-3 max-w-lg mx-auto px-4">
               ${tabs.map(tData => `
@@ -1514,16 +1529,23 @@
         return;
       }
 
+      // ป้องกันการ Render ซ้ำแบบไม่จำเป็น (Skip Re-rendering ถ้าแท็บเดิมไม่มีการอัปเดตโครงสร้างสำคัญ)
+      if (lastRenderedTab === currentTab && (currentTab === 'products' || currentTab === 'profile')) {
+        updateDynamicValues();
+        return;
+      }
+
       let tempDiv = document.createElement('div');
-      lastRenderedTab = currentTab; 
       
       if (currentTab === 'home') renderHome(tempDiv); 
       else if (currentTab === 'products') renderProducts(tempDiv); 
       else if (currentTab === 'history') renderHistory(tempDiv); 
       else if (currentTab === 'profile') renderProfile(tempDiv);
       
+      // การเปรียบเทียบก่อนปรับปรุงโครงสร้างเพื่อป้องกันปัญหารูปภาพแฟลช
       if (c.innerHTML !== tempDiv.innerHTML) {
         c.innerHTML = tempDiv.innerHTML;
+        lastRenderedTab = currentTab;
       }
       
       applyDynamicStyles();
@@ -1531,6 +1553,7 @@
       initGalleryObserver();
     }
 
+    // ฟังก์ชันอัปเดตค่าตัวเลขแบบตรงจุด ป้องกันปัญหากรอบภาพกระพริบหรือสั่นตัวแบบสุ่ม
     function updateDynamicValues() {
       const u = currentUser;
       if (!u) return;
@@ -1563,7 +1586,7 @@
       
       const todayStr = new Date().toDateString();
       const todayComm = getUserOrders()
-        .filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
+        .filter(o => o && o.createdAt && new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
         .reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
       
       const prodComm = $('prod-comm-display');
@@ -1876,7 +1899,9 @@
       const total = availableProducts.length; 
       const pct = total === 0 ? 0 : Math.min(100, Math.round((done/total)*100));
       const todayStr = new Date().toDateString();
-      const todayComm = getUserOrders().filter(o => new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed').reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
+      const todayComm = getUserOrders()
+        .filter(o => o && o.createdAt && new Date(o.createdAt).toDateString() === todayStr && o.status === 'completed')
+        .reduce((sum, o) => sum + (Number(o.commission) || 0), 0);
       
       let levelText = 'VIP ' + userLevel; 
       if(userLevel === 'fixturn') levelText = currentLang === 'th' ? 'ซ่อมยอดเทิร์น' : 'Turnover Repair'; 
@@ -1932,7 +1957,7 @@
       const done = u.runIndex || 0;
       const userLevel = u.userLevel || '1';
 
-      if (getUserOrders().find(o => o.status === 'pending')) {
+      if (getUserOrders().find(o => o && o.status === 'pending')) {
         showModal(`
           <div class="text-center py-4 font-mono">
             <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-amber-100"><i data-lucide="alert-circle" class="w-10 h-10"></i></div>
@@ -1958,7 +1983,7 @@
       const availableProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel));
       const targetOrderNum = done + 1;
       
-      const specialProduct = getSpecialAssignments().find(s => s.targetUser === u.id && Number(s.targetIndex) === targetOrderNum);
+      const specialProduct = getSpecialAssignments().find(s => s && s.targetUser === u.id && Number(s.targetIndex) === targetOrderNum);
       let pToRun = null; let isSpecial = false;
       
       if (specialProduct) { 
@@ -2011,17 +2036,17 @@
       let p = typeof productIdOrObj === 'object' ? productIdOrObj : publicData.products.find(d => d.__backendId === productIdOrObj); 
       
       if(!p && typeof productIdOrObj === 'string') {
-        p = userSpecialAssignData.find(d => d.__backendId === productIdOrObj);
+        p = userSpecialAssignData.find(d => d && d.__backendId === productIdOrObj);
       }
       if(!p && typeof productIdOrObj === 'string') {
-        p = userOrdersData.find(d => d.__backendId === productIdOrObj);
+        p = userOrdersData.find(d => d && d.__backendId === productIdOrObj);
       }
       if(!p) return;
       
       const isSpecialMode = (isSpecial === true || String(isSpecial) === 'true');
 
       if (creditVal < (p.productPrice || 0)) { 
-        const existingPending = getUserOrders().find(o => o.status === 'pending');
+        const existingPending = getUserOrders().find(o => o && o.status === 'pending');
         if (p.type !== 'order' && !existingPending) {
           const orderData = { 
             type:'order', id:genId(), userId:u.id, username:usernameVal, 
@@ -2071,7 +2096,7 @@
       const btn = $('btn-confirm-final'); if(!btn || btn.disabled) return;
       btn.disabled = true; btn.innerHTML = t('processing');
       
-      let p = publicData.products.find(d => d.__backendId === id) || userSpecialAssignData.find(d => d.__backendId === id) || userOrdersData.find(d => d.__backendId === id); 
+      let p = publicData.products.find(d => d.__backendId === id) || userSpecialAssignData.find(d => d && d.__backendId === id) || userOrdersData.find(d => d && d.__backendId === id); 
       if(!p) return;
 
       let userDocRef = doc(db, "users", currentUser.id);
@@ -2087,7 +2112,7 @@
 
           if (currentCredit < p.productPrice) throw "Credit insufficient!";
 
-          let calculatedCredit = currentCredit + p.commission; 
+          let calculatedCredit = currentCredit - p.productPrice + (p.productPrice + p.commission); 
 
           const updatePayload = {
             credit: calculatedCredit,
@@ -2116,7 +2141,7 @@
           }
 
           if (isSpecial) {
-            const assignment = userSpecialAssignData.find(s => s.targetUser === userData.id && Number(s.targetIndex) === (currentRunIndex + 1));
+            const assignment = userSpecialAssignData.find(s => s && s.targetUser === userData.id && Number(s.targetIndex) === (currentRunIndex + 1));
             if (assignment) {
               transaction.delete(doc(db, "special_assignments", assignment.__backendId));
             }
@@ -2155,17 +2180,17 @@
         const orders = getUserOrders().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
         const totalVipProducts = getProducts().filter(p => String(p.vipLevel) === String(userLevel)).length;
         const isAllDone = done >= totalVipProducts && totalVipProducts > 0;
-        const pendingOrder = orders.find(o => o.status === 'pending');
+        const pendingOrder = orders.find(o => o && o.status === 'pending');
         
         let seenOrderIds = new Set();
         const completedOrders = orders.filter(o => { 
-          if (o.status !== 'pending' && o.status !== undefined && !seenOrderIds.has(o.id)) { 
+          if (o && o.status !== 'pending' && o.status !== undefined && !seenOrderIds.has(o.id)) { 
             seenOrderIds.add(o.id); 
             return true; 
           } 
           return false; 
         }); 
-        const allCompleted = [...completedOrders, ...orders.filter(o => o.status === undefined && !seenOrderIds.has(o.id))];
+        const allCompleted = [...completedOrders, ...orders.filter(o => o && o.status === undefined && !seenOrderIds.has(o.id))];
         let html = '';
         
         if (pendingOrder) { 
@@ -2199,6 +2224,7 @@
           html += `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTasksRecorded')}</div>`;
         } else { 
           html += allCompleted.map(o => { 
+            if (!o) return '';
             const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
             return `
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100 font-mono">
@@ -2221,6 +2247,7 @@
       } else {
         const wds = getUserWithdrawals().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
         listHtml = wds.length === 0 ? `<div class="text-center text-slate-400 py-12 font-medium text-sm font-mono">${t('noTransactions')}</div>` : wds.map(w => { 
+          if (!w) return '';
           let sc = { color: 'text-slate-500', text: 'Unknown' }; 
           if (w.status === 'deposit') sc = { color: 'text-emerald-600 bg-emerald-50 border border-emerald-100', text: t('deposit') }; 
           else if (w.status === 'pending') sc = { color: 'text-amber-600 bg-amber-50 border border-amber-100', text: t('pending') }; 
@@ -2367,7 +2394,7 @@
       if (!u) return;
       const creditVal = u.credit || 0;
       if (!u.bankName || !u.bankNumber) return showToast(t('noBankDetails'),'error');
-      if (getUserOrders().find(o => o.status === 'pending')) return showToast(t('cantWdPending'),'error');
+      if (getUserOrders().find(o => o && o.status === 'pending')) return showToast(t('cantWdPending'),'error');
       showModal(`
         <div class="text-center font-mono">
           <div class="w-16 h-16 bg-blue-50 text-primary rounded-3xl flex items-center justify-center mx-auto mb-2 border border-blue-100"><i data-lucide="arrow-down-to-line" class="w-8 h-8"></i></div>
