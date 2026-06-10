@@ -72,20 +72,20 @@
 
       // จัดการภาพพื้นหลังหน้าล็อกอินด้วย CSS ป้องกันการกระตุกช่วงเวลาโหลดภาพ
       if (loginBg) {
-        cssRules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        cssRules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       }
       if (loginBgMobile) {
-        cssRules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
+        cssRules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
       // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน
       if (userBg) {
-        cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
         cssRules.push("#dash-outer-container { background-color: #f8fafc !important; }");
       }
       if (userBgMobile) {
-        cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+        cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
       var styleEl = document.createElement('style');
@@ -194,27 +194,30 @@
       -webkit-backdrop-filter: blur(12px); 
     }
 
+    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นช้าและนุ่มนวลกว่าเดิม */
     .gallery-item {
-      opacity: 0.3;
+      opacity: 0;
       filter: brightness(0.6) grayscale(20%);
-      transform: scale(0.97);
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(0.95);
+      transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                  transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                  filter 1.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .gallery-item.reveal {
       opacity: 1;
-      filter: brightness(1.1) grayscale(0%);
+      filter: brightness(1.0) grayscale(0%);
       transform: scale(1);
     }
 
     .scroll-reveal-left {
       opacity: 0;
       transform: translateX(-20px);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-right {
       opacity: 0;
       transform: translateX(20px);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-active {
       opacity: 1 !important;
@@ -262,22 +265,23 @@
       }
     }
 
+    /* ชะลอความเร็วของอนิเมชันสินค้าแนะนำ 8 ชิ้นให้ช้าลง */
     .revealed-slide .showcase-card-left {
-      animation: slideFromLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromLeft 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .revealed-slide .showcase-card-right {
-      animation: slideFromRightNew 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromRightNew 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.05s; }
-    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.15s; }
-    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.35s; }
+    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.1s; }
+    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.3s; }
+    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.5s; }
+    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.7s; }
 
-    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.05s; }
-    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.15s; }
-    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.35s; }
+    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.1s; }
+    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.3s; }
+    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.5s; }
+    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.7s; }
   </style>
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
@@ -708,19 +712,22 @@
         ".fill-blue-100\\/50 { fill: " + p + "33 !important; }"
       ];
 
+      // จัดการภาพพื้นหลังหน้าล็อกอินด้วย CSS ป้องกันการกระตุกช่วงเวลาโหลดภาพ รองรับ PC และ Mobile
       if (loginBg) {
-        rules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        rules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       }
       if (loginBgMobile) {
-        rules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
+        rules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
+
+      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน รองรับ PC และ Mobile
       if (userBg) {
-        rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
         rules.push("#dash-outer-container { background-color: #f8fafc !important; background-image: none !important; }");
       }
       if (userBgMobile) {
-        rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+        rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
       styleEl.innerHTML = rules.join("\n");
@@ -1685,6 +1692,7 @@
       if (galleryObserver) galleryObserver.disconnect();
       if (showcaseObserver) showcaseObserver.disconnect();
 
+      // ตรวจจับการสกรอลภาพแกลเลอรีให้ทำงานเฉพาะเวลาที่เลื่อนผ่านหน้าจออย่างนุ่มนวล
       galleryObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1693,9 +1701,10 @@
             entry.target.classList.remove('reveal');
           }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.05 });
       document.querySelectorAll('.gallery-item').forEach(el => galleryObserver.observe(el));
 
+      // ตรวจจับสินค้าแนะนำ 8 ชิ้นให้เคลื่อนที่ช้าลงเฉพาะช่วงที่เลื่อนหน้าจอมาแสดงผล
       showcaseObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1877,17 +1886,6 @@
             <p class="mt-4 text-white/80 text-xs font-semibold uppercase tracking-wider">${t('availBalance')}</p>
             <p id="home-credit-display" class="text-3xl font-black mt-1 tracking-tight">฿${safeFormatNumber(creditVal)}</p>
           </div>
-          
-          <div class="grid grid-cols-2 gap-4 mt-6">
-            <button onclick="switchTab('products')" class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 hover:shadow-md active:scale-[0.98] transition font-mono">
-              <div class="w-14 h-14 bg-blue-50 text-primary rounded-3xl flex items-center justify-center shadow-inner"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div>
-              <span class="font-bold text-slate-700 text-sm">${t('runOrders')}</span>
-            </button>
-            <button onclick="switchTab('history')" class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 hover:shadow-md active:scale-[0.98] transition font-mono">
-              <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center shadow-inner"><i data-lucide="file-text" class="w-6 h-6"></i></div>
-              <span class="font-bold text-slate-700 text-sm">${t('history')}</span>
-            </button>
-          </div>
 
           ${featuredProductsHtml}
           ${commissionSummaryHtml}
@@ -1901,8 +1899,13 @@
           ${galleryHtml}
         </div>`;
       
-      startBannerSlide();
+      sidebarMenuWorkaround();
       setTimeout(initGalleryObserver, 50);
+    }
+
+    // ฟังก์ชันความปลอดภัยเสริมเพื่อป้องกันสคริปต์สไลด์ทำงานซ้ำซ้อน
+    function sidebarMenuWorkaround() {
+      startBannerSlide();
     }
 
     function renderProducts(c) {
