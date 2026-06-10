@@ -27,7 +27,7 @@
       var cached = localStorage.getItem('tos_cached_config');
       var primary = '#FFFFFF'; 
       var secondary = '#4f46e5';
-      var title = 'Shopping';
+      var title = 'TOS Shopping';
       var themeType = 'gradient';
       var marqueeBg = '#eb2f96';
       var loginBg = '';
@@ -78,14 +78,14 @@
         cssRules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
       }
 
-      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน
+      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน สำหรับจอเดสก์ท็อปและจอมือถือ
       if (userBg) {
-        cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-attachment: fixed !important; }");
       } else {
         cssRules.push("#dash-outer-container { background-color: #f8fafc !important; }");
       }
       if (userBgMobile) {
-        cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+        cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-attachment: scroll !important; } }");
       }
 
       var styleEl = document.createElement('style');
@@ -194,27 +194,27 @@
       -webkit-backdrop-filter: blur(12px); 
     }
 
+    /* สไตล์ปรับแต่งเอฟเฟกต์แกลเลอรีให้ปรากฏช้าลง */
     .gallery-item {
-      opacity: 0.3;
-      filter: brightness(0.6) grayscale(20%);
-      transform: scale(0.97);
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: scale(0.95) translateY(15px);
+      transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform, opacity;
     }
     .gallery-item.reveal {
       opacity: 1;
-      filter: brightness(1.1) grayscale(0%);
-      transform: scale(1);
+      transform: scale(1) translateY(0);
     }
 
     .scroll-reveal-left {
       opacity: 0;
       transform: translateX(-20px);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-right {
       opacity: 0;
       transform: translateX(20px);
-      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .scroll-reveal-active {
       opacity: 1 !important;
@@ -240,9 +240,10 @@
       will-change: transform, opacity;
     }
 
+    /* ปรับเอฟเฟกต์เลื่อนเข้าของสินค้าโชว์ 8 ชิ้นให้ช้าลง */
     @keyframes slideFromLeft {
       0% {
-        transform: translate3d(-30px, 0, 0);
+        transform: translate3d(-40px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -253,7 +254,7 @@
 
     @keyframes slideFromRightNew {
       0% {
-        transform: translate3d(30px, 0, 0);
+        transform: translate3d(40px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -262,22 +263,23 @@
       }
     }
 
+    /* ทำงานสัมพันธ์กับการเลื่อนเลย์เอาท์มาถึงจุดแสดงผล */
     .revealed-slide .showcase-card-left {
-      animation: slideFromLeft 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromLeft 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .revealed-slide .showcase-card-right {
-      animation: slideFromRightNew 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromRightNew 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.05s; }
-    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.15s; }
-    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.35s; }
+    .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.15s; }
+    .revealed-slide .showcase-card-left:nth-child(2) { animation-delay: 0.30s; }
+    .revealed-slide .showcase-card-left:nth-child(3) { animation-delay: 0.45s; }
+    .revealed-slide .showcase-card-left:nth-child(4) { animation-delay: 0.60s; }
 
-    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.05s; }
-    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.15s; }
-    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.25s; }
-    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.35s; }
+    .revealed-slide .showcase-card-right:nth-child(5) { animation-delay: 0.15s; }
+    .revealed-slide .showcase-card-right:nth-child(6) { animation-delay: 0.30s; }
+    .revealed-slide .showcase-card-right:nth-child(7) { animation-delay: 0.45s; }
+    .revealed-slide .showcase-card-right:nth-child(8) { animation-delay: 0.60s; }
   </style>
  </head>
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
@@ -453,7 +455,7 @@
         contactSupport: "ติดต่อฝ่ายบริการลูกค้า",
         close: "ปิด",
         noProductTier: "ไม่ได้ตั้งค่าสินค้าสำหรับระดับสมาชิกของคุณ",
-        allTasksDone: "ทำภารกิจทั้งหมดในวันนี้เสร็จสิ้นแล้ว!",
+        allTasksDone: "🎉 ทำภารกิจทั้งหมดในวันนี้เสร็จสิ้นแล้ว!",
         matchingOrder: "กำลังจับคู่ออเดอร์...",
         specialOrder: "ออเดอร์พิเศษ",
         productPrice: "ราคาสินค้า",
@@ -558,7 +560,7 @@
         contactSupport: "Contact Support",
         close: "Close",
         noProductTier: "No products configured for your tier",
-        allTasksDone: "All tasks completed for today!",
+        allTasksDone: "🎉 All tasks completed for today!",
         matchingOrder: "Matching order...",
         specialOrder: "Special Order",
         productPrice: "Product Price",
@@ -715,12 +717,12 @@
         rules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; } }");
       }
       if (userBg) {
-        rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; }");
+        rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-attachment: fixed !important; }");
       } else {
         rules.push("#dash-outer-container { background-color: #f8fafc !important; background-image: none !important; }");
       }
       if (userBgMobile) {
-        rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; } }");
+        rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-attachment: scroll !important; } }");
       }
 
       styleEl.innerHTML = rules.join("\n");
@@ -1685,6 +1687,7 @@
       if (galleryObserver) galleryObserver.disconnect();
       if (showcaseObserver) showcaseObserver.disconnect();
 
+      // สั่งการให้แสดงผลรูปภาพแกลเลอรีแบบหน่วงเวลาช้าลง เฉพาะตอนที่ผู้ใช้งานสกรอลล์มาพบเท่านั้น
       galleryObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1693,9 +1696,10 @@
             entry.target.classList.remove('reveal');
           }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.15 });
       document.querySelectorAll('.gallery-item').forEach(el => galleryObserver.observe(el));
 
+      // สั่งการให้สไลด์สินค้าแนะนำ 8 ตัวค่อย ๆ ปรากฏช้า ๆ เฉพาะตอนที่สกรอลล์จอมาพบ
       showcaseObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1878,7 +1882,8 @@
             <p id="home-credit-display" class="text-3xl font-black mt-1 tracking-tight">฿${safeFormatNumber(creditVal)}</p>
           </div>
           
-          <div class="grid grid-cols-2 gap-4 mt-6">
+          <!-- ซ่อนปุ่มลัดเหล่านี้โดยอัตโนมัติเมื่อแสดงผลบนจอเดสก์ท็อปพีซี (md:hidden) -->
+          <div class="grid grid-cols-2 gap-4 mt-6 md:hidden">
             <button onclick="switchTab('products')" class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-3 hover:shadow-md active:scale-[0.98] transition font-mono">
               <div class="w-14 h-14 bg-blue-50 text-primary rounded-3xl flex items-center justify-center shadow-inner"><i data-lucide="shopping-cart" class="w-6 h-6"></i></div>
               <span class="font-bold text-slate-700 text-sm">${t('runOrders')}</span>
@@ -2405,7 +2410,7 @@
           <option value="" disabled ${!u.bankName ? 'selected' : ''}>${t('selectBank')}</option>
           ${bankList.map(bank => `<option value="${bank}" ${u.bankName===bank?'selected':''}>${bank}</option>`).join('')}
         </select>
-        <input id="inp-bank-num" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-5 outline-none font-semibold text-sm font-mono" placeholder="${t('accNumber')}" value="${u.bankNumber||''}">
+        <input id="inp-bank-num" class="w-full px-4 py-3 border border-slate-200 bg-slate-50 rounded-2xl mb-5 outline-none font-semibold text-sm font-mono" placeholder="${t('accNumber')" value="${u.bankNumber||''}">
         <div class="flex gap-3 font-mono">
           <button onclick="closeModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200">${t('cancel')}</button>
           <button onclick="saveBank()" class="flex-1 py-3 bg-primary text-white rounded-2xl font-bold shadow-md">${t('saveSettings')}</button>
