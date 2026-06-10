@@ -91,50 +91,50 @@
       font-weight: 400 !important;
     }
     
-    /* ปรับแต่งแผงควบคุมหลังบ้านเป็นพื้นหลังสีดำ ตัวอักษรสีขาว */
+    /* ปรับแต่งแผงควบคุมหลังบ้านเป็นพื้นหลังสีดำ-เทา ตัวอักษรสีขาวสว่าง */
     html, body { 
       min-height: 100%; 
       margin: 0; 
-      background-color: #000000 !important; 
+      background-color: #0c0c0e !important; 
       color: #ffffff !important;
     }
     
-    /* สไตล์สีแผงหลังบ้าน Override */
+    /* ตัวปรับแต่งสไตล์ (Theme Color Override) จาก Slate เป็น Black-Gray */
     .bg-slate-900 {
-      background-color: #0a0a0a !important;
+      background-color: #16161a !important; /* สีเทาเข้ม */
     }
     .bg-slate-950 {
-      background-color: #000000 !important;
+      background-color: #0d0d0f !important; /* สีดำสลัว */
     }
     .border-slate-800 {
-      border-color: #1a1a1a !important;
+      border-color: #242429 !important; /* ขอบสีเทาหม่น */
     }
     .text-slate-200 {
-      color: #f5f5f5 !important;
+      color: #f3f4f6 !important;
     }
     .text-slate-300 {
-      color: #e5e5e5 !important;
+      color: #e5e7eb !important;
     }
     .text-slate-400 {
-      color: #a3a3a3 !important;
+      color: #9ca3af !important;
     }
     .text-slate-500 {
-      color: #737373 !important;
+      color: #6b7280 !important;
     }
     .bg-slate-900\/40 {
-      background-color: rgba(10, 10, 10, 0.4) !important;
+      background-color: rgba(22, 22, 26, 0.4) !important;
     }
     .bg-slate-900\/60 {
-      background-color: rgba(10, 10, 10, 0.6) !important;
+      background-color: rgba(22, 22, 26, 0.6) !important;
     }
     .bg-slate-950\/40 {
-      background-color: rgba(0, 0, 0, 0.4) !important;
+      background-color: rgba(13, 13, 15, 0.4) !important;
     }
     .bg-slate-950\/70 {
-      background-color: rgba(0, 0, 0, 0.7) !important;
+      background-color: rgba(13, 13, 15, 0.7) !important;
     }
     .divide-slate-800 > :not([hidden]) ~ :not([hidden]) {
-      border-color: #1a1a1a !important;
+      border-color: #242429 !important;
     }
 
     .scrollbar-none::-webkit-scrollbar {
@@ -145,10 +145,10 @@
       scrollbar-width: none;
     }
     .custom-shadow {
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.7);
     }
     .industrial-border {
-      border: 1px solid rgba(38, 38, 38, 0.8);
+      border: 1px solid rgba(36, 36, 41, 0.8);
     }
     .led-glow-green {
       box-shadow: 0 0 8px #10b981;
@@ -281,7 +281,7 @@
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff',
         iconColor: type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#0284c7'),
         didOpen: (toast) => {
@@ -957,7 +957,7 @@
         <div class="space-y-4 max-h-[65vh] overflow-y-auto pr-1 scrollbar-none text-left font-mono text-xs text-white">
           <div class="bg-black p-2.5 rounded border border-neutral-800 flex justify-between items-center">
             <div>
-              <span class="text-[9px] text-neutral-500 font-medium block uppercase">เครดิตปัจจุบัน</span>
+              <span class="text-[9px] text-slate-500 font-medium block uppercase">เครดิตปัจจุบัน</span>
               <p class="text-xs font-medium text-sky-400">฿${credit.toLocaleString()}</p>
             </div>
             <button onclick="resetUserTasks('${bid}')" class="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black font-medium rounded text-[10px] transition uppercase">รีเซ็ตภารกิจเป็น 0</button>
@@ -995,7 +995,7 @@
             </div>
 
             <div class="bg-black p-3 rounded border border-neutral-800 space-y-1">
-              <span class="text-[9px] text-neutral-500 block uppercase font-medium">ข้อมูลบัญชีเงินรับฝาก</span>
+              <span class="text-[9px] text-slate-500 block uppercase font-medium">ข้อมูลบัญชีเงินรับฝาก</span>
               <p class="text-xs text-white">ธนาคาร: <span class="font-medium text-sky-400">${u.bankName || 'ยังไม่ได้ผูกบัญชี'}</span></p>
               <p class="text-xs text-white">เลขบัญชี: <span class="font-medium text-sky-400">${u.bankNumber || '-'}</span></p>
             </div>
@@ -1024,7 +1024,7 @@
         showCancelButton: true,
         confirmButtonText: 'ใช่, รีเซ็ตเลย',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff',
         confirmButtonColor: '#d97706',
         cancelButtonColor: '#404040'
@@ -1055,7 +1055,7 @@
         showCancelButton: true,
         confirmButtonText: 'ตกลง',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff',
         confirmButtonColor: '#0284c7',
         cancelButtonColor: '#404040'
@@ -1153,7 +1153,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ยืนยัน, ลบข้อมูลทั้งหมดถาวร',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -1371,7 +1371,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -1392,12 +1392,12 @@
       const templates = getSpecialTemplates(); const assignments = getSpecialAssignments();
       const paginated = assignments.slice((adminSpecialPage - 1) * ITEMS_PER_PAGE, adminSpecialPage * ITEMS_PER_PAGE);
       c.innerHTML = `
-        <div class="bg-neutral-950 p-5 rounded-xl border border-neutral-900 shadow-sm mb-6 text-left font-mono text-xs">
+        <div class="bg-neutral-950 p-5 rounded-xl border border-neutral-900 shadow-sm mb-6 text-left font-mono text-xs text-white">
           <h3 class="font-medium text-xs mb-3 text-sky-400 flex items-center gap-2 border-b border-neutral-900 pb-2 uppercase tracking-wider"><i data-lucide="star" class="w-4 h-4"></i> แผงเก็บคลังเทมเพลตออเดอร์พิเศษ</h3>
           <button onclick="showCreateSpecialTemplate()" class="w-full py-2 bg-black hover:bg-neutral-900 text-white border border-neutral-800 rounded text-[10px] font-medium transition mb-4 uppercase tracking-wider">+ สร้างเทมเพลตสินค้าออเดอร์พิเศษ</button>
           <div class="flex overflow-x-auto gap-3 pb-2 scrollbar-none">
             ${templates.map(t => `
-              <div class="w-44 flex-shrink-0 bg-black border border-neutral-800 rounded p-3 relative shadow-inner">
+              <div class="w-44 flex-shrink-0 bg-black border border-neutral-800 rounded p-3 relative shadow-inner text-white">
                 <button onclick="deleteSpecialTemplate('${t.__backendId}')" class="absolute top-2 right-2 p-1 bg-rose-950 hover:bg-rose-900 text-rose-300 rounded"><i data-lucide="x" class="w-3 h-3"></i></button>
                 <p class="text-[11px] text-white font-medium truncate mb-3 pr-6">${t.productName}</p>
                 <button onclick="assignSpecialOrder('${t.__backendId}')" class="w-full py-1 bg-sky-600 hover:bg-sky-500 text-black font-medium text-[10px] rounded transition uppercase">ล็อกคิวสมาชิก</button>
@@ -1419,7 +1419,7 @@
               </div>
               <div class="flex gap-1.5">
                 <button onclick="editAssignedSpecial('${s.__backendId}')" class="p-2 bg-black hover:bg-neutral-900 text-sky-400 border border-neutral-800 rounded transition"><i data-lucide="edit" class="w-3.5 h-3.5"></i></button>
-                <button onclick="deleteAssignedSpecial('${s.__backendId}')" class="p-2 bg-rose-950 hover:bg-rose-900 text-rose-300 border border-neutral-800 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <button onclick="deleteAssignedSpecial('${s.__backendId}')" class="p-2 bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800 rounded transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>
             </div>`
           }).join('')}
@@ -1428,7 +1428,7 @@
       lucide.createIcons();
     }
 
-    function showCreateSpecialTemplate() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">สร้างเทมเพลตสินค้าออเดอร์พิเศษ</h3><div class="space-y-3.5 text-left text-xs font-mono text-white"><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label><input id="st-n" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-xs text-center" placeholder="ระบุชื่อเรียก"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ราคาทุนระบบ (บาท)</label><input id="st-p" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-xs font-medium text-center" placeholder="ทุน"></div><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">กำไรคอมมิชชัน (บาท)</label><input id="st-c" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-xs font-medium text-center" placeholder="กำไร"></div></div><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ลิงก์ภาพสินค้า URL</label><input id="st-i" type="text" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-xs text-center" placeholder="วางลิงก์รูปภาพ"></div><button onclick="doCreateST()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider">บันทึกข้อมูลเทมเพลต</button></div>`); }
+    function showCreateSpecialTemplate() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">สร้างเทมเพลตสินค้าออเดอร์พิเศษ</h3><div class="space-y-3.5 text-left text-xs font-mono text-white"><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label><input id="st-n" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-xs text-center" placeholder="ระบุชื่อเรียก"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ราคาทุนระบบ (บาท)</label><input id="st-p" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-xs font-medium text-center" placeholder="ทุน"></div><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">กำไรคอมมิชชัน (บาท)</label><input id="st-c" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-xs font-medium text-center" placeholder="กำไร"></div></div><div><label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ลิงก์ภาพสินค้า URL</label><input id="st-i" type="text" class="w-full px-4 py-2.5 bg-black border border-neutral-200 text-white rounded text-xs text-center" placeholder="วางลิงก์รูปภาพ"></div><button onclick="doCreateST()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider">บันทึกข้อมูลเทมเพลต</button></div>`); }
     
     async function doCreateST() { 
       try {
@@ -1458,7 +1458,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -1568,29 +1568,29 @@
 
     function editAssignedSpecial(bid) {
       const s = adminSpecialAssignData.find(d => d.__backendId === bid); if(!s) return;
-      showModal suicide_prevent(`
+      showModal(`
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงคิวออเดอร์พิเศษสำหรับล็อกสมาชิก</h3>
         <div class="space-y-3.5 max-h-[75vh] overflow-y-auto px-1 text-left text-xs font-mono text-white">
           <div>
-            <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
+            <label class="text-[10px] text-slate-400 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
             <input id="sa-edit-name" type="text" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-medium text-xs text-center" value="${s.productName}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
+              <label class="text-[10px] text-slate-400 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
               <input id="sa-edit-price" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-medium text-xs text-center" value="${s.productPrice}">
             </div>
             <div>
-              <label class="text-[10px] text-neutral-400 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
+              <label class="text-[10px] text-slate-400 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
               <input id="sa-edit-comm" type="number" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-medium text-xs text-center" value="${s.commission}">
             </div>
           </div>
           <div>
-            <label class="text-[10px] text-neutral-400 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
-            <input id="sa-edit-user-search" type="text" oninput="filterEditAssignUsers(this.value)" class="w-full px-3.5 py-2 bg-black border border-neutral-800 text-neutral-400 placeholder-neutral-600 text-xs text-center" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหา...">
+            <label class="text-[10px] text-slate-400 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
+            <input id="sa-edit-user-search" type="text" oninput="filterEditAssignUsers(this.value)" class="w-full px-3.5 py-2 bg-black border border-neutral-800 text-white placeholder-slate-600 text-xs text-center" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหา...">
           </div>
           <div>
-            <label class="text-[10px] text-neutral-400 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
+            <label class="text-[10px] text-slate-400 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
             <select id="sa-edit-user" class="w-full px-3.5 py-2 border border-neutral-800 rounded bg-black text-white font-medium text-xs text-center">
               ${adminUsersData.map(u => {
                 const username = u.username || 'User';
@@ -1599,7 +1599,7 @@
             </select>
           </div>
           <div>
-            <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ทำงานเมื่อจับคู่ออเดอร์ลำดับที่เท่าไร</label>
+            <label class="text-[10px] text-slate-400 block mb-1 uppercase">ทำงานเมื่อจับคู่ออเดอร์ลำดับที่เท่าไร</label>
             <input id="sa-edit-idx" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-amber-500 font-medium text-center text-xs" value="${s.targetIndex}">
           </div>
           
@@ -1671,7 +1671,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -1856,7 +1856,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -1959,7 +1959,7 @@
               <div class="flex items-center gap-3 bg-black p-3 rounded border border-neutral-800 text-xs text-white">
                 <div class="flex flex-col gap-1 flex-shrink-0">
                   <img src="${b.bannerUrl}" class="w-20 h-12 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเนอร์มือถือ" onerror="this.onerror=null;">
-                  ${b.bannerPcUrl ? `<img src="${b.bannerPcUrl}" class="w-20 h-10 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเนอร์ PC" onerror="this.onerror=null;">` : `<div class="w-20 h-10 bg-neutral-900 flex items-center justify-center rounded text-[9px] text-neutral-600 border border-neutral-800 font-medium">ไม่มีภาพ PC</div>`}
+                  ${b.bannerPcUrl ? `<img src="${b.bannerPcUrl}" class="w-20 h-10 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเนอร์ PC" onerror="this.onerror=null;">` : `<div class="w-20 h-10 bg-neutral-900 flex items-center justify-center rounded text-[9px] text-slate-600 border border-slate-800 font-medium">ไม่มีภาพ PC</div>`}
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-xs text-neutral-200 truncate font-medium">Mobile: ${b.bannerUrl}</p>
@@ -2019,11 +2019,11 @@
         <div class="space-y-3.5 text-left text-xs font-mono text-white">
           <div>
             <label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ภาพสำหรับแสดงผลบนมือถือ (สัดส่วน 5:3)</label>
-            <input id="ab-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-xs" placeholder="https://domain.com/mobile-image.jpg">
+            <input id="ab-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-xs text-white" placeholder="https://domain.com/mobile-image.jpg">
           </div>
           <div>
             <label class="text-[10px] text-neutral-400 font-medium block mb-1 uppercase">ภาพสำหรับแสดงผลบนหน้าจอ PC (สัดส่วน 20:10)</label>
-            <input id="ab-pc-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-xs" placeholder="https://domain.com/pc-image.jpg">
+            <input id="ab-pc-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-xs text-white" placeholder="https://domain.com/pc-image.jpg">
           </div>
           <button id="btn-submit-banner" onclick="doAddBanner()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition mt-2 text-xs uppercase tracking-wider">นำส่งข้อมูลรูปแบนเนอร์</button>
         </div>
@@ -2095,7 +2095,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -2142,7 +2142,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -2272,7 +2272,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบ',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
@@ -2328,11 +2328,11 @@
             <div id="sec-browser" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
                 <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ชื่อแถบหัวเรื่องประจำเว็บ (Browser Tab Name)</label>
-                <input id="cfg-tab-title" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-xs text-center" placeholder="เช่น TOS Shopping" value="${getTabTitle()}">
+                <input id="cfg-tab-title" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs text-center" placeholder="เช่น TOS Shopping" value="${getTabTitle()}">
               </div>
               <div>
                 <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ลิงก์ไอคอนเว็บหน้าบ้าน (Favicon URL)</label>
-                <input id="cfg-tab-favicon" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-xs font-mono text-center" placeholder="ระบุที่อยู่ URL สำหรับรูปไอคอน" value="${getTabFavicon()}">
+                <input id="cfg-tab-favicon" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs font-mono text-center" placeholder="ระบุที่อยู่ URL สำหรับรูปไอคอน" value="${getTabFavicon()}">
               </div>
               <button onclick="saveAdminSettings('tab_config')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition uppercase tracking-wider">บันทึกข้อมูลชื่อเบราว์เซอร์</button>
             </div>
@@ -2436,11 +2436,11 @@
                 <p class="text-[11px] font-bold text-sky-500 uppercase border-b border-neutral-900 pb-1">1. วอลเปเปอร์หน้าล็อกอิน (Login Screen Wallpaper)</p>
                 <div>
                   <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอ PC / Desktop)</label>
-                  <input id="cfg-login-bg" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-xs text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Desktop" value="${loginBgUrl}">
+                  <input id="cfg-login-bg" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Desktop" value="${loginBgUrl}">
                 </div>
                 <div>
                   <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอมือถือ / Mobile)</label>
-                  <input id="cfg-login-bg-mobile" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-xs text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Mobile" value="${loginBgUrlMobile}">
+                  <input id="cfg-login-bg-mobile" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Mobile" value="${loginBgUrlMobile}">
                 </div>
               </div>
 
@@ -2615,7 +2615,7 @@
       debouncedRenderAdminTab();
     }
 
-    function showAddMenuIcon() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ลงทะเบียนเพิ่มคู่มือผู้ใช้</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" placeholder="ระบุหัวข้อหัวข้อย่อยคู่มือ"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" placeholder="ที่อยู่ไฟล์รูปภาพไอคอน URL (ถ้ามี)"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono" placeholder="รายละเอียดเนื้อความคำแนะนำแนะนำ..."></textarea><button id="btn-submit-menu-icon" onclick="doAddMenuIcon()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">ส่งพอร์ตบันทึกข้อมูล</button>`); }
+    function showAddMenuIcon() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ลงทะเบียนเพิ่มคู่มือผู้ใช้</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" placeholder="ระบุหัวข้อหัวข้อย่อยคู่มือ"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-850 text-white rounded mb-3 text-xs font-mono" placeholder="ที่อยู่ไฟล์รูปภาพไอคอน URL (ถ้ามี)"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono" placeholder="รายละเอียดเนื้อความคำแนะนำแนะนำ..."></textarea><button id="btn-submit-menu-icon" onclick="doAddMenuIcon()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">ส่งพอร์ตบันทึกข้อมูล</button>`); }
     function editMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรายละเอียดหัวข้อแนะนำระบบ</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-medium font-mono" value="${m.menuLabel}"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" value="${m.menuIconUrl||''}"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono">${m.menuContent||''}</textarea><button id="btn-edit-menu-icon" onclick="doEditMenuIcon('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">อัปเดตและบันทึกข้อมูล</button>`); }
     function doAddMenuIcon() { 
       const btn = $('btn-submit-menu-icon');
@@ -2652,7 +2652,7 @@
         cancelButtonColor: '#404040',
         confirmButtonText: 'ลบออก',
         cancelButtonText: 'ยกเลิก',
-        background: '#0a0a0a',
+        background: '#16161a',
         color: '#ffffff'
       });
 
