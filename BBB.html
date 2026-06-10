@@ -828,11 +828,11 @@
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-medium block mb-1 uppercase">รหัสผ่านเข้าสู่ระบบ</label>
-            <input id="an-pass" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs font-medium text-center" value="123456">
+            <input id="an-pass" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-xs text-center" value="123456">
           </div>
           <div>
             <label class="text-[10px] text-slate-400 font-medium block mb-1 uppercase">รหัสถอนเงินความปลอดภัย PIN (6 หลัก)</label>
-            <input id="an-pin" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-center text-xs font-medium" value="102552">
+            <input id="an-pin" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded text-slate-200 text-center text-xs" value="102552">
           </div>
           
           <div class="flex gap-3 pt-2">
@@ -1264,25 +1264,25 @@
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงรายละเอียดระบบสินค้า</h3>
         <div class="space-y-3.5 text-left text-xs font-mono">
           <div>
-            <label class="text-[10px] text-slate-400 font-medium uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
+            <label class="text-[10px] text-slate-400 uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
             <input id="ep-order" type="number" class="w-full mt-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs font-medium text-center" value="${p.productOrder||1}">
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 font-medium uppercase">ชื่อสินค้า</label>
+            <label class="text-[10px] text-slate-400 uppercase">ชื่อสินค้า</label>
             <input id="ep-name" class="w-full mt-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs text-center" value="${p.productName}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-[10px] text-slate-400 font-medium uppercase">ราคาทุนระบบ</label>
+              <label class="text-[10px] text-slate-400 uppercase">ราคาทุนระบบ</label>
               <input id="ep-price" type="number" class="w-full mt-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs font-medium text-center" value="${p.productPrice}">
             </div>
             <div>
-              <label class="text-[10px] text-slate-400 font-medium uppercase">ผลคอมมิชชันภารกิจ</label>
+              <label class="text-[10px] text-slate-400 uppercase">ผลคอมมิชชันภารกิจ</label>
               <input id="ep-comm" type="number" class="w-full mt-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs font-medium text-center" value="${p.commission}">
             </div>
           </div>
           <div>
-            <label class="text-[10px] text-slate-400 font-medium uppercase">ที่อยู่ URL รูปภาพสินค้า</label>
+            <label class="text-[10px] text-slate-400 uppercase">ที่อยู่ URL รูปภาพสินค้า</label>
             <input id="ep-img" type="text" class="w-full mt-1 px-4 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs text-center" value="${p.productImage||''}">
           </div>
           <div class="flex gap-2 pt-2">
@@ -1426,8 +1426,11 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(publicData.special_templates.find(d => d.__backendId === bid)); 
-        debouncedRenderAdminTab(); 
+        const template = adminSpecialTemplatesData.find(d => d.__backendId === bid);
+        if (template) {
+          await windowDataSdk.delete(template); 
+          debouncedRenderAdminTab(); 
+        }
       }
     }
 
@@ -1822,9 +1825,12 @@
 
       if (result.isConfirmed) {
         try {
-          await deleteDoc(doc(db, "withdrawals", bid));
-          showToast('ทำลายข้อมูลบิลเรียบร้อย');
-          debouncedRenderAdminTab();
+          const withdrawalObj = adminWithdrawalsData.find(d => d.__backendId === bid);
+          if (withdrawalObj) {
+            await windowDataSdk.delete(withdrawalObj);
+            showToast('ทำลายข้อมูลบิลเรียบร้อย');
+            debouncedRenderAdminTab();
+          }
         } catch (err) {
           showToast('ความผิดพลาดจากฝั่งเครื่องแม่ข่าย: ' + err.message, 'error');
         }
@@ -1982,7 +1988,7 @@
             <label class="text-[10px] text-slate-400 font-medium block mb-1 uppercase">ภาพสำหรับแสดงผลบนหน้าจอ PC (สัดส่วน 20:10)</label>
             <input id="ab-pc-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 rounded text-xs" placeholder="https://domain.com/pc-image.jpg">
           </div>
-          <button onclick="doAddBanner()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition mt-2 text-xs uppercase tracking-wider">นำส่งข้อมูลรูปแบนเนอร์</button>
+          <button id="btn-submit-banner" onclick="doAddBanner()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition mt-2 text-xs uppercase tracking-wider">นำส่งข้อมูลรูปแบนเนอร์</button>
         </div>
       `); 
     }
@@ -1990,11 +1996,20 @@
       const url = $('ab-url').value.trim();
       const pcUrl = $('ab-pc-url').value.trim();
       if(!url) return showToast('กรุณาระบุรูปภาพมือถือ', 'error');
-      await windowDataSdk.create({ 
-        type: 'banner', id: genId(), bannerUrl: url, bannerPcUrl: pcUrl
-      }); 
-      closeModal(); 
-      debouncedRenderAdminTab(); 
+      
+      const btn = $('btn-submit-banner');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+
+      try {
+        await windowDataSdk.create({ 
+          type: 'banner', id: genId(), bannerUrl: url, bannerPcUrl: pcUrl
+        }); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'นำส่งข้อมูลรูปแบนเนอร์'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
     }
     function editBanner(bid) { 
       const b = publicData.banners.find(d => d.__backendId === bid); 
@@ -2009,7 +2024,7 @@
             <label class="text-[10px] text-slate-400 font-medium block mb-1 uppercase">รูปเวอร์ชัน PC</label>
             <input id="eb-pc-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded text-xs font-medium" value="${b.bannerPcUrl || ''}">
           </div>
-          <button onclick="doEditBanner('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูลแบนเนอร์</button>
+          <button id="btn-edit-banner" onclick="doEditBanner('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูลแบนเนอร์</button>
         </div>
       `); 
     }
@@ -2018,11 +2033,20 @@
       const url = $('eb-url').value.trim();
       const pcUrl = $('eb-pc-url').value.trim();
       if(!url) return showToast('กรุณาระบุรูปภาพมือถือ', 'error');
-      await windowDataSdk.update({
-        ...b, bannerUrl: url, bannerPcUrl: pcUrl
-      }); 
-      closeModal(); 
-      debouncedRenderAdminTab(); 
+
+      const btn = $('btn-edit-banner');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+
+      try {
+        await windowDataSdk.update({
+          ...b, bannerUrl: url, bannerPcUrl: pcUrl
+        }); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'อัปเดตข้อมูลแบนเนอร์'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
     }
     async function deleteBanner(bid) { 
       const result = await Swal.fire({
@@ -2044,10 +2068,33 @@
       }
     }
     
-    function showAddGallery() { showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรูปแกลเลอรีประดับ</h3><input id="ag-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded mb-4 text-xs font-mono" placeholder="ระบุลิงก์รูปภาพของคุณที่นี่"><button onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">บันทึกรูปภาพ</button>`); }
-    async function doAddGallery() { await windowDataSdk.create({ type:'gallery', id:genId(), galleryUrl:$('ag-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
-    function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
-    async function doEditGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); await windowDataSdk.update({...g, galleryUrl: $('eg-url').value.trim()}); closeModal(); debouncedRenderAdminTab(); }
+    function showAddGallery() { showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรูปแกลเลอรีประดับ</h3><input id="ag-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded mb-4 text-xs font-mono" placeholder="ระบุลิงก์รูปภาพของคุณที่นี่"><button id="btn-submit-gallery" onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">บันทึกรูปภาพ</button>`); }
+    async function doAddGallery() { 
+      const btn = $('btn-submit-gallery');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+      try {
+        await windowDataSdk.create({ type:'gallery', id:genId(), galleryUrl:$('ag-url').value.trim() }); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'บันทึกรูปภาพ'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
+    }
+    function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button id="btn-edit-gallery" onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
+    async function doEditGallery(bid) { 
+      const g = publicData.galleries.find(d => d.__backendId === bid); 
+      const btn = $('btn-edit-gallery');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+      try {
+        await windowDataSdk.update({...g, galleryUrl: $('eg-url').value.trim()}); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'อัปเดตข้อมูล'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
+    }
     async function deleteGallery(bid) { 
       const result = await Swal.fire({
         title: 'ทำลายรูปภาพแกลเลอรีนี้?',
@@ -2063,9 +2110,12 @@
       });
 
       if (result.isConfirmed) {
-        await deleteDoc(doc(db, "galleries", bid));
-        showToast('ลบรูปภาพจากแกลเลอรีเรียบร้อย');
-        debouncedRenderAdminTab();
+        const galleryObj = publicData.galleries.find(d => d.__backendId === bid);
+        if (galleryObj) {
+          await windowDataSdk.delete(galleryObj);
+          showToast('ลบรูปภาพจากแกลเลอรีเรียบร้อย');
+          debouncedRenderAdminTab();
+        }
       }
     }
 
@@ -2089,7 +2139,7 @@
             <label class="text-[10px] text-slate-400 block mb-1">ลิงก์ URL รูปภาพสินค้า</label>
             <input id="asp-image" type="text" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded" placeholder="วางลิงก์รูปภาพ">
           </div>
-          <button onclick="doAddShowcaseProduct()" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-medium rounded transition uppercase tracking-wider">บันทึกสินค้าแนะนำ</button>
+          <button id="btn-submit-showcase" onclick="doAddShowcaseProduct()" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-medium rounded transition uppercase tracking-wider">บันทึกสินค้าแนะนำ</button>
         </div>`);
     }
 
@@ -2101,18 +2151,26 @@
 
       if (!nameVal || !priceVal || !imageVal) return showToast('กรุณาระบุข้อมูลจำเป็นให้ครบถ้วน', 'error');
 
-      await windowDataSdk.create({
-        type: 'showcase_product',
-        id: genId(),
-        order: orderVal,
-        productName: nameVal,
-        price: priceVal,
-        image: imageVal
-      });
+      const btn = $('btn-submit-showcase');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
 
-      showToast('บันทึกรูปสินค้าโชว์หน้าหลักสำเร็จ');
-      closeModal();
-      debouncedRenderAdminTab();
+      try {
+        await windowDataSdk.create({
+          type: 'showcase_product',
+          id: genId(),
+          order: orderVal,
+          productName: nameVal,
+          price: priceVal,
+          image: imageVal
+        });
+
+        showToast('บันทึกรูปสินค้าโชว์หน้าหลักสำเร็จ');
+        closeModal();
+        debouncedRenderAdminTab();
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'บันทึกสินค้าแนะนำ'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
     }
 
     function editShowcaseProduct(bid) {
@@ -2138,7 +2196,7 @@
             <label class="text-[10px] text-slate-400 block mb-1">ที่อยู่ URL รูปภาพสินค้า</label>
             <input id="esp-image" type="text" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 text-slate-200 rounded" value="${sp.image || ''}">
           </div>
-          <button onclick="doEditShowcaseProduct('${bid}')" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-medium rounded transition uppercase tracking-wider">บันทึกแก้ไขสินค้าแนะนำ</button>
+          <button id="btn-edit-showcase" onclick="doEditShowcaseProduct('${bid}')" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-medium rounded transition uppercase tracking-wider">บันทึกแก้ไขสินค้าแนะนำ</button>
         </div>`);
     }
 
@@ -2146,17 +2204,25 @@
       const sp = adminShowcaseData.find(d => d.__backendId === bid);
       if(!sp) return;
 
-      await windowDataSdk.update({
-        ...sp,
-        order: parseInt($('esp-order').value) || 1,
-        productName: $('esp-name').value.trim(),
-        price: $('esp-price').value.trim(),
-        image: $('esp-image').value.trim()
-      });
+      const btn = $('btn-edit-showcase');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
 
-      showToast('ปรับปรุงข้อมูลสินค้าแนะนำหน้าหลักสำเร็จ');
-      closeModal();
-      debouncedRenderAdminTab();
+      try {
+        await windowDataSdk.update({
+          ...sp,
+          order: parseInt($('esp-order').value) || 1,
+          productName: $('esp-name').value.trim(),
+          price: $('esp-price').value.trim(),
+          image: $('esp-image').value.trim()
+        });
+
+        showToast('ปรับปรุงข้อมูลสินค้าแนะนำหน้าหลักสำเร็จ');
+        closeModal();
+        debouncedRenderAdminTab();
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'บันทึกแก้ไขสินค้าแนะนำ'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
     }
 
     async function deleteShowcaseProduct(bid) {
@@ -2495,10 +2561,33 @@
       debouncedRenderAdminTab();
     }
 
-    function showAddMenuIcon() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">ลงทะเบียนเพิ่มคู่มือผู้ใช้</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-3 text-xs font-mono" placeholder="ระบุหัวข้อหัวข้อย่อยคู่มือ"><input id="mi-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded mb-3 text-xs font-mono" placeholder="ที่อยู่ไฟล์รูปภาพไอคอน URL (ถ้ามี)"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded h-28 mb-4 text-xs font-mono" placeholder="รายละเอียดเนื้อความคำแนะนำแนะนำ..."></textarea><button onclick="doAddMenuIcon()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider font-mono">ส่งพอร์ตบันทึกข้อมูล</button>`); }
-    function editMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรายละเอียดหัวข้อแนะนำระบบ</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-3 text-xs font-medium font-mono" value="${m.menuLabel}"><input id="mi-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded mb-3 text-xs font-mono" value="${m.menuIconUrl||''}"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded h-28 mb-4 text-xs font-mono">${m.menuContent||''}</textarea><button onclick="doEditMenuIcon('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider font-mono">อัปเดตและบันทึกข้อมูล</button>`); }
-    function doAddMenuIcon() { windowDataSdk.create({ type:'menuIcon', id:genId(), menuLabel: $('mi-label').value.trim(), menuContent: $('mi-content').value.trim(), menuIconUrl: $('mi-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
-    function doEditMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); windowDataSdk.update({ ...m, menuLabel: $('mi-label').value.trim(), menuContent: $('mi-content').value.trim(), menuIconUrl: $('mi-url').value.trim() }); closeModal(); debouncedRenderAdminTab(); }
+    function showAddMenuIcon() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">ลงทะเบียนเพิ่มคู่มือผู้ใช้</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-3 text-xs font-mono" placeholder="ระบุหัวข้อหัวข้อย่อยคู่มือ"><input id="mi-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded mb-3 text-xs font-mono" placeholder="ที่อยู่ไฟล์รูปภาพไอคอน URL (ถ้ามี)"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded h-28 mb-4 text-xs font-mono" placeholder="รายละเอียดเนื้อความคำแนะนำแนะนำ..."></textarea><button id="btn-submit-menu-icon" onclick="doAddMenuIcon()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider font-mono">ส่งพอร์ตบันทึกข้อมูล</button>`); }
+    function editMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-slate-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรายละเอียดหัวข้อแนะนำระบบ</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 text-slate-200 rounded mb-3 text-xs font-medium font-mono" value="${m.menuLabel}"><input id="mi-url" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded mb-3 text-xs font-mono" value="${m.menuIconUrl||''}"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-200 text-slate-200 rounded h-28 mb-4 text-xs font-mono">${m.menuContent||''}</textarea><button id="btn-edit-menu-icon" onclick="doEditMenuIcon('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-slate-950 font-medium rounded transition text-xs uppercase tracking-wider font-mono">อัปเดตและบันทึกข้อมูล</button>`); }
+    function doAddMenuIcon() { 
+      const btn = $('btn-submit-menu-icon');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+      try {
+        windowDataSdk.create({ type:'menuIcon', id:genId(), menuLabel: $('mi-label').value.trim(), menuContent: $('mi-content').value.trim(), menuIconUrl: $('mi-url').value.trim() }); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'ส่งพอร์ตบันทึกข้อมูล'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
+    }
+    function doEditMenuIcon(bid) { 
+      const m = publicData.menuIcons.find(d => d.__backendId === bid); 
+      const btn = $('btn-edit-menu-icon');
+      if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
+      try {
+        windowDataSdk.update({ ...m, menuLabel: $('mi-label').value.trim(), menuContent: $('mi-content').value.trim(), menuIconUrl: $('mi-url').value.trim() }); 
+        closeModal(); 
+        debouncedRenderAdminTab(); 
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.textContent = 'อัปเดตและบันทึกข้อมูล'; }
+        showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
+      }
+    }
     async function deleteMenuIcon(bid) { 
       const result = await Swal.fire({
         title: 'ยืนยันการลบคู่มือแนะนำนี้?',
