@@ -70,7 +70,6 @@
         ".fill-blue-100\\/50 { fill: " + primary + "33 !important; }"
       ];
 
-      // จัดการภาพพื้นหลังหน้าล็อกอินด้วย CSS ป้องกันการกระตุกช่วงเวลาโหลดภาพ
       if (loginBg) {
         cssRules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       }
@@ -78,7 +77,6 @@
         cssRules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
-      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน
       if (userBg) {
         cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
@@ -194,7 +192,6 @@
       -webkit-backdrop-filter: blur(12px); 
     }
 
-    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นนุ่มนวลเป็นธรรมชาติ */
     .gallery-item {
       opacity: 0;
       transition: opacity 0.5s ease-in-out;
@@ -218,7 +215,6 @@
       transform: translateX(0) !important;
     }
 
-    /* อนิมชันสำหรับ 4 ชิ้นแรกและ 4 ชิ้นหลังตามโครงสร้างความต้องการ */
     @keyframes slideFromLeft {
       0% {
         transform: translate3d(-50px, 0, 0);
@@ -267,36 +263,10 @@
  <body class="h-full text-slate-800 antialiased selection:bg-pink-200">
 
   <!-- โครงสร้างแอปพลิเคชันหลัก -->
-  <div id="app" class="h-full w-full overflow-auto relative flex flex-col">
-    <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
-      <div class="w-full max-w-[380px] relative z-10 py-1">
-        <div class="text-center mb-4">
-          <div class="logo-slide-right inline-flex items-center justify-center w-32 h-32 rounded-full overflow-hidden bg-white p-0 shadow-lg border border-slate-100">
-            <div class="w-full h-full animate-pulse bg-slate-200 rounded-full"></div>
-          </div>
-        </div>
-        <div class="bg-white rounded-[24px] p-5 shadow-2xl border border-slate-100/80">
-          <div class="fade-in">
-            <h2 class="text-slate-800 font-bold text-xl mb-4 text-center tracking-wide">เข้าสู่ระบบ</h2>
-            <div class="w-full max-w-[320px] mx-auto space-y-3">
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
-                  <i data-lucide="user" class="w-4 h-4"></i>
-                </span>
-                <input id="inp-phone-login" type="tel" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent text-sm" placeholder="User">
-              </div>
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
-                  <i data-lucide="lock" class="w-4 h-4"></i>
-                </span>
-                <input id="inp-pass-login" type="password" class="w-full pl-11 pr-11 py-2.5 rounded-xl bg-[#f1f1f1] text-slate-800 placeholder-slate-500 outline-none text-center font-medium border border-transparent text-sm" placeholder="กรุณาใส่รหัสผ่านเข้าสู่ระบบ">
-              </div>
-              <button onclick="doLogin()" id="btn-login" class="w-full py-2.5 bg-pink-500 text-white font-bold rounded-xl shadow-lg text-sm tracking-wide">เข้าสู่ระบบ</button>
-              <button onclick="showRegisterForm()" class="w-full py-2.5 bg-[#3b3a3a] text-white font-bold rounded-xl shadow-md text-sm tracking-wide">ลงทะเบียน</button>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div id="app" class="h-full w-full relative flex flex-col">
+    <!-- ตัวโหลดจำลองตอนเริ่มระบบเพื่อหลีกเลี่ยงการกะพริบซ้อน -->
+    <div id="app-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-[#f8fafc] z-[9999] transition-opacity duration-300">
+      <div class="dot-anim"><span></span><span></span><span></span></div>
     </div>
   </div>
 
@@ -340,7 +310,6 @@
     let lastUsername = '';
     let lastUserCredit = -1;
 
-    // Cache Serializer เพื่อป้องกัน Redundant Re-render และอาการสั่นไหวของ DOM
     let lastSerialized = {
       configs: '', banners: '', galleries: '', menuIcons: '', products: '', showcaseProducts: '',
       userOrders: '', userWithdrawals: '', userSpecialAssign: ''
@@ -650,7 +619,6 @@
       return luma > 180; 
     }
 
-    // ฟังก์ชันสำหรับแฮชข้อมูลผ่าน SHA-256 ด้วย Web Crypto API เพื่อความปลอดภัย
     async function hashValue(string) {
       if (!string) return '';
       try {
@@ -659,7 +627,15 @@
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
       } catch (e) {
-        return string; // Fallback ในกรณีที่เกิดข้อผิดพลาด
+        return string;
+      }
+    }
+
+    function hideLoader() {
+      const loader = $('app-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => { if (loader) loader.remove(); }, 300);
       }
     }
 
@@ -937,7 +913,7 @@
           lastSerialized.banners = serialized;
           publicData.banners = banners;
           localStorage.setItem('tos_cached_banners', serialized);
-          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บหน้าหลัก Re-render ทันทีเมื่อข้อมูลมีการเปลี่ยนจริง
+          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -1198,7 +1174,9 @@
 
     function renderLogin() {
       const app = $('app');
+      const loaderHtml = $('app-loader') ? $('app-loader').outerHTML : '';
       app.innerHTML = `
+      ${loaderHtml}
       <div id="form-card-wrapper" class="min-h-full w-full flex flex-col items-center justify-center p-4 relative bg-slate-100">
         <div class="w-full max-w-[380px] relative z-10 py-1">
           <div class="text-center mb-4">
@@ -1214,6 +1192,7 @@
       showLoginForm();
       applyDynamicStyles();
       safeCreateIcons();
+      hideLoader();
     }
 
     function showLoginForm() {
@@ -1343,7 +1322,6 @@
           userDoc = { ...d.data(), id: d.id };
         });
 
-        // เข้ารหัสแบบ Hash ในการเปรียบเทียบรหัสผ่าน (รองรับบัญชีเก่าที่เป็น Plaintext)
         const hashedEnteredPass = await hashValue(password);
         if (userDoc.password !== password && userDoc.password !== hashedEnteredPass) {
           showToast(t('invalidPass'), 'error');
@@ -1359,7 +1337,7 @@
         localStorage.setItem('tos_logged_user_id', userDoc.id);
         currentUser = userDoc;
         currentTab = 'home';
-        lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
+        lastRenderedTab = ''; 
         sessionStorage.setItem('tos_current_tab', 'home');
         
         startUserSubscriptions(userDoc.id);
@@ -1432,7 +1410,6 @@
           return;
         }
 
-        // เข้ารหัส Hash รหัสผ่านและ PIN ก่อนนำลงสู่ระบบป้องกันการเห็นแบบข้อความเปล่า
         const hashedPassword = await hashValue(password);
         const hashedPin = await hashValue(pin);
 
@@ -1460,7 +1437,7 @@
         localStorage.setItem('tos_logged_user_id', newUserId);
         currentUser = newUserDoc;
         currentTab = 'home';
-        lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
+        lastRenderedTab = ''; 
         sessionStorage.setItem('tos_current_tab', 'home');
 
         startUserSubscriptions(newUserId);
@@ -1479,7 +1456,7 @@
       stopUserSubscriptions();
       currentUser = null; 
       currentTab = 'home'; 
-      lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
+      lastRenderedTab = ''; 
       localStorage.removeItem('tos_logged_user_id');
       localStorage.removeItem('tos_cached_user');
       sessionStorage.removeItem('tos_current_tab'); 
@@ -1499,7 +1476,9 @@
       ];
       
       if (!$('dash-outer-container')) {
+        const loaderHtml = $('app-loader') ? $('app-loader').outerHTML : '';
         $('app').innerHTML = `
+        ${loaderHtml}
         <div id="dash-outer-container" class="h-full flex flex-col relative transition-all duration-300">
           <div id="dash-content" class="flex-1 overflow-auto pb-24" style="background-color: transparent;"></div>
           <nav class="fixed bottom-0 left-0 right-0 border-t border-slate-100 shadow-[0_-8px_30px_rgb(0,0,0,0.04)] z-50 rounded-t-[28px] nav-glass">
@@ -1536,6 +1515,7 @@
       });
 
       renderTabContent();
+      hideLoader();
     }
 
     function switchTab(tab) {
@@ -1561,12 +1541,6 @@
         return;
       }
 
-      // ระบบควบคุม State เช็คแท็บเดิมเพื่อข้ามการวาดใหม่ทับซ้ำ ป้องกันจอกระพริบ (Flicker-Free UI) ในแท็บหลัก 3 แท็บ
-      if (lastRenderedTab === currentTab && (currentTab === 'home' || currentTab === 'products' || currentTab === 'profile')) {
-        updateDynamicValues();
-        return;
-      }
-
       let tempDiv = document.createElement('div');
       
       if (currentTab === 'home') renderHome(tempDiv); 
@@ -1574,16 +1548,24 @@
       else if (currentTab === 'history') renderHistory(tempDiv); 
       else if (currentTab === 'profile') renderProfile(tempDiv);
       
-      if (c.innerHTML !== tempDiv.innerHTML) {
+      if (lastRenderedTab !== currentTab) {
+        // เมื่อเปลี่ยนแท็บ ให้เปลี่ยนเนื้อหาและดัน Scroll ขึ้นบนสุด
         c.innerHTML = tempDiv.innerHTML;
         lastRenderedTab = currentTab;
+        c.scrollTop = 0;
+      } else {
+        // เมื่อข้อมูลอัปเดตในหน้าเดิม ให้แทนที่ HTML โดยรักษาตำแหน่ง Scroll (Scroll Preservation) เพื่อไม่ให้ข้ามหรือเด้ง
+        if (c.innerHTML !== tempDiv.innerHTML) {
+          const savedScrollTop = c.scrollTop;
+          c.innerHTML = tempDiv.innerHTML;
+          c.scrollTop = savedScrollTop;
+        }
       }
       
       applyDynamicStyles();
       safeCreateIcons();
       initGalleryObserver();
 
-      // บังคับเริ่มสไลด์แบนเนอร์เมื่อเขียนลงใน DOM จริงเรียบร้อยแล้ว
       if (currentTab === 'home' || currentTab === 'products') {
         startBannerSlide();
       }
@@ -1740,7 +1722,6 @@
 
       clearInterval(rewardInterval);
 
-      // ยกเลิกกระบวนการทำงานของสุ่มรางวัลเบื้องหลังหากสมาชิกสลับไปแท็บอื่น (Memory leak protection)
       if (currentTab !== 'home') return;
 
       const cfg = getConfig();
@@ -1757,7 +1738,6 @@
           rewardIndex = (rewardIndex + 1) % items.length;
           const currentItem = items[rewardIndex];
 
-          // ป้องกันการทำงานของโค้ดพังในกรณีกรอกข้อมูลแอดมินผิดโครงสร้าง
           if (currentItem && currentItem.includes(':')) {
             const parts = currentItem.split(':');
             const phone = parts[0] || 'User';
@@ -1847,10 +1827,8 @@
             const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
             const pImg = safeImgUrl(p.productImage || p.image);
 
-            // อิงตามเงื่อนไข: สี่ชิ้นแรกขยับมาจากฝั่งซ้าย (Left Slide) และสี่ชิ้นหลังขยับมาจากฝั่งขวา (Right Slide)
             const animationTypeClass = index < 4 ? 'showcase-card-left' : 'showcase-card-right';
 
-            // เพิ่มแบรนด์ป้ายลดราคา % และขีดเส้นทับราคาเก่าจำลองตามภาพตัวอย่างอ้างอิง
             const discountBadge = p.discount ? `<span class="bg-red-100 text-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full">${p.discount}</span>` : '';
             const originalPriceDisplay = p.originalPrice ? `<span class="text-slate-400 line-through text-[8px] ml-1">${p.originalPrice}</span>` : '';
 
@@ -1901,7 +1879,6 @@
         <div class="mt-10">
           <div class="grid grid-cols-2 gap-y-12 gap-x-4">
             ${gallery.map(g => {
-              // เพิ่มหัวข้อเนื้อหาด้านบนรูป (เช่น VIP 1 / VIP 2) วางตรงกลางคาดทับขอบกล่องด้านบนอย่างสมมาตรตามภาพอ้างอิง
               const titleText = g.galleryTitle || g.title || '';
               const titleContainerHtml = titleText ? `
                 <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-red-500 text-slate-950 text-[9px] font-black px-4 py-0.5 rounded shadow-sm z-10 font-bold uppercase tracking-widest min-w-[70px] text-center">
@@ -1948,7 +1925,6 @@
     }
 
     function sidebarMenuWorkaround() {
-      // ยกเลิกคำสั่งเริ่มสไลด์จาก Virtual Node เพื่อย้ายไปทำงานที่ Active DOM ป้องกันสไลด์ไม่ทำงาน
     }
 
     function renderProducts(c) {
@@ -2139,7 +2115,7 @@
             <div class="w-full h-64 bg-slate-100 rounded-2xl mb-4 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative bg-slate-100 animate-pulse">
               ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain relative z-0 opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
             </div>
-            <p class="text-slate-950 font-bold mt-5 text-center text-sm leading-relaxed uppercase px-2">${t('insufficientSub')}</p>
+            <p class="text-slate-955 font-bold mt-5 text-center text-sm leading-relaxed uppercase px-2">${t('insufficientSub')}</p>
             <p class="text-xs text-rose-500 font-bold mt-1">${t('insufficientShortfall')} ฿${((p.productPrice || 0) - creditVal).toLocaleString()}</p>
             <button onclick="closeModal(); showTopupModal();" class="mt-4 w-full py-3.5 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 transition shadow-md text-base flex justify-center items-center gap-2"><span>${t('deposit')}</span></button>
             <button onclick="closeModal(); switchTab('history'); switchHistoryTab('orders');" class="mt-2.5 w-full py-3 bg-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-300 transition">${t('viewPending')}</button>
@@ -2221,7 +2197,6 @@
             });
           }
 
-          // ป้องกันข้อผิดพลาดในการแย่งเขียนแก้ไขข้อมูล ด้วยการเรียกอ่านและลบ Special Queue ใน Transaction
           if (isSpecial) {
             const assignment = userSpecialAssignData.find(s => s && s.targetUser === userData.id && Number(s.targetIndex) === (currentRunIndex + 1));
             if (assignment) {
@@ -2248,7 +2223,6 @@
       }
     }
 
-    // ล้างสถานะ lastRenderedTab เพื่อบังคับวาดโครงสร้างรายการใหม่ แก้ปัญหาคลิกสลับเมนูแล้วค้าง
     function switchHistoryTab(tab) { 
       historyTab = tab; 
       lastRenderedTab = ''; 
@@ -2510,7 +2484,6 @@
       
       if (!amt || amt <= 0 || creditVal < amt) return showToast(t('invalidWdBal'),'error');
 
-      // เข้ารหัสแบบ Hash ในการตรวจสอบรหัสถอนเงินเพื่อความปลอดภัย (รองรับพินเก่าที่เป็น Plaintext)
       const hashedPin = await hashValue(pin);
       if (String(withdrawPassword) !== String(pin) && String(withdrawPassword) !== String(hashedPin)) {
         return showToast(t('invalidPIN'),'error');
