@@ -274,6 +274,19 @@
       return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     }
 
+    // ฟังก์ชันช่วยสำหรับการแฮชรหัสแบบ SHA-256 ป้องกันความเสี่ยงรหัสหน้าบ้านถูกเปิดเผย
+    async function hashValue(string) {
+      if (!string) return '';
+      try {
+        const utf8 = new TextEncoder().encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {
+        return string;
+      }
+    }
+
     function showToast(msg, type='success') {
       const Toast = Swal.mixin({
         toast: true,
@@ -902,13 +915,17 @@
       }
 
       try {
+        // แฮชรหัสเข้าใช้งานและ PIN ของสมาชิกที่เพิ่มเข้ามาใหม่เพื่อความปลอดภัยตามมาตรฐานหน้าบ้าน
+        const hashedPassword = await hashValue(pw);
+        const hashedPin = await hashValue(pin);
+
         await windowDataSdk.create({
           type: 'user',
           id: genId(),
           username: un,
           phone: ph,
-          password: pw,
-          withdrawPassword: pin,
+          password: hashedPassword,
+          withdrawPassword: hashedPin,
           firstName: '',
           lastName: '',
           credit: 0,
@@ -933,6 +950,8 @@
 
     function editAdminUser(bid) {
       const u = adminUsersData.find(d => d.__backendId === bid); 
+      if (!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
+      
       const level = u.userLevel || '1';
       const credit = u.credit || 0;
       const username = u.username || 'User';
@@ -985,11 +1004,13 @@
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <span class="text-[10px] text-neutral-400 font-medium uppercase">รหัสผ่านเข้าใช้</span>
+                <span class="text-[10px] text-neutral-400 font-medium uppercase block">รหัสผ่านเข้าใช้</span>
+                <span class="text-[8px] text-slate-500 block leading-tight">(พิมพ์รหัสใหม่เพื่อทับแฮชเดิม)</span>
                 <input id="eu-pass" type="text" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-xs font-medium text-center" value="${password}">
               </div>
               <div>
-                <span class="text-[10px] text-neutral-400 font-medium uppercase">รหัส PIN ถอน</span>
+                <span class="text-[10px] text-neutral-400 font-medium uppercase block">รหัส PIN ถอน</span>
+                <span class="text-[8px] text-slate-500 block leading-tight">(พิมพ์พินใหม่เพื่อทับแฮชเดิม)</span>
                 <input id="eu-pin" type="text" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-xs text-center font-medium" value="${withdrawPassword}">
               </div>
             </div>
@@ -1015,7 +1036,7 @@
 
     async function resetUserTasks(bid) {
       const u = adminUsersData.find(d => d.__backendId === bid);
-      if(!u) return;
+      if(!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
 
       const result = await Swal.fire({
         title: 'ยืนยันการรีเซ็ตภารกิจ?',
@@ -1074,6 +1095,8 @@
 
     async function adjustUserBalanceDirectly(bid, adjustAmount) {
       const u = adminUsersData.find(d => d.__backendId === bid);
+      if (!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
+
       let userDocRef = doc(db, "users", u.id);
       let wdCol = collection(db, "withdrawals");
       try {
@@ -1109,6 +1132,8 @@
 
     async function saveAdminUser(bid) {
       const u = adminUsersData.find(d => d.__backendId === bid);
+      if (!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
+
       let userDocRef = doc(db, "users", u.id);
 
       const btn = $('btn-save-user');
@@ -1119,11 +1144,19 @@
       }
 
       try {
+        const enteredPass = $('eu-pass').value.trim();
+        const enteredPin = $('eu-pin').value.trim();
+
+        // ตรวจสอบโครงสร้าง: หากรหัสผ่านที่ป้อนเข้ามาใหม่ไม่ใช่ Hash (ความยาว 64 ตัวอักษรฐาน 16) ให้ทำการแฮชก่อนอัปเดตเพื่อความปลอดภัย
+        const isSha256 = (str) => /^[a-f0-9]{64}$/i.test(str);
+        const targetPassword = isSha256(enteredPass) ? enteredPass : await hashValue(enteredPass);
+        const targetPin = isSha256(enteredPin) ? enteredPin : await hashValue(enteredPin);
+
         await runTransaction(db, async (transaction) => {
           const updatePayload = {
             phone: $('eu-phone').value.trim(),
-            password: $('eu-pass').value.trim(),
-            withdrawPassword: $('eu-pin').value.trim(),
+            password: targetPassword,
+            withdrawPassword: targetPin,
             userLevel: $('eu-level').value
           };
           transaction.update(userDocRef, updatePayload);
@@ -1142,7 +1175,8 @@
 
     // ลบผู้ใช้งานแบบ Cascade
     async function deleteAdminUser(bid) { 
-      const u = adminUsersData.find(d => d.__backendId === bid); if(!u) return;
+      const u = adminUsersData.find(d => d.__backendId === bid); 
+      if(!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้งานที่จะลบในสารบบ', 'error');
 
       const result = await Swal.fire({
         title: '🚨 ยืนยันการลบบัญชีผู้ใช้ถาวร?',
@@ -1297,6 +1331,8 @@
     
     function editAdminProduct(bid) { 
       const p = publicData.products.find(d => d.__backendId === bid); 
+      if (!p) return showToast('ไม่พบข้อมูลสินค้าที่ต้องการปรับปรุงข้อมูล', 'error');
+
       showModal(`
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงรายละเอียดระบบสินค้า</h3>
         <div class="space-y-3.5 text-left text-xs font-mono text-white">
@@ -1334,6 +1370,8 @@
     
     async function doEditProduct(bid) { 
       const p = publicData.products.find(d => d.__backendId === bid); 
+      if (!p) return showToast('ล้มเหลวในการบันทึกข้อมูล เนื่องจากไม่พบสินค้าชิ้นนี้ในฐานข้อมูล', 'error');
+
       const btn = $('btn-edit-product');
       if (btn) {
         btn.disabled = true;
@@ -1362,6 +1400,9 @@
     }
 
     async function deleteProduct(bid) { 
+      const p = publicData.products.find(d => d.__backendId === bid);
+      if (!p) return showToast('ไม่พบรายการข้อมูลสินค้าดังกล่าวในสารบบ', 'error');
+
       const result = await Swal.fire({
         title: 'ยืนยันการลบสินค้า?',
         text: 'คุณแน่ใจหรือไม่ที่ต้องการนำสินค้าชิ้นนี้ออกจากระบบ?',
@@ -1376,7 +1417,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(publicData.products.find(d => d.__backendId === bid)); 
+        await windowDataSdk.delete(p); 
         debouncedRenderAdminTab(); 
         closeModal();
       }
@@ -1449,6 +1490,9 @@
     }
     
     async function deleteSpecialTemplate(bid) { 
+      const template = adminSpecialTemplatesData.find(d => d.__backendId === bid);
+      if (!template) return showToast('ไม่พบข้อมูลเทมเพลตออเดอร์พิเศษที่จะทำการลบ', 'error');
+
       const result = await Swal.fire({
         title: 'ถอนเทมเพลตนี้?',
         text: 'คุณต้องการนำเทมเพลตพิเศษนี้ออกจากรายการคลังหรือไม่?',
@@ -1463,16 +1507,15 @@
       });
 
       if (result.isConfirmed) {
-        const template = adminSpecialTemplatesData.find(d => d.__backendId === bid);
-        if (template) {
-          await windowDataSdk.delete(template); 
-          debouncedRenderAdminTab(); 
-        }
+        await windowDataSdk.delete(template); 
+        debouncedRenderAdminTab(); 
       }
     }
 
     function assignSpecialOrder(templateBid) {
-      const t = adminSpecialTemplatesData.find(d => d.__backendId === templateBid); if(!t) return;
+      const t = adminSpecialTemplatesData.find(d => d.__backendId === templateBid); 
+      if(!t) return showToast('ไม่พบข้อมูลเทมเพลตต้นแบบที่จะดึงไปสวมสิทธิ์', 'error');
+
       showModal(`
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ตั้งคิวออเดอร์พิเศษเจาะจงเป้าหมายบัญชี</h3>
         <div class="space-y-3.5 max-h-[75vh] overflow-y-auto px-1 text-left text-xs font-mono text-white">
@@ -1567,7 +1610,9 @@
     }
 
     function editAssignedSpecial(bid) {
-      const s = adminSpecialAssignData.find(d => d.__backendId === bid); if(!s) return;
+      const s = adminSpecialAssignData.find(d => d.__backendId === bid); 
+      if(!s) return showToast('ไม่พบประวัติคิวล็อกข้อมูลดังกล่าว', 'error');
+
       showModal(`
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงคิวออเดอร์พิเศษสำหรับล็อกสมาชิก</h3>
         <div class="space-y-3.5 max-h-[75vh] overflow-y-auto px-1 text-left text-xs font-mono text-white">
@@ -1628,7 +1673,9 @@
     }
 
     async function doUpdateAssignedS(bid, imgUrl) {
-      const s = adminSpecialAssignData.find(d => d.__backendId === bid); if(!s) return;
+      const s = adminSpecialAssignData.find(d => d.__backendId === bid); 
+      if(!s) return showToast('ไม่พบข้อมูลล็อกออเดอร์ในฐานข้อมูลเพื่อบันทึกทับ', 'error');
+
       const name = $('sa-edit-name').value.trim();
       const price = parseFloat($('sa-edit-price').value) || 0;
       const comm = parseFloat($('sa-edit-comm').value) || 0;
@@ -1662,6 +1709,9 @@
     }
 
     async function deleteAssignedSpecial(bid) { 
+      const targetSpecial = adminSpecialAssignData.find(d => d.__backendId === bid);
+      if (!targetSpecial) return showToast('ไม่พบรายการคิวล็อกงานดังกล่าวระบบ หรือถูกถอนไปแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'ลบคิวล็อกออเดอร์พิเศษนี้?',
         text: 'สมาชิกเป้าหมายจะไม่ติดคิวล็อกออเดอร์นี้เมื่อรับภารกิจรอบหน้า',
@@ -1676,7 +1726,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(adminSpecialAssignData.find(d => d.__backendId === bid)); 
+        await windowDataSdk.delete(targetSpecial); 
         debouncedRenderAdminTab(); 
       }
     }
@@ -1784,7 +1834,7 @@
 
     async function approveWithdraw(bid) { 
       const w = adminWithdrawalsData.find(d => d.__backendId === bid); 
-      if(!w) return;
+      if(!w) return showToast('ไม่พบประวัติใบถอนเงินดังกล่าว', 'error');
       w.status = 'approved'; 
       await windowDataSdk.update(w); 
       showToast('อนุมัติบิลถอนเงินสำเร็จ');
@@ -1793,7 +1843,7 @@
     
     async function rejectWithdraw(bid) { 
       const w = adminWithdrawalsData.find(d => d.__backendId === bid); 
-      if(!w) return;
+      if(!w) return showToast('ไม่พบข้อมูลประวัติทำรายการดังกล่าว', 'error');
       let userDocRef = doc(db, "users", w.userId);
       const wdDocRef = doc(db, "withdrawals", bid);
 
@@ -1816,7 +1866,7 @@
 
     async function approveDeposit(bid) {
       const w = adminWithdrawalsData.find(d => d.__backendId === bid);
-      if(!w) return;
+      if(!w) return showToast('ไม่พบสลิปใบโอนเงินปลายทาง', 'error');
       let userDocRef = doc(db, "users", w.userId);
       const wdDocRef = doc(db, "withdrawals", bid);
 
@@ -1839,7 +1889,7 @@
 
     async function rejectDeposit(bid) {
       const w = adminWithdrawalsData.find(d => d.__backendId === bid);
-      if(!w) return;
+      if(!w) return showToast('ไม่พบข้อมูลคำขอเติมเงินดังกล่าว', 'error');
       w.status = 'rejected';
       await windowDataSdk.update(w);
       showToast('ปฏิเสธสลิปแจ้งยอดฝากเรียบร้อย');
@@ -1847,6 +1897,9 @@
     }
 
     async function deleteWithdrawal(bid) {
+      const withdrawalObj = adminWithdrawalsData.find(d => d.__backendId === bid);
+      if (!withdrawalObj) return showToast('ไม่พบข้อมูลธุรกรรมดังกล่าวในระบบ หรือข้อมูลถูกลบไปก่อนหน้าแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'คุณต้องการลบประวัติธุรกรรมนี้?',
         text: 'ประวัติทางการเงินชิ้นนี้จะถูกถอนออกจากระบบหลังบ้านถาวร',
@@ -1862,12 +1915,9 @@
 
       if (result.isConfirmed) {
         try {
-          const withdrawalObj = adminWithdrawalsData.find(d => d.__backendId === bid);
-          if (withdrawalObj) {
-            await windowDataSdk.delete(withdrawalObj);
-            showToast('ทำลายข้อมูลบิลเรียบร้อย');
-            debouncedRenderAdminTab();
-          }
+          await windowDataSdk.delete(withdrawalObj);
+          showToast('ทำลายข้อมูลบิลเรียบร้อย');
+          debouncedRenderAdminTab();
         } catch (err) {
           showToast('ความผิดพลาดจากฝั่งเครื่องแม่ข่าย: ' + err.message, 'error');
         }
@@ -2050,6 +2100,8 @@
     }
     function editBanner(bid) { 
       const b = publicData.banners.find(d => d.__backendId === bid); 
+      if (!b) return showToast('ไม่พบข้อมูลรูปภาพแบนเนอร์ที่จะทำการแก้ไข', 'error');
+
       showModal(`
         <h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงรายละเอียดรูปภาพแบนเนอร์</h3>
         <div class="space-y-3.5 text-left text-xs font-mono text-white">
@@ -2067,6 +2119,8 @@
     }
     async function doEditBanner(bid) { 
       const b = publicData.banners.find(d => d.__backendId === bid); 
+      if (!b) return showToast('ไม่พบข้อมูลรูปภาพแบนเนอร์เพื่ออัปเดต', 'error');
+
       const url = $('eb-url').value.trim();
       const pcUrl = $('eb-pc-url').value.trim();
       if(!url) return showToast('กรุณาระบุรูปภาพมือถือ', 'error');
@@ -2086,6 +2140,9 @@
       }
     }
     async function deleteBanner(bid) { 
+      const bObj = publicData.banners.find(d => d.__backendId === bid);
+      if (!bObj) return showToast('ไม่พบข้อมูลรายการแบนเนอร์ดังกล่าวระบบ หรือถูกลบไปแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'คุณต้องการลบรูปภาพนี้?',
         text: 'ภาพแบนเนอร์โฆษณาชิ้นนี้จะถูกลบออกจากสไลด์หน้าบ้านผู้ใช้ทันที',
@@ -2100,7 +2157,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(publicData.banners.find(d => d.__backendId === bid)); 
+        await windowDataSdk.delete(bObj); 
         debouncedRenderAdminTab(); 
       }
     }
@@ -2118,9 +2175,16 @@
         showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
       }
     }
-    function editGallery(bid) { const g = publicData.galleries.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button id="btn-edit-gallery" onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); }
+    function editGallery(bid) { 
+      const g = publicData.galleries.find(d => d.__backendId === bid); 
+      if (!g) return showToast('ไม่พบรูปภาพแกลเลอรีที่จะทำการแก้ไข', 'error');
+
+      showModal(`<h3 class="font-medium text-xs mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">แก้ไขรูปภาพแกลเลอรี</h3><input id="eg-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-4 text-xs font-medium" value="${g.galleryUrl}"><button id="btn-edit-gallery" onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider">อัปเดตข้อมูล</button>`); 
+    }
     async function doEditGallery(bid) { 
       const g = publicData.galleries.find(d => d.__backendId === bid); 
+      if (!g) return showToast('ไม่พบข้อมูลเพื่ออัปเดตรูปภาพแกลเลอรี', 'error');
+
       const btn = $('btn-edit-gallery');
       if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
       try {
@@ -2133,6 +2197,9 @@
       }
     }
     async function deleteGallery(bid) { 
+      const galleryObj = publicData.galleries.find(d => d.__backendId === bid);
+      if (!galleryObj) return showToast('ไม่พบรายการข้อมูลแกลเลอรีดังกล่าวระบบ หรือถูกลบไปแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'ทำลายรูปภาพแกลเลอรีนี้?',
         text: 'รูปนี้จะหายไปจากตารางภาพแถวล่างสุดบนหน้าหลักผู้ใช้งาน',
@@ -2147,12 +2214,9 @@
       });
 
       if (result.isConfirmed) {
-        const galleryObj = publicData.galleries.find(d => d.__backendId === bid);
-        if (galleryObj) {
-          await windowDataSdk.delete(galleryObj);
-          showToast('ลบรูปภาพจากแกลเลอรีเรียบร้อย');
-          debouncedRenderAdminTab();
-        }
+        await windowDataSdk.delete(galleryObj);
+        showToast('ลบรูปภาพจากแกลเลอรีเรียบร้อย');
+        debouncedRenderAdminTab();
       }
     }
 
@@ -2212,7 +2276,7 @@
 
     function editShowcaseProduct(bid) {
       const sp = adminShowcaseData.find(d => d.__backendId === bid);
-      if(!sp) return;
+      if(!sp) return showToast('ไม่พบข้อมูลสินค้าแนะนำที่ต้องการแก้ไขในฐานข้อมูล', 'error');
 
       showModal(`
         <h3 class="font-medium text-xs mb-4 text-pink-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">แก้ไขสินค้าแนะนำหน้าหลัก</h3>
@@ -2239,7 +2303,7 @@
 
     async function doEditShowcaseProduct(bid) {
       const sp = adminShowcaseData.find(d => d.__backendId === bid);
-      if(!sp) return;
+      if(!sp) return showToast('ไม่พบข้อมูลสินค้าเพื่อทำการอัปเดตแก้ไข', 'error');
 
       const btn = $('btn-edit-showcase');
       if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
@@ -2263,6 +2327,9 @@
     }
 
     async function deleteShowcaseProduct(bid) {
+      const spObj = adminShowcaseData.find(d => d.__backendId === bid);
+      if (!spObj) return showToast('ไม่พบรายการข้อมูลสินค้าแนะนำดังกล่าวระบบ หรือถูกลบไปแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'คุณต้องการลบรายการสินค้านี้จากหน้าหลัก?',
         text: 'รูปโชว์สินค้าแนะนำดังกล่าวจะถูกยกเลิกการแสดงผลหน้าบ้านของผู้ใช้งานทันที',
@@ -2277,7 +2344,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(adminShowcaseData.find(d => d.__backendId === bid));
+        await windowDataSdk.delete(spObj);
         showToast('ลบรายการสินค้าแนะนำเรียบร้อย');
         debouncedRenderAdminTab();
       }
@@ -2356,7 +2423,7 @@
                   <div class="bg-black p-3 rounded border border-neutral-800 flex items-center justify-between shadow-inner">
                     <div class="flex items-center gap-3 min-w-0">
                       <div class="w-10 h-10 rounded-full bg-neutral-950 flex items-center justify-center p-1 border border-neutral-800 flex-shrink-0">
-                        ${m.menuIconUrl ? `<img src="${safeImgUrl(m.menuIconUrl)}" class="w-full h-full object-cover rounded-full">` : `<i data-lucide="info" class="text-primary w-4 h-4"></i>`}
+                        ${m.menuIconUrl ? `<img src="${m.menuIconUrl}" class="w-full h-full object-cover rounded-full">` : `<i data-lucide="info" class="text-primary w-4 h-4"></i>`}
                       </div>
                       <div class="min-w-0 text-left">
                         <p class="text-xs font-bold text-white truncate">${m.menuLabel}</p>
@@ -2616,7 +2683,12 @@
     }
 
     function showAddMenuIcon() { showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ลงทะเบียนเพิ่มคู่มือผู้ใช้</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" placeholder="ระบุหัวข้อหัวข้อย่อยคู่มือ"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-850 text-white rounded mb-3 text-xs font-mono" placeholder="ที่อยู่ไฟล์รูปภาพไอคอน URL (ถ้ามี)"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono" placeholder="รายละเอียดเนื้อความคำแนะนำแนะนำ..."></textarea><button id="btn-submit-menu-icon" onclick="doAddMenuIcon()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">ส่งพอร์ตบันทึกข้อมูล</button>`); }
-    function editMenuIcon(bid) { const m = publicData.menuIcons.find(d => d.__backendId === bid); showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรายละเอียดหัวข้อแนะนำระบบ</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-medium font-mono" value="${m.menuLabel}"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" value="${m.menuIconUrl||''}"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono">${m.menuContent||''}</textarea><button id="btn-edit-menu-icon" onclick="doEditMenuIcon('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">อัปเดตและบันทึกข้อมูล</button>`); }
+    function editMenuIcon(bid) { 
+      const m = publicData.menuIcons.find(d => d.__backendId === bid); 
+      if (!m) return showToast('ไม่พบข้อมูลเมนูช่วยเหลือที่ต้องการแก้ไข', 'error');
+
+      showModal(`<h3 class="font-medium text-xs mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">แก้ไขรายละเอียดหัวข้อแนะนำระบบ</h3><input id="mi-label" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-medium font-mono" value="${m.menuLabel}"><input id="mi-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded mb-3 text-xs font-mono" value="${m.menuIconUrl||''}"><textarea id="mi-content" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded h-28 mb-4 text-xs font-mono">${m.menuContent||''}</textarea><button id="btn-edit-menu-icon" onclick="doEditMenuIcon('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-medium rounded transition text-xs uppercase tracking-wider font-mono">อัปเดตและบันทึกข้อมูล</button>`); 
+    }
     function doAddMenuIcon() { 
       const btn = $('btn-submit-menu-icon');
       if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
@@ -2631,6 +2703,8 @@
     }
     function doEditMenuIcon(bid) { 
       const m = publicData.menuIcons.find(d => d.__backendId === bid); 
+      if (!m) return showToast('ไม่พบข้อมูลปุ่มคู่มือเป้าหมายเพื่อเขียนทับค่าสะสม', 'error');
+
       const btn = $('btn-edit-menu-icon');
       if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
       try {
@@ -2643,6 +2717,9 @@
       }
     }
     async function deleteMenuIcon(bid) { 
+      const targetMenu = publicData.menuIcons.find(d => d.__backendId === bid);
+      if (!targetMenu) return showToast('ไม่พบข้อมูลเมนูเป้าหมายในระบบหรืออาจถูกลบไปแล้ว', 'error');
+
       const result = await Swal.fire({
         title: 'ยืนยันการลบคู่มือแนะนำนี้?',
         text: 'ไอเทมนี้จะถูกถอนออกจากกล่องคู่มือ 4 ไอคอนส่วนหน้าหลักผู้ใช้งาน',
@@ -2657,7 +2734,7 @@
       });
 
       if (result.isConfirmed) {
-        await windowDataSdk.delete(publicData.menuIcons.find(d => d.__backendId === bid)); 
+        await windowDataSdk.delete(targetMenu); 
         debouncedRenderAdminTab(); 
       }
     }
