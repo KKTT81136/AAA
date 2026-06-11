@@ -260,7 +260,7 @@
     const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
     const getLogoUrl = () => { const c = getConfig(); return (c.logoUrl && c.logoUrl.trim() !== '') ? c.logoUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; };
     const getMarqueeText = () => { const c = getConfig(); return c.marqueeText || ''; };
-    const getLineQrUrl = () => { const c = getConfig(); return c.lineQrUrl || ''; };
+    const getLineQrUrl = () => { const c = getConfig(); return cfg.lineQrUrl || ''; };
     const getLineId = () => { const c = getConfig(); return c.lineId || ''; };
     const getTopupQrUrl = () => { const c = getConfig(); return c.topupQrUrl || ''; };
     const getTopupAccount = () => { const c = getConfig(); return c.topupAccount || ''; };
@@ -1710,7 +1710,7 @@
 
     async function deleteAssignedSpecial(bid) { 
       const targetSpecial = adminSpecialAssignData.find(d => d.__backendId === bid);
-      if (!targetSpecial) return showToast('ไม่พบรายการคิวล็อกงานดังกล่าวระบบ หรือถูกถอนไปแล้ว', 'error');
+      if (!targetSpecial) return showToast('ไม่พบรายการคิวล็อกงานดังกล่าวระบบ หรือถูกลบไปแล้ว', 'error');
 
       const result = await Swal.fire({
         title: 'ลบคิวล็อกออเดอร์พิเศษนี้?',
@@ -2395,7 +2395,7 @@
             <div id="sec-browser" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
                 <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ชื่อแถบหัวเรื่องประจำเว็บ (Browser Tab Name)</label>
-                <input id="cfg-tab-title" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs text-center" placeholder="เช่น TOS Shopping" value="${getTabTitle()}">
+                <input id="cfg-tab-title" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-xs text-center" placeholder="เช่น Shopping" value="${getTabTitle()}">
               </div>
               <div>
                 <label class="text-[10px] text-neutral-400 block mb-1 uppercase">ลิงก์ไอคอนเว็บหน้าบ้าน (Favicon URL)</label>
