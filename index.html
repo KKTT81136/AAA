@@ -194,19 +194,13 @@
       -webkit-backdrop-filter: blur(12px); 
     }
 
-    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นช้าและนุ่มนวลกว่าเดิม */
+    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นนุ่มนวลเป็นธรรมชาติ ไม่มี grayscale หรือ brightness หน่วงเครื่อง */
     .gallery-item {
       opacity: 0;
-      filter: brightness(0.6) grayscale(20%);
-      transform: scale(0.95);
-      transition: opacity 1.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                  transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                  filter 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.5s ease-in-out;
     }
     .gallery-item.reveal {
       opacity: 1;
-      filter: brightness(1.0) grayscale(0%);
-      transform: scale(1);
     }
 
     .scroll-reveal-left {
@@ -265,7 +259,7 @@
       }
     }
 
-    /* ชะลอความเร็วของอนิเมชันสินค้าแนะนำ 8 ชิ้นให้ช้าลง */
+    /* อนิเมชันสินค้าแนะนำ 8 ชิ้น */
     .revealed-slide .showcase-card-left {
       animation: slideFromLeft 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
@@ -651,7 +645,6 @@
       return num.toLocaleString();
     }
 
-    // ลบคำ "TOS Shopping" ที่ติดค้างเป็น Fallback
     function safeImgUrl(url) {
       if (!url || typeof url !== 'string' || url.trim() === '') {
         return 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png';
@@ -734,7 +727,7 @@
       if (userBg) {
         rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
-        rules.push("#dash-outer-container { background-color: #f8fafc !important; background-image: none !important; }");
+        rules.push("#dash-outer-container { background-color: #f8fafc !important; }");
       }
       if (userBgMobile) {
         rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
@@ -745,7 +738,6 @@
 
     let currentFavicon = '';
     function updateBrowserTab() {
-      // ลบคำว่า TOS Shopping แทนที่ด้วย Shopping
       const title = getTabTitle() || "Shopping";
       if (document.title !== title) {
         document.title = title;
@@ -796,7 +788,7 @@
         userBgUrl: '',
         userBgUrlMobile: '',
         marqueeText: 'ยินดีต้อนรับสู่ระบบสั่งซื้อและจัดหมวดหมู่ออเดอร์',
-        tabTitle: 'Shopping', // ลบคำว่า TOS Shopping
+        tabTitle: 'Shopping',
         tabFaviconUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
         scheduleText: 'เปิดทำการ 10:00-22:00 น.',
         rewardsList: '095***567:433,000,095***091:2,050,000,088***324:120,500',
@@ -959,7 +951,7 @@
           lastSerialized.banners = serialized;
           publicData.banners = banners;
           localStorage.setItem('tos_cached_banners', serialized);
-          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บหน้าหลัก Re-render ทันทีเมื่อข้อมูลมีการเปลี่ยนจริง
+          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บ Re-render เมื่อโครงสร้างเปลี่ยนจริง
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -1580,8 +1572,8 @@
         return;
       }
 
-      // ระบบควบคุม State เช็คแท็บเดิมเพื่อข้ามการวาดใหม่ทับซ้ำ ป้องกันจอกระพริบ (Flicker-Free UI)
-      if (lastRenderedTab === currentTab) {
+      // ระบบป้องกันจอกระพริบ (Flicker-Free UI) ในแท็บหลัก 3 แท็บ
+      if (lastRenderedTab === currentTab && (currentTab === 'home' || currentTab === 'products' || currentTab === 'profile')) {
         updateDynamicValues();
         return;
       }
@@ -2245,7 +2237,12 @@
       }
     }
 
-    function switchHistoryTab(tab) { historyTab = tab; renderTabContent(); }
+    // ล้างสถานะ lastRenderedTab เพื่อบังคับวาดโครงสร้างรายการใหม่ แก้ปัญหาคลิกสลับเมนูแล้วค้าง
+    function switchHistoryTab(tab) { 
+      historyTab = tab; 
+      lastRenderedTab = ''; 
+      renderTabContent(); 
+    }
 
     function renderHistory(c) {
       const u = currentUser; 
