@@ -260,7 +260,8 @@
     const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
     const getLogoUrl = () => { const c = getConfig(); return (c.logoUrl && c.logoUrl.trim() !== '') ? c.logoUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; };
     const getMarqueeText = () => { const c = getConfig(); return c.marqueeText || ''; };
-    const getLineQrUrl = () => { const c = getConfig(); return cfg.lineQrUrl || ''; };
+    // ปรับแก้ไขคีย์ตัวแปรให้ตรงกับ Context ป้องกันปัญหาระบบล่มจนพารามิเตอร์หลักว่างเปล่า
+    const getLineQrUrl = () => { const c = getConfig(); return c.lineQrUrl || ''; };
     const getLineId = () => { const c = getConfig(); return c.lineId || ''; };
     const getTopupQrUrl = () => { const c = getConfig(); return c.topupQrUrl || ''; };
     const getTopupAccount = () => { const c = getConfig(); return c.topupAccount || ''; };
@@ -658,9 +659,18 @@
     }
 
     // ==========================================
-    // ADMIN PANEL LAYOUT
+    // ADMIN PANEL LAYOUT (โครงแบบ SPA ไร้รอยต่อ ป้องกันการกะพริบเวลากดเปลี่ยนเมนู)
     // ==========================================
-    function renderAdmin() {
+    function renderAdminFrame() {
+      const app = $('app');
+      
+      // ตรวจสอบว่ามีโครงของแผงหลักอยู่ใน DOM อยู่แล้วหรือไม่ เพื่อข้ามการสร้างใหม่ทับซ้ำ (ป้องกันหน้าจอระคายสายตา)
+      if (app.querySelector('#admin-skeleton-wrapper')) {
+        updateActiveSidebar();
+        debouncedRenderAdminTab();
+        return;
+      }
+
       const sidebarMenu = [
         {id:'users', icon:'users', label:'ฐานข้อมูลสมาชิก', type:'main'},
         {id:'orders', icon:'list', label:'ประวัติออเดอร์ทั้งหมด', type:'main'},
@@ -681,77 +691,102 @@
       const logoUrl = getLogoUrl();
       const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-full h-full object-cover">` : `<div class="w-full h-full bg-neutral-900 flex items-center justify-center border border-neutral-800 text-sky-400"><i data-lucide="shield" class="w-6 h-6"></i></div>`;
 
-      $('app').innerHTML = `
-        <div class="w-64 bg-black flex flex-col h-full overflow-hidden flex-shrink-0 border-r border-neutral-900">
-          <div class="p-6 border-b border-neutral-900 flex flex-col items-center flex-shrink-0">
-            <div onclick="handleSidebarClick('users')" class="w-14 h-14 rounded bg-black flex items-center justify-center overflow-hidden mb-3 border border-neutral-800 shadow-inner cursor-pointer active:scale-95 transition-transform" title="กลับสู่ฐานข้อมูลสมาชิก">
-              ${logoHtml}
+      app.innerHTML = `
+        <div id="admin-skeleton-wrapper" class="flex h-full w-full overflow-hidden">
+          <!-- เมนูด้านข้าง (Sidebar) -->
+          <div class="w-64 bg-black flex flex-col h-full overflow-hidden flex-shrink-0 border-r border-neutral-900">
+            <div class="p-6 border-b border-neutral-900 flex flex-col items-center flex-shrink-0">
+              <div onclick="handleSidebarClick('users')" class="w-14 h-14 rounded bg-black flex items-center justify-center overflow-hidden mb-3 border border-neutral-800 shadow-inner cursor-pointer active:scale-95 transition-transform" title="กลับสู่ฐานข้อมูลสมาชิก">
+                ${logoHtml}
+              </div>
+              <div class="mt-1 px-3 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 rounded text-[9px] font-medium tracking-widest font-mono">
+                SYS STATUS: ACTIVE
+              </div>
             </div>
-            <div class="mt-1 px-3 py-1 bg-sky-500/10 border border-sky-500/30 text-sky-400 rounded text-[9px] font-medium tracking-widest font-mono">
-              SYS STATUS: ACTIVE
+            <div id="sidebar-menu-list" class="flex-1 overflow-y-auto px-3 py-4 space-y-1.5 scrollbar-none">
+              ${sidebarMenu.map(m => {
+                const padClass = m.type === 'sub' ? 'pl-8 py-1.5 text-[11px] text-neutral-400 font-mono' : 'px-4 py-2.5 text-xs text-neutral-200 font-medium uppercase tracking-wider';
+                return `<button id="menu-btn-${m.id}" onclick="handleSidebarClick('${m.id}')" class="w-full flex items-center gap-2 rounded transition-all text-left ${padClass} hover:bg-neutral-900 hover:text-white">
+                  <i data-lucide="${m.icon}" class="w-3.5 h-3.5"></i>
+                  <span>${m.label}</span>
+                </button>`;
+              }).join('')}
             </div>
-          </div>
-          <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1.5 scrollbar-none">
-            ${sidebarMenu.map(m => {
-              let isSelected = false;
-              if (m.id.startsWith('products_')) {
-                const subVip = m.id.replace('products_', '');
-                isSelected = (adminTab === 'products' && adminProductTab === subVip);
-              } else {
-                isSelected = (adminTab === m.id);
-              }
-              const padClass = m.type === 'sub' ? 'pl-8 py-1.5 text-[11px] text-neutral-400 font-mono' : 'px-4 py-2.5 text-xs text-neutral-200 font-medium uppercase tracking-wider';
-              const activeClass = isSelected ? 'bg-neutral-900 text-sky-400 border-l-2 border-sky-400 font-medium' : 'hover:bg-neutral-900 hover:text-white';
-              return `<button onclick="handleSidebarClick('${m.id}')" class="w-full flex items-center gap-2 rounded transition-all text-left ${padClass} ${activeClass}">
-                <i data-lucide="${m.icon}" class="w-3.5 h-3.5"></i>
-                <span>${m.label}</span>
-              </button>`;
-            }).join('')}
-          </div>
-          <div class="p-4 border-t border-neutral-900 flex-shrink-0 bg-black">
-            <button onclick="exitAdmin()" class="w-full py-2 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs font-medium transition flex items-center justify-center gap-2">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i> ยกเลิกช่องสัญญาณ
-            </button>
-          </div>
-        </div>
-
-        <div class="flex-1 flex flex-col overflow-hidden bg-black text-white">
-          <div class="p-5 border-b border-neutral-900 bg-neutral-950 flex justify-between items-center flex-wrap gap-4 flex-shrink-0">
-            <div class="flex items-center gap-4 flex-wrap">
-              <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
-                <div class="p-2 bg-blue-950/80 text-blue-400 border border-blue-900/40 rounded"><i data-lucide="users" class="w-5 h-5"></i></div>
-                <div>
-                  <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">ยอดสมาชิกรวม</p>
-                  <p id="stat-total-members" class="text-sm font-medium text-white font-mono">0 บัญชี</p>
-                </div>
-              </div>
-              <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
-                <div class="p-2 bg-indigo-950/80 text-indigo-400 border border-indigo-900/40 rounded"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
-                <div>
-                  <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">ประวัติออเดอร์รวม</p>
-                  <p id="stat-total-orders" class="text-sm font-medium text-white font-mono">0 รายการ</p>
-                </div>
-              </div>
-              <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
-                <div class="p-2 bg-emerald-950/80 text-emerald-400 border border-emerald-900/40 rounded"><i data-lucide="package" class="w-5 h-5"></i></div>
-                <div>
-                  <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">จำนวนคลังสินค้า</p>
-                  <p id="stat-total-products" class="text-sm font-medium text-white font-mono">0 ชิ้น</p>
-                </div>
-              </div>
-              
-              <div class="bg-neutral-900 px-4 py-3.5 rounded border border-neutral-800 flex items-center gap-2.5 shadow-sm">
-                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 led-glow-green animate-pulse"></span>
-                <span class="text-xs font-medium text-emerald-400 font-mono tracking-wider">เชื่อมต่อฐานข้อมูลสมบูรณ์</span>
-              </div>
+            <div class="p-4 border-t border-neutral-900 flex-shrink-0 bg-black">
+              <button onclick="exitAdmin()" class="w-full py-2 bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 rounded text-xs font-medium transition flex items-center justify-center gap-2">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i> ยกเลิกช่องสัญญาณ
+              </button>
             </div>
           </div>
 
-          <div id="admin-content" class="flex-1 p-6 overflow-auto scrollbar-none"></div>
+          <!-- พื้นที่แสดงข้อมูลและการทำงาน (Main Content Area) -->
+          <div class="flex-1 flex flex-col overflow-hidden bg-black text-white">
+            <div class="p-5 border-b border-neutral-900 bg-neutral-950 flex justify-between items-center flex-wrap gap-4 flex-shrink-0">
+              <div class="flex items-center gap-4 flex-wrap">
+                <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
+                  <div class="p-2 bg-blue-950/80 text-blue-400 border border-blue-900/40 rounded"><i data-lucide="users" class="w-5 h-5"></i></div>
+                  <div>
+                    <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">ยอดสมาชิกรวม</p>
+                    <p id="stat-total-members" class="text-sm font-medium text-white font-mono">0 บัญชี</p>
+                  </div>
+                </div>
+                <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
+                  <div class="p-2 bg-indigo-950/80 text-indigo-400 border border-indigo-900/40 rounded"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
+                  <div>
+                    <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">ประวัติออเดอร์รวม</p>
+                    <p id="stat-total-orders" class="text-sm font-medium text-white font-mono">0 รายการ</p>
+                  </div>
+                </div>
+                <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
+                  <div class="p-2 bg-emerald-950/80 text-emerald-400 border border-emerald-900/40 rounded"><i data-lucide="package" class="w-5 h-5"></i></div>
+                  <div>
+                    <p class="text-[10px] text-neutral-400 font-medium uppercase tracking-wider font-mono">จำนวนคลังสินค้า</p>
+                    <p id="stat-total-products" class="text-sm font-medium text-white font-mono">0 ชิ้น</p>
+                  </div>
+                </div>
+                
+                <div class="bg-neutral-900 px-4 py-3.5 rounded border border-neutral-800 flex items-center gap-2.5 shadow-sm">
+                  <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 led-glow-green animate-pulse"></span>
+                  <span class="text-xs font-medium text-emerald-400 font-mono tracking-wider">เชื่อมต่อฐานข้อมูลสมบูรณ์</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- กล่องแท็บเนื้อหาที่ถูกสับเปลี่ยนข้อมูลแบบไดนามิก -->
+            <div id="admin-content" class="flex-1 p-6 overflow-auto scrollbar-none"></div>
+          </div>
         </div>
       `;
+      updateActiveSidebar();
       debouncedRenderAdminTab();
       updateHeaderStats();
+      lucide.createIcons();
+    }
+
+    function updateActiveSidebar() {
+      const menuIds = ['users', 'orders', 'special', 'products_1', 'products_2', 'products_3', 'products_4', 'products_5', 'products_6', 'products_fixturn', 'products_allowwd', 'withdrawals', 'media', 'settings'];
+      menuIds.forEach(id => {
+        const btn = $(`menu-btn-${id}`);
+        if (!btn) return;
+        
+        let isSelected = false;
+        if (id.startsWith('products_')) {
+          const subVip = id.replace('products_', '');
+          isSelected = (adminTab === 'products' && adminProductTab === subVip);
+        } else {
+          isSelected = (adminTab === id);
+        }
+
+        if (isSelected) {
+          btn.className = btn.className.replace('hover:bg-neutral-900 hover:text-white', '').trim();
+          btn.classList.add('bg-neutral-900', 'text-sky-400', 'border-l-2', 'border-sky-400', 'font-medium');
+        } else {
+          btn.classList.remove('bg-neutral-900', 'text-sky-400', 'border-l-2', 'border-sky-400', 'font-medium');
+          if (!btn.className.includes('hover:bg-neutral-900')) {
+            btn.classList.add('hover:bg-neutral-900', 'hover:text-white');
+          }
+        }
+      });
     }
 
     function handleSidebarClick(id) {
@@ -763,7 +798,8 @@
         adminTab = id;
       }
       sessionStorage.setItem('tos_admin_tab', adminTab);
-      renderAdmin();
+      updateActiveSidebar();
+      debouncedRenderAdminTab();
     }
 
     function changeAdminProductPage(p) { adminProductPage = p; debouncedRenderAdminTab(); }
@@ -2771,7 +2807,7 @@
         isAdmin = true;
         adminTab = sessionStorage.getItem('tos_admin_tab') || 'users'; 
         startAdminSubscriptions();
-        renderAdmin();
+        renderAdminFrame(); // เรียกแสดงผลผ่านเฟรม SPA เพื่อความราบรื่นนุ่มนวล
       } else {
         isAdmin = false;
         renderAdminLogin();
