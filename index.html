@@ -510,7 +510,6 @@
         depositTerms: "* กรุณาแสกน QR Code ชำระเงินหรือโอนเงินผ่านพอร์ตบัญชีธนาคารด้านล่าง จากนั้นติดต่อฝ่ายบริการลูกค้าเพื่อแจ้งปรับยอดเครดิตในระบบ",
         noSupportCfg: "ไม่ได้ตั้งค่าช่องทางการติดต่อฝ่ายบริการลูกค้า",
         cancel: "ยกเลิก",
-        // คำแปลเพิ่มเติมสำหรับแก้จุดบกพร่อง
         passNotMatch: "รหัสผ่านไม่ตรงกัน",
         pinMustBeNumber: "รหัส PIN ต้องเป็นตัวเลขเท่านั้น",
         insufficientShortfall: "ยอดขาดแคลน:",
@@ -615,7 +614,6 @@
         depositTerms: "* Please scan QR Code or transfer via bank details below, then contact customer support to adjust your wallet credit.",
         noSupportCfg: "No support channel configured",
         cancel: "Cancel",
-        // คำแปลเพิ่มเติมสำหรับแก้จุดบกพร่อง
         passNotMatch: "Passwords do not match",
         pinMustBeNumber: "PIN must be a number",
         insufficientShortfall: "Shortfall amount:",
@@ -672,6 +670,19 @@
       return luma > 180; 
     }
 
+    // ฟังก์ชันสำหรับแฮชข้อมูลผ่าน SHA-256 ด้วย Web Crypto API เพื่อความปลอดภัย
+    async function hashValue(string) {
+      if (!string) return '';
+      try {
+        const utf8 = new TextEncoder().encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {
+        return string; // Fallback ในกรณีที่เกิดข้อผิดพลาด
+      }
+    }
+
     function applyTheme(primary, secondary, themeType) {
       const p = primary || '#FFFFFF';
       const s = secondary || '#4f46e5';
@@ -712,7 +723,6 @@
         ".fill-blue-100\\/50 { fill: " + p + "33 !important; }"
       ];
 
-      // จัดการภาพพื้นหลังหน้าล็อกอินด้วย CSS ป้องกันการกระตุกช่วงเวลาโหลดภาพ รองรับ PC และ Mobile
       if (loginBg) {
         rules.push("#form-card-wrapper { background-image: url('" + loginBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       }
@@ -720,7 +730,6 @@
         rules.push("@media (max-width: 767px) { #form-card-wrapper { background-image: url('" + loginBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
-      // จัดการภาพพื้นหลังหน้าแดชบอร์ดด้านใน รองรับ PC และ Mobile
       if (userBg) {
         rules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
@@ -948,6 +957,7 @@
           lastSerialized.banners = serialized;
           publicData.banners = banners;
           localStorage.setItem('tos_cached_banners', serialized);
+          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บหน้าหลัก Re-render ทันทีเมื่อข้อมูลมีการเปลี่ยนจริง
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -960,6 +970,7 @@
           lastSerialized.galleries = serialized;
           publicData.galleries = galleries;
           localStorage.setItem('tos_cached_galleries', serialized);
+          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -973,6 +984,7 @@
           lastSerialized.menuIcons = serialized;
           publicData.menuIcons = sortedIcons;
           localStorage.setItem('tos_cached_menu_icons', serialized);
+          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -986,6 +998,7 @@
           lastSerialized.products = serialized;
           publicData.products = sortedProds;
           localStorage.setItem('tos_cached_products', serialized);
+          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -999,6 +1012,7 @@
           lastSerialized.showcaseProducts = serialized;
           publicData.showcaseProducts = sortedShowcase;
           localStorage.setItem('tos_cached_showcase', serialized);
+          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -1349,7 +1363,9 @@
           userDoc = { ...d.data(), id: d.id };
         });
 
-        if (userDoc.password !== password) {
+        // เข้ารหัสแบบ Hash ในการเปรียบเทียบรหัสผ่าน (รองรับบัญชีเก่าที่เป็น Plaintext)
+        const hashedEnteredPass = await hashValue(password);
+        if (userDoc.password !== password && userDoc.password !== hashedEnteredPass) {
           showToast(t('invalidPass'), 'error');
           if (btn) {
             btn.disabled = false;
@@ -1435,13 +1451,17 @@
           return;
         }
 
+        // เข้ารหัส Hash รหัสผ่านและ PIN ก่อนนำลงสู่ระบบป้องกันการเห็นแบบข้อความเปล่า
+        const hashedPassword = await hashValue(password);
+        const hashedPin = await hashValue(pin);
+
         const newUserId = genId();
         const newUserDoc = {
           id: newUserId,
           phone: phone,
           username: username,
-          password: password,
-          withdrawPassword: pin,
+          password: hashedPassword,
+          withdrawPassword: hashedPin,
           credit: 0,
           userLevel: '1',
           runIndex: 0,
@@ -1558,8 +1578,8 @@
         return;
       }
 
-      // Skip Re-rendering ถ้าแท็บเดิมไม่มีการอัปเดตโครงสร้างสำคัญ เพื่อลดอาการแฟลชของรูปภาพ
-      if (lastRenderedTab === currentTab && (currentTab === 'products' || currentTab === 'profile')) {
+      // ระบบควบคุม State เช็คแท็บเดิมเพื่อข้ามการวาดใหม่ทับซ้ำ ป้องกันจอกระพริบ (Flicker-Free UI)
+      if (lastRenderedTab === currentTab) {
         updateDynamicValues();
         return;
       }
@@ -1581,7 +1601,6 @@
       initGalleryObserver();
     }
 
-    // ฟังก์ชันอัปเดตค่าตัวเลขแบบตรงจุด ป้องกันปัญหากรอบภาพกระพริบหรือสั่นตัวแบบสุ่ม
     function updateDynamicValues() {
       const u = currentUser;
       if (!u) return;
@@ -1692,7 +1711,6 @@
       if (galleryObserver) galleryObserver.disconnect();
       if (showcaseObserver) showcaseObserver.disconnect();
 
-      // ตรวจจับการสกรอลภาพแกลเลอรีให้ทำงานเฉพาะเวลาที่เลื่อนผ่านหน้าจออย่างนุ่มนวล
       galleryObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1704,7 +1722,6 @@
       }, { threshold: 0.05 });
       document.querySelectorAll('.gallery-item').forEach(el => galleryObserver.observe(el));
 
-      // ตรวจจับสินค้าแนะนำ 8 ชิ้นให้เคลื่อนที่ช้าลงเฉพาะช่วงที่เลื่อนหน้าจอมาแสดงผล
       showcaseObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -1734,6 +1751,10 @@
       revealRights.forEach(el => scrollObserver.observe(el));
 
       clearInterval(rewardInterval);
+
+      // ยกเลิกกระบวนการทำงานของสุ่มรางวัลเบื้องหลังหากสมาชิกสลับไปแท็บอื่น (Memory leak protection)
+      if (currentTab !== 'home') return;
+
       const cfg = getConfig();
       const rewardStr = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
       const items = rewardStr.split(',').map(x => x.trim()).filter(Boolean);
@@ -1746,23 +1767,30 @@
           if (!elPhone || !elAmt) return;
 
           rewardIndex = (rewardIndex + 1) % items.length;
-          const [phone, amt] = items[rewardIndex].split(':');
+          const currentItem = items[rewardIndex];
 
-          elPhone.style.opacity = '0';
-          elAmt.style.opacity = '0';
-          elPhone.style.transform = 'translateY(-8px)';
-          elAmt.style.transform = 'translateY(-8px)';
-          elPhone.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
-          elAmt.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+          // ป้องกันการระเบิดทำงานของโค้ดในกรณีกรอกข้อมูลแอดมินผิดโครงสร้าง
+          if (currentItem && currentItem.includes(':')) {
+            const parts = currentItem.split(':');
+            const phone = parts[0] || 'User';
+            const amt = parts[1] || '0';
 
-          setTimeout(() => {
-            elPhone.innerText = phone || 'User';
-            elAmt.innerText = (amt || '0') + ' THB';
-            elPhone.style.opacity = '1';
-            elAmt.style.opacity = '1';
-            elPhone.style.transform = 'translateY(0)';
-            elAmt.style.transform = 'translateY(0)';
-          }, 400);
+            elPhone.style.opacity = '0';
+            elAmt.style.opacity = '0';
+            elPhone.style.transform = 'translateY(-8px)';
+            elAmt.style.transform = 'translateY(-8px)';
+            elPhone.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+            elAmt.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+            setTimeout(() => {
+              elPhone.innerText = phone;
+              elAmt.innerText = amt + ' THB';
+              elPhone.style.opacity = '1';
+              elAmt.style.opacity = '1';
+              elPhone.style.transform = 'translateY(0)';
+              elAmt.style.transform = 'translateY(0)';
+            }, 400);
+          }
         }, 3000);
       }
     }
@@ -1848,8 +1876,16 @@
       </div>`;
 
       const rewardStr = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
-      const defaultReward = rewardStr.split(',')[0] || '095***567:433,000';
-      const [firstPhone, firstAmt] = defaultReward.split(':');
+      const items = rewardStr.split(',').map(x => x.trim()).filter(Boolean);
+      const defaultReward = items[0] || '095***567:433,000';
+      
+      let firstPhone = '095***567';
+      let firstAmt = '433,000';
+      if (defaultReward.includes(':')) {
+        const parts = defaultReward.split(':');
+        firstPhone = parts[0];
+        firstAmt = parts[1];
+      }
 
       let commissionSummaryHtml = `
       <div class="bg-white rounded-2xl p-4 mt-4 shadow-sm border border-slate-100 flex justify-between items-center text-sm font-semibold text-slate-700 relative overflow-hidden">
@@ -1903,7 +1939,6 @@
       setTimeout(initGalleryObserver, 50);
     }
 
-    // ฟังก์ชันความปลอดภัยเสริมเพื่อป้องกันสคริปต์สไลด์ทำงานซ้ำซ้อน
     function sidebarMenuWorkaround() {
       startBannerSlide();
     }
@@ -2042,7 +2077,7 @@
               <p class="text-xs text-slate-400 font-semibold mb-0.5">${t('productPrice')}</p>
               <p class="font-black text-primary text-xl">฿${(p.productPrice||0).toLocaleString()}</p>
             </div>
-            <button id="btn-buy-step1" onclick="triggerStep1Delay('${p.__backendId}', ${isSpecial || p.isSpecial || false})" class="mt-5 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-black transition duration-200 text-base font-mono">${t('submitOrder')}</button>
+            <button id="btn-buy-step1" onclick="triggerStep1Delay('${p.__backendId || p.id}', ${isSpecial || p.isSpecial || false})" class="mt-5 w-full py-3.5 bg-slate-900 text-white font-bold rounded-2xl shadow-md hover:bg-black transition duration-200 text-base font-mono">${t('submitOrder')}</button>
           </div>`);
       }, 3500); 
     }
@@ -2067,10 +2102,10 @@
       let p = typeof productIdOrObj === 'object' ? productIdOrObj : publicData.products.find(d => d.__backendId === productIdOrObj); 
       
       if(!p && typeof productIdOrObj === 'string') {
-        p = userSpecialAssignData.find(d => d && d.__backendId === productIdOrObj);
+        p = userSpecialAssignData.find(d => d && (d.__backendId === productIdOrObj || d.id === productIdOrObj));
       }
       if(!p && typeof productIdOrObj === 'string') {
-        p = userOrdersData.find(d => d && d.__backendId === productIdOrObj);
+        p = userOrdersData.find(d => d && (d.__backendId === productIdOrObj || d.id === productIdOrObj));
       }
       if(!p) return;
       
@@ -2079,8 +2114,9 @@
       if (creditVal < (p.productPrice || 0)) { 
         const existingPending = getUserOrders().find(o => o && o.status === 'pending');
         if (p.type !== 'order' && !existingPending) {
+          const orderId = genId();
           const orderData = { 
-            type:'order', id:genId(), userId:u.id, username:usernameVal, 
+            type:'order', id:orderId, __backendId:orderId, userId:u.id, username:usernameVal, 
             productName:p.productName, productPrice:p.productPrice, 
             commission:p.commission, productImage:p.productImage||'', 
             status:'pending', isSpecial: isSpecialMode, createdAt: new Date().toISOString() 
@@ -2119,7 +2155,7 @@
               <span class="font-black text-slate-950">฿${p.productPrice.toLocaleString()}</span>
             </div>
           </div>
-          <button onclick="confirmOrderSuccess('${p.__backendId}', ${isSpecialMode})" id="btn-confirm-final" class="mt-6 w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-md active:scale-[0.98] transition text-base font-mono">${t('confirmPurchase')}</button>
+          <button onclick="confirmOrderSuccess('${p.__backendId || p.id}', ${isSpecialMode})" id="btn-confirm-final" class="mt-6 w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-md active:scale-[0.98] transition text-base font-mono">${t('confirmPurchase')}</button>
         </div>`);
     }
 
@@ -2129,7 +2165,7 @@
       btn.disabled = true; 
       btn.innerHTML = t('processing');
       
-      let p = publicData.products.find(d => d.__backendId === id) || userSpecialAssignData.find(d => d && d.__backendId === id) || userOrdersData.find(d => d && d.__backendId === id); 
+      let p = publicData.products.find(d => d.__backendId === id) || userSpecialAssignData.find(d => d && (d.__backendId === id || d.id === id)) || userOrdersData.find(d => d && (d.__backendId === id || d.id === id)); 
       if(!p) {
         btn.disabled = false;
         btn.innerHTML = t('confirmPurchase');
@@ -2177,10 +2213,15 @@
             });
           }
 
+          // ป้องกันข้อผิดพลาดในการแย่งเขียนแก้ไขข้อมูล ด้วยการเรียกอ่านและลบ Special Queue ใน Transaction
           if (isSpecial) {
             const assignment = userSpecialAssignData.find(s => s && s.targetUser === userData.id && Number(s.targetIndex) === (currentRunIndex + 1));
             if (assignment) {
-              transaction.delete(doc(db, "special_assignments", assignment.__backendId));
+              const assignDocRef = doc(db, "special_assignments", assignment.__backendId || assignment.id);
+              const assignSnap = await transaction.get(assignDocRef);
+              if (assignSnap.exists()) {
+                transaction.delete(assignDocRef);
+              }
             }
           }
         });
@@ -2253,7 +2294,7 @@
                 <span class="font-black text-emerald-600 text-sm">+฿${(pendingOrder.commission||0).toLocaleString()}</span>
               </div>
             </div>
-            <button id="btn-pay-pending" onclick="if(!isOrderProcessing){ isOrderProcessing=true; this.disabled=true; this.innerHTML='${t('processing')}'; processOrderFlowStep2('${pendingOrder.__backendId}', ${pendingOrder.isSpecial});}" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow transition text-base font-mono">${t('textSettlePending')}</button>
+            <button id="btn-pay-pending" onclick="if(!isOrderProcessing){ isOrderProcessing=true; this.disabled=true; this.innerHTML='${t('processing')}'; processOrderFlowStep2('${pendingOrder.__backendId || pendingOrder.id}', ${pendingOrder.isSpecial});}" class="w-full py-3.5 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow transition text-base font-mono">${t('textSettlePending')}</button>
           </div>`; 
         }
 
@@ -2455,7 +2496,12 @@
       const usernameVal = u.username || 'User';
       
       if (!amt || amt <= 0 || creditVal < amt) return showToast(t('invalidWdBal'),'error');
-      if (String(pin) !== String(withdrawPassword)) return showToast(t('invalidPIN'),'error');
+
+      // เข้ารหัสแบบ Hash ในการตรวจสอบรหัสถอนเงินเพื่อความปลอดภัย (รองรับพินเก่าที่เป็น Plaintext)
+      const hashedPin = await hashValue(pin);
+      if (String(withdrawPassword) !== String(pin) && String(withdrawPassword) !== String(hashedPin)) {
+        return showToast(t('invalidPIN'),'error');
+      }
       
       $('btn-wd').disabled = true; $('btn-wd').textContent = t('processing');
       
