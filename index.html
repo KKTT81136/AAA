@@ -194,7 +194,7 @@
       -webkit-backdrop-filter: blur(12px); 
     }
 
-    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นนุ่มนวลเป็นธรรมชาติ ไม่มี grayscale หรือ brightness หน่วงเครื่อง */
+    /* ปรับแต่งแกลเลอรีให้ปรากฏขึ้นนุ่มนวลเป็นธรรมชาติ */
     .gallery-item {
       opacity: 0;
       transition: opacity 0.5s ease-in-out;
@@ -218,28 +218,10 @@
       transform: translateX(0) !important;
     }
 
-    @keyframes slideFromRight {
-      0% {
-        transform: translate3d(50px, 0, 0);
-        opacity: 0;
-      }
-      100% {
-        transform: translate3d(0, 0, 0);
-        opacity: 1;
-      }
-    }
-    .logo-slide-right {
-      animation: slideFromRight 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    .showcase-card {
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-
+    /* อนิมชันสำหรับ 4 ชิ้นแรกและ 4 ชิ้นหลังตามโครงสร้างความต้องการ */
     @keyframes slideFromLeft {
       0% {
-        transform: translate3d(-30px, 0, 0);
+        transform: translate3d(-50px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -250,7 +232,7 @@
 
     @keyframes slideFromRightNew {
       0% {
-        transform: translate3d(30px, 0, 0);
+        transform: translate3d(50px, 0, 0);
         opacity: 0;
       }
       100% {
@@ -259,12 +241,16 @@
       }
     }
 
-    /* อนิเมชันสินค้าแนะนำ 8 ชิ้น */
+    .showcase-card {
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
     .revealed-slide .showcase-card-left {
-      animation: slideFromLeft 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromLeft 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .revealed-slide .showcase-card-right {
-      animation: slideFromRightNew 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: slideFromRightNew 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .revealed-slide .showcase-card-left:nth-child(1) { animation-delay: 0.1s; }
@@ -951,7 +937,7 @@
           lastSerialized.banners = serialized;
           publicData.banners = banners;
           localStorage.setItem('tos_cached_banners', serialized);
-          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บ Re-render เมื่อโครงสร้างเปลี่ยนจริง
+          lastRenderedTab = ''; // ล้างสถานะเพื่อบังคับให้แท็บหน้าหลัก Re-render ทันทีเมื่อข้อมูลมีการเปลี่ยนจริง
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -1373,6 +1359,7 @@
         localStorage.setItem('tos_logged_user_id', userDoc.id);
         currentUser = userDoc;
         currentTab = 'home';
+        lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
         sessionStorage.setItem('tos_current_tab', 'home');
         
         startUserSubscriptions(userDoc.id);
@@ -1473,6 +1460,7 @@
         localStorage.setItem('tos_logged_user_id', newUserId);
         currentUser = newUserDoc;
         currentTab = 'home';
+        lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
         sessionStorage.setItem('tos_current_tab', 'home');
 
         startUserSubscriptions(newUserId);
@@ -1491,6 +1479,7 @@
       stopUserSubscriptions();
       currentUser = null; 
       currentTab = 'home'; 
+      lastRenderedTab = ''; // ล้างประวัติเพื่อแก้ปัญหากล่องหน้าจอว่างเปล่าเวลาสลับล็อกอินใหม่
       localStorage.removeItem('tos_logged_user_id');
       localStorage.removeItem('tos_cached_user');
       sessionStorage.removeItem('tos_current_tab'); 
@@ -1572,7 +1561,7 @@
         return;
       }
 
-      // ระบบป้องกันจอกระพริบ (Flicker-Free UI) ในแท็บหลัก 3 แท็บ
+      // ระบบควบคุม State เช็คแท็บเดิมเพื่อข้ามการวาดใหม่ทับซ้ำ ป้องกันจอกระพริบ (Flicker-Free UI) ในแท็บหลัก 3 แท็บ
       if (lastRenderedTab === currentTab && (currentTab === 'home' || currentTab === 'products' || currentTab === 'profile')) {
         updateDynamicValues();
         return;
@@ -1824,14 +1813,14 @@
       }
 
       const defaultProducts = [
-        { name: "นาฬิกาสปอร์ตเรือนหรูระดับพรีเมียม", price: "10,540.00 THB", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80" },
-        { name: "กระเป๋าถือแฟชั่นผู้หญิงดีไซน์โมเดิร์น", price: "5,150.00 THB", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80" },
-        { name: "หูฟังครอบหัวบลูทูธพลังเสียงรอบทิศทาง", price: "11,900.00 THB", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80" },
-        { name: "แท็บเล็ตหน้าจอสีสันสดใสประสิทธิภาพสูง", price: "50,900.00 THB", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80" },
-        { name: "กล้องถ่ายภาพดิจิทัลไร้มิลเลอร์พร้อมเลนส์", price: "25,990.00 THB", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80" },
-        { name: "น้ำหอมสูตรเข้มข้นกลิ่นหอมหรูติดทนนาน", price: "4,390.00 THB", image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=300&q=80" },
-        { name: "เครื่องชงกาแฟเอสเปรสโซอัตโนมัติประจำบ้าน", price: "28,500.00 THB", image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=300&q=80" },
-        { name: "โทรศัพท์มือถือสมาร์ตโฟนเชื่อมต่อ 5G ยุคใหม่", price: "45,900.00 THB", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80" }
+        { name: "นาฬิกา MIDO Belluna Sunray M024.630.11.061.00 - 42 มม.", price: "10,540.00 THB", discount: "ลด 37%", originalPrice: "16,940.00 THB", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80" },
+        { name: "กระเป๋า COACH Tabby Top Handle 20 - สีดำ", price: "5,150.00 THB", discount: "ลด 66%", originalPrice: "15,300.00 THB", image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=300&q=80" },
+        { name: "หูฟัง BOSE QuietComfort® 45 headphones - สีดำ", price: "11,900.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80" },
+        { name: "แท็บเล็ตหน้าจอสีสันสดใสประสิทธิภาพสูง", price: "50,900.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=300&q=80" },
+        { name: "กล้องถ่ายภาพดิจิทัลไร้มิลเลอร์พร้อมเลนส์", price: "25,990.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=300&q=80" },
+        { name: "น้ำหอมสูตรเข้มข้นกลิ่นหอมหรูติดทนนาน", price: "4,390.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=300&q=80" },
+        { name: "เครื่องชงกาแฟเอสเปรสโซอัตโนมัติประจำบ้าน", price: "28,500.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1517256064527-09c53b2d0bc6?auto=format&fit=crop&w=300&q=80" },
+        { name: "โทรศัพท์มือถือสมาร์ตโฟนเชื่อมต่อ 5G ยุคใหม่", price: "45,900.00 THB", discount: "", originalPrice: "", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80" }
       ];
 
       const fallbackImages = [
@@ -1858,7 +1847,12 @@
             const pPrice = p.productPrice ? `฿${safeFormatNumber(p.productPrice)}` : (p.price || "0");
             const pImg = safeImgUrl(p.productImage || p.image);
 
+            // อิงตามเงื่อนไข: สี่ชิ้นแรกขยับมาจากฝั่งซ้าย (Left Slide) และสี่ชิ้นหลังขยับมาจากฝั่งขวา (Right Slide)
             const animationTypeClass = index < 4 ? 'showcase-card-left' : 'showcase-card-right';
+
+            // เพิ่มแบรนด์ป้ายลดราคา % และขีดเส้นทับราคาเก่าจำลองตามภาพตัวอย่างอ้างอิง
+            const discountBadge = p.discount ? `<span class="bg-red-100 text-red-600 text-[8px] font-bold px-1.5 py-0.5 rounded-full">${p.discount}</span>` : '';
+            const originalPriceDisplay = p.originalPrice ? `<span class="text-slate-400 line-through text-[8px] ml-1">${p.originalPrice}</span>` : '';
 
             return `
             <div class="showcase-card ${animationTypeClass} bg-slate-50 border border-slate-100 rounded-xl p-2 flex flex-col justify-between text-left relative overflow-hidden shadow-inner">
@@ -1867,6 +1861,10 @@
               </div>
               <p class="text-[9px] font-bold text-slate-700 line-clamp-2 leading-tight">${pName}</p>
               <div class="mt-2">
+                <div class="flex items-center flex-wrap gap-0.5 mb-0.5 min-h-[14px]">
+                  ${discountBadge}
+                  ${originalPriceDisplay}
+                </div>
                 <p class="text-[10px] font-black text-slate-900">${pPrice}</p>
               </div>
             </div>`;
@@ -1900,19 +1898,30 @@
       let galleryHtml = ''; 
       if (gallery.length > 0) {
         galleryHtml = `
-        <div class="mt-6">
-          <div class="grid grid-cols-2 gap-4">
-            ${gallery.map(g => `
-              <div class="gallery-item w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-slate-100 bg-slate-100 p-1.5 flex items-center justify-center">
-                <img src="${safeImgUrl(g.galleryUrl)}" class="w-full h-full object-cover rounded-[18px] opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0');" onerror="this.onerror=null; this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; this.classList.remove('opacity-0');">
-              </div>
-            `).join('')}
+        <div class="mt-10">
+          <div class="grid grid-cols-2 gap-y-12 gap-x-4">
+            ${gallery.map(g => {
+              // เพิ่มหัวข้อเนื้อหาด้านบนรูป (เช่น VIP 1 / VIP 2) วางตรงกลางคาดทับขอบกล่องด้านบนอย่างสมมาตรตามภาพอ้างอิง
+              const titleText = g.galleryTitle || g.title || '';
+              const titleContainerHtml = titleText ? `
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white border-2 border-red-500 text-slate-950 text-[9px] font-black px-4 py-0.5 rounded shadow-sm z-10 font-bold uppercase tracking-widest min-w-[70px] text-center">
+                  ${titleText}
+                </div>
+              ` : '';
+              return `
+              <div class="gallery-item w-full aspect-square rounded-[24px] border-2 border-[#ca9eff] bg-white p-2 flex items-center justify-center relative shadow-sm">
+                ${titleContainerHtml}
+                <div class="w-full h-full rounded-[18px] overflow-hidden bg-slate-50 flex items-center justify-center">
+                  <img src="${safeImgUrl(g.galleryUrl)}" class="w-full h-full object-cover opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0');" onerror="this.onerror=null; this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; this.classList.remove('opacity-0');">
+                </div>
+              </div>`;
+            }).join('')}
           </div>
         </div>`;
       }
 
       c.innerHTML = `
-        <div id="home-container" class="p-4 w-full fade-in">
+        <div id="home-container" class="p-4 w-full fade-in font-mono">
           ${getBannerHtml()}
           
           <div class="bg-theme-gradient rounded-[32px] p-6 text-white shadow-xl relative overflow-hidden">
@@ -2001,6 +2010,8 @@
             </div>
           </div>
         </div>`;
+      
+      startBannerSlide();
     }
 
     function startRun(btnElement) {
