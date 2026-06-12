@@ -292,7 +292,7 @@
 
     const appInstance = initializeApp(firebaseConfig);
     const db = getFirestore(appInstance);
-    const auth = getAuth(auth);
+    const auth = getAuth(appInstance);
 
     // ==========================================
     // STATE ENGINE & DICTIONARY
@@ -700,7 +700,10 @@
         rules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
       }
 
-      styleEl.innerHTML = rules.join("\n");
+      var styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-theme-style';
+      styleEl.innerHTML = cssRules.join("\n");
+      document.head.appendChild(styleEl);
     }
 
     let currentFavicon = '';
