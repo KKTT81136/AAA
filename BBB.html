@@ -6,7 +6,8 @@
   <title>แอดมิน</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght=300;400;500;600&display=swap" rel="stylesheet">
+  <!-- นำเข้าฟอนต์ Inter และ Noto Sans Thai ชนิดความหนาพอดี สบายตา -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
   <script>
@@ -85,20 +86,20 @@
       font-size: 14px !important;
     }
     * { 
-      font-family: 'Kanit', sans-serif; 
+      font-family: 'Inter', 'Noto Sans Thai', sans-serif; 
       -webkit-font-smoothing: antialiased; 
       box-sizing: border-box;
-      font-weight: 400;
+      font-weight: 300; /* ปรับระดับความหนาตัวอักษรให้อ่านง่าย สบายตา สไตล์โมเดิร์น */
     }
     b, strong, h1, h2, h3, h4, th, .font-bold, .font-black, .font-semibold {
-      font-weight: 600 !important;
+      font-weight: 500 !important; /* ปรับระดับตัวหนาให้ออกมาคมชัดระดับสมส่วน */
     }
     
     html, body { 
       min-height: 100%; 
       margin: 0; 
       background-color: #0c0c0e !important; 
-      color: #ffffff !important;
+      color: #ffffff !important; /* บังคับตัวหนังสือหน้าจอแอดมินทั้งหมดเป็นสีขาว */
     }
     
     .bg-slate-900 {
@@ -725,21 +726,21 @@
                 <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
                   <div class="p-2 bg-blue-950/80 text-blue-400 border border-blue-900/40 rounded"><i data-lucide="users" class="w-5 h-5"></i></div>
                   <div>
-                    <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider font-mono">ยอดสมาชิกรวม</p>
+                    <p class="text-xs text-neutral-300 font-semibold uppercase tracking-wider font-mono">ยอดสมาชิกรวม</p>
                     <p id="stat-total-members" class="text-sm font-semibold text-white font-mono">0 บัญชี</p>
                   </div>
                 </div>
                 <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
                   <div class="p-2 bg-indigo-950/80 text-indigo-400 border border-indigo-900/40 rounded"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
                   <div>
-                    <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider font-mono">ประวัติออเดอร์รวม</p>
+                    <p class="text-xs text-neutral-300 font-semibold uppercase tracking-wider font-mono">ประวัติออเดอร์รวม</p>
                     <p id="stat-total-orders" class="text-sm font-semibold text-white font-mono">0 รายการ</p>
                   </div>
                 </div>
                 <div class="bg-neutral-900 px-4 py-3 rounded border border-neutral-800 flex items-center gap-4 min-w-[200px] shadow-sm">
                   <div class="p-2 bg-emerald-950/80 text-emerald-400 border border-emerald-900/40 rounded"><i data-lucide="package" class="w-5 h-5"></i></div>
                   <div>
-                    <p class="text-xs text-neutral-400 font-semibold uppercase tracking-wider font-mono">จำนวนคลังสินค้า</p>
+                    <p class="text-xs text-neutral-300 font-semibold uppercase tracking-wider font-mono">จำนวนคลังสินค้า</p>
                     <p id="stat-total-products" class="text-sm font-semibold text-white font-mono">0 ชิ้น</p>
                   </div>
                 </div>
@@ -804,7 +805,7 @@
 
     function renderAdminTab() {
       const c = $('admin-content'); if(!c) return;
-      const savedScrollTop = c.scrollTop; // บันทึกตำแหน่ง Scroll ป้องกันหน้าจอกระตุก
+      const savedScrollTop = c.scrollTop; // เก็บค่าพิกัด Scroll เพื่อไม่ให้หน้ากระตุกยามเรียลไทม์ทำงาน
       
       if (adminTab === 'users') renderAdminUsers(c); 
       else if (adminTab === 'products') renderAdminProducts(c); 
@@ -814,7 +815,7 @@
       else if (adminTab === 'settings') renderAdminSettings(c);
       else if (adminTab === 'orders') renderAdminOrders(c);
       
-      c.scrollTop = savedScrollTop; // คืนค่าตำแหน่ง Scroll เดิม
+      c.scrollTop = savedScrollTop; // คืนตำแหน่ง Scroll ทันที
       lucide.createIcons();
     }
 
@@ -846,8 +847,8 @@
         if(level === 'allowwd') levelText = 'ปลดล็อกแล้ว';
         
         return `
-        <tr class="hover:bg-neutral-900 transition">
-          <td class="p-3.5 font-semibold text-sky-400 text-sm">${username}</td>
+        <tr class="hover:bg-neutral-900 transition border-b border-neutral-900">
+          <td class="p-3.5 font-semibold text-white text-sm">${username}</td>
           <td class="p-3.5 text-neutral-300 text-sm">${u.phone}</td>
           <td class="p-3.5">
             <span class="px-2.5 py-1 bg-black border border-neutral-800 text-white text-xs font-semibold rounded">
@@ -886,9 +887,9 @@
           </div>
           
           <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
-            <table class="w-full text-left border-collapse text-sm font-mono">
+            <table class="w-full text-left border-collapse text-sm font-mono text-white">
               <thead>
-                <tr class="bg-black border-b border-neutral-900 text-neutral-400 font-semibold uppercase text-xs tracking-wider">
+                <tr class="bg-black border-b border-neutral-900 text-neutral-300 font-semibold uppercase text-xs tracking-wider">
                   <th class="p-3.5">รหัสชื่อบัญชี</th>
                   <th class="p-3.5">เบอร์โทรศัพท์ติดต่อ</th>
                   <th class="p-3.5">สิทธิ์ / ระดับ VIP</th>
@@ -909,21 +910,21 @@
     function showAddUserModal() {
       showModal(`
         <h3 class="font-semibold text-sm mb-4 text-sky-400 flex items-center gap-1.5 border-b border-neutral-800 pb-2 uppercase tracking-wider"><i data-lucide="user-plus" class="text-sky-400"></i> ลงทะเบียนบัญชีสมาชิกใหม่</h3>
-        <div id="add-user-form" class="space-y-4 text-left text-sm font-mono sandbox">
+        <div id="add-user-form" class="space-y-4 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">เบอร์โทรศัพท์ (ใช้เข้าระบบ)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">เบอร์โทรศัพท์ (ใช้เข้าระบบ)</label>
             <input id="an-phone" class="w-full px-3.5 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" placeholder="เช่น 0812345678">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ชื่อบัญชีผู้ใช้ (แสดงผล)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ชื่อบัญชีผู้ใช้ (แสดงผล)</label>
             <input id="an-username" class="w-full px-3.5 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" placeholder="เช่น สุขใจ ดำเนินการ">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">รหัสผ่านเข้าสู่ระบบ</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">รหัสผ่านเข้าสู่ระบบ</label>
             <input id="an-pass" class="w-full px-3.5 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" value="123456">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">รหัสถอนเงินความปลอดภัย PIN (6 หลัก)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">รหัสถอนเงินความปลอดภัย PIN (6 หลัก)</label>
             <input id="an-pin" class="w-full px-3.5 py-2.5 bg-black border border-neutral-800 rounded text-white text-center text-sm" value="102552">
           </div>
           
@@ -996,12 +997,12 @@
       const withdrawPassword = u.withdrawPassword || '';
 
       showModal(`
-        <div class="flex items-center justify-between border-b border-neutral-800 pb-3 mb-4 font-mono text-sm">
+        <div class="flex items-center justify-between border-b border-neutral-800 pb-3 mb-4 font-mono text-sm text-white">
           <div class="flex items-center gap-2">
             <span class="text-2xl">⚙️</span>
             <div>
               <h3 class="font-semibold text-sm text-sky-400">${username}</h3>
-              <p class="text-xs text-neutral-400">บัญชี: ${u.phone}</p>
+              <p class="text-xs text-neutral-300">บัญชี: ${u.phone}</p>
             </div>
           </div>
           <div class="flex gap-1">
@@ -1013,7 +1014,7 @@
         <div class="space-y-4 max-h-[65vh] overflow-y-auto pr-1 scrollbar-none text-left font-mono text-sm text-white">
           <div class="bg-black p-2.5 rounded border border-neutral-800 flex justify-between items-center">
             <div>
-              <span class="text-[10px] text-slate-500 font-semibold block uppercase">เครดิตปัจจุบัน</span>
+              <span class="text-[10px] text-neutral-300 font-semibold block uppercase">เครดิตปัจจุบัน</span>
               <p class="text-sm font-semibold text-sky-400">฿${credit.toLocaleString()}</p>
             </div>
             <button onclick="resetUserTasks('${bid}')" class="px-3 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-black font-semibold rounded text-xs transition uppercase">รีเซ็ตภารกิจเป็น 0</button>
@@ -1021,7 +1022,7 @@
 
           <div class="space-y-3">
             <div>
-              <span class="text-xs text-neutral-400 font-semibold uppercase">ระดับสิทธิ์ VIP บัญชี</span>
+              <span class="text-xs text-neutral-300 font-semibold uppercase">ระดับสิทธิ์ VIP บัญชี</span>
               <select id="eu-level" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-sm font-semibold text-white">
                 <option value="1" ${level=='1'?'selected':''}>VIP 1</option>
                 <option value="2" ${level=='2'?'selected':''}>VIP 2</option>
@@ -1035,25 +1036,25 @@
             </div>
 
             <div>
-              <span class="text-xs text-neutral-400 font-semibold uppercase">เบอร์โทรศัพท์</span>
+              <span class="text-xs text-neutral-300 font-semibold uppercase">เบอร์โทรศัพท์</span>
               <input id="eu-phone" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm text-center font-bold" value="${u.phone || ''}">
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <span class="text-xs text-neutral-400 font-semibold uppercase block">รหัสผ่านเข้าใช้</span>
-                <span class="text-[10px] text-slate-500 block leading-tight">(พิมพ์รหัสใหม่เพื่อทับแฮชเดิม)</span>
+                <span class="text-xs text-neutral-300 font-semibold uppercase block">รหัสผ่านเข้าใช้</span>
+                <span class="text-[10px] text-neutral-400 block leading-tight">(พิมพ์รหัสใหม่เพื่อทับแฮชเดิม)</span>
                 <input id="eu-pass" type="text" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm font-semibold text-center" value="${password}">
               </div>
               <div>
-                <span class="text-xs text-neutral-400 font-semibold uppercase block">รหัส PIN ถอน</span>
-                <span class="text-[10px] text-slate-500 block leading-tight">(พิมพ์พินใหม่เพื่อทับแฮชเดิม)</span>
+                <span class="text-xs text-neutral-300 font-semibold uppercase block">รหัส PIN ถอน</span>
+                <span class="text-[10px] text-neutral-400 block leading-tight">(พิมพ์พินใหม่เพื่อทับแฮชเดิม)</span>
                 <input id="eu-pin" type="text" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm text-center font-semibold" value="${withdrawPassword}">
               </div>
             </div>
 
             <div class="bg-black p-3 rounded border border-neutral-800 space-y-1">
-              <span class="text-[10px] text-slate-500 block uppercase font-semibold">ข้อมูลบัญชีเงินรับฝาก</span>
+              <span class="text-[10px] text-neutral-400 block uppercase font-semibold">ข้อมูลบัญชีเงินรับฝาก</span>
               <p class="text-sm text-white">ธนาคาร: <span class="font-semibold text-sky-400">${u.bankName || 'ยังไม่ได้ผูกบัญชี'}</span></p>
               <p class="text-sm text-white">เลขบัญชี: <span class="font-semibold text-sky-400">${u.bankNumber || '-'}</span></p>
             </div>
@@ -1069,102 +1070,6 @@
         </div>
       `);
       lucide.createIcons();
-    }
-
-    async function resetUserTasks(bid) {
-      const u = adminUsersData.find(d => d.__backendId === bid);
-      if(!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
-
-      const result = await Swal.fire({
-        title: 'ยืนยันการรีเซ็ตภารกิจ?',
-        text: `คุณต้องการเริ่มรีเซ็ตจำนวนภารกิจของ ${u.username} เป็น 0 หรือไม่?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'ใช่, รีเซ็ตเลย',
-        cancelButtonText: 'ยกเลิก',
-        background: '#16161a',
-        color: '#ffffff',
-        confirmButtonColor: '#d97706',
-        cancelButtonColor: '#404040'
-      });
-
-      if (result.isConfirmed) {
-        try {
-          await setDoc(doc(db, "users", u.id), { ...u, runIndex: 0 });
-          showToast('รีเซ็ตจำนวนภารกิจผู้ใช้รายนี้สำเร็จ');
-          closeModal();
-          debouncedRenderAdminTab();
-        } catch (err) {
-          showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
-        }
-      }
-    }
-
-    function promptUserBalanceUpdate(bid, adjustType) {
-      const actionText = adjustType === 'deposit' ? 'เพิ่มเครดิต' : 'ลดเครดิต';
-      Swal.fire({
-        title: `${actionText}`,
-        text: 'กรุณากรอกจำนวนเงิน:',
-        input: 'number',
-        inputAttributes: {
-          min: 1,
-          step: 1
-        },
-        showCancelButton: true,
-        confirmButtonText: 'ตกลง',
-        cancelButtonText: 'ยกเลิก',
-        background: '#16161a',
-        color: '#ffffff',
-        confirmButtonColor: '#0284c7',
-        cancelButtonColor: '#404040'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const amount = parseFloat(result.value);
-          if (isNaN(amount) || amount <= 0) {
-            showToast('กรุณากรอกจำนวนเงินที่ถูกต้อง', 'error');
-            return;
-          }
-          const adjustAmount = adjustType === 'deposit' ? amount : -amount;
-          adjustUserBalanceDirectly(bid, adjustAmount);
-        }
-      });
-    }
-
-    async function adjustUserBalanceDirectly(bid, adjustAmount) {
-      const u = adminUsersData.find(d => d.__backendId === bid);
-      if (!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้ในระบบ', 'error');
-
-      let userDocRef = doc(db, "users", u.id);
-      let wdCol = collection(db, "withdrawals");
-      try {
-        await runTransaction(db, async (transaction) => {
-          const snap = await transaction.get(userDocRef);
-          if (!snap.exists()) return;
-          const currentCredit = snap.data().credit || 0;
-
-          const updatePayload = {
-            credit: Math.max(0, currentCredit + adjustAmount)
-          };
-
-          transaction.update(userDocRef, updatePayload);
-
-          const newWdRef = doc(wdCol);
-          transaction.set(newWdRef, {
-            type: 'withdrawal',
-            id: newWdRef.id,
-            userId: u.id,
-            username: snap.data().username || 'User',
-            amount: Math.abs(adjustAmount),
-            status: adjustAmount > 0 ? 'deposit' : 'rejected',
-            createdAt: new Date().toISOString()
-          });
-        });
-        showToast('แก้ไขข้อมูลการปรับปรุงเครดิตบัญชีเรียบร้อย');
-        closeModal();
-        debouncedRenderAdminTab();
-      } catch (err) {
-        showToast('ล้มเหลวในการปรับปรุงเครดิตสมาชิก', 'error');
-      }
     }
 
     async function saveAdminUser(bid) {
@@ -1286,9 +1191,9 @@
         <div class="space-y-3 pt-2">
           ${products.length === 0 ? '<p class="text-neutral-500 text-center py-8 text-sm font-mono font-semibold">ไม่มีรายการสินค้าที่ระบุไว้ในระดับ VIP นี้</p>' : products.map(p => `
             <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-900 flex items-center justify-between shadow-sm font-mono text-sm">
-              <div class="flex-1 min-w-0 pr-3 text-left">
+              <div class="flex-1 min-w-0 pr-3 text-left text-white">
                 <p class="font-semibold text-white text-sm">ลำดับขั้นตอนการจับคู่ที่ ${p.productOrder||1}: ${p.productName}</p>
-                <p class="text-xs text-neutral-400 mt-1 font-semibold">ราคาทุนอ้างอิง: ฿${p.productPrice} | ค่าคอมมิชชันภารกิจ: <span class="text-emerald-400">฿${p.commission}</span></p>
+                <p class="text-xs text-neutral-300 mt-1 font-semibold">ราคาทุนอ้างอิง: ฿${p.productPrice} | ค่าคอมมิชชันภารกิจ: <span class="text-emerald-400">฿${p.commission}</span></p>
               </div>
               <button onclick="editAdminProduct('${p.__backendId}')" class="p-2 bg-black hover:bg-neutral-900 border border-neutral-800 rounded transition text-sky-400"><i data-lucide="edit" class="w-4 h-4"></i></button>
             </div>`).join('')}
@@ -1301,25 +1206,25 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรายการสินค้า (VIP ${adminProductTab})</h3>
         <div class="space-y-3.5 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
             <input id="ap-order" type="number" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="เช่น 1, 2, 3">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ชื่อข้อมูลสินค้า</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ชื่อข้อมูลสินค้า</label>
             <input id="ap-name" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="ระบุชื่อสินค้าทางบัญชี">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
+              <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
               <input id="ap-price" type="number" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="ทุน">
             </div>
             <div>
-              <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ผลคอมมิชชันภารกิจ (฿)</label>
+              <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ผลคอมมิชชันภารกิจ (฿)</label>
               <input id="ap-comm" type="number" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="กำไร">
             </div>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ลิงก์ URL รูปภาพสินค้า</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ลิงก์ URL รูปภาพสินค้า</label>
             <input id="ap-img" type="text" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="วางลิงก์รูปภาพ">
           </div>
           
@@ -1372,25 +1277,25 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงรายละเอียดระบบสินค้า</h3>
         <div class="space-y-3.5 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
+            <label class="text-xs text-neutral-300 uppercase">คิวลำดับการกดจับคู่สินค้า (ออเดอร์ลำดับที่)</label>
             <input id="ep-order" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" value="${p.productOrder||1}">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 uppercase">ชื่อสินค้า</label>
+            <label class="text-xs text-neutral-300 uppercase">ชื่อสินค้า</label>
             <input id="ep-name" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" value="${p.productName}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-neutral-400 uppercase">ราคาทุนระบบ</label>
+              <label class="text-xs text-neutral-300 uppercase">ราคาทุนระบบ</label>
               <input id="ep-price" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" value="${p.productPrice}">
             </div>
             <div>
-              <label class="text-xs text-neutral-400 uppercase">ผลคอมมิชชันภารกิจ</label>
+              <label class="text-xs text-neutral-300 uppercase">ผลคอมมิชชันภารกิจ</label>
               <input id="ep-comm" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" value="${p.commission}">
             </div>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 uppercase">ที่อยู่ URL รูปภาพสินค้า</label>
+            <label class="text-xs text-neutral-300 uppercase">ที่อยู่ URL รูปภาพสินค้า</label>
             <input id="ep-img" type="text" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm text-center" value="${p.productImage||''}">
           </div>
           <div class="flex gap-2 pt-2">
@@ -1490,8 +1395,8 @@
               <div class="flex-1 min-w-0 pr-3 text-left text-white">
                 <p class="font-semibold text-amber-500 text-xs uppercase tracking-wider">ทำงานทันทีเมื่อถึงภารกิจคิวที่: ${s.targetIndex}</p>
                 <p class="font-semibold text-white text-sm truncate mt-1">${s.productName}</p>
-                <p class="text-sm text-neutral-400 mt-1">ตั้งค่าราคาทุน: <span class="text-white font-semibold">฿${(s.productPrice||0).toLocaleString()}</span> | ตั้งค่ากำไร: <span class="text-emerald-400 font-semibold">฿${(s.commission||0).toLocaleString()}</span></p>
-                <p class="text-sm text-neutral-400 mt-0.5">สมาชิกปลายทาง: <span class="text-sky-400 font-semibold">${username}</span></p>
+                <p class="text-sm text-neutral-300 mt-1">ตั้งค่าราคาทุน: <span class="text-white font-semibold">฿${(s.productPrice||0).toLocaleString()}</span> | ตั้งค่ากำไร: <span class="text-emerald-400 font-semibold">฿${(s.commission||0).toLocaleString()}</span></p>
+                <p class="text-sm text-neutral-300 mt-0.5">สมาชิกปลายทาง: <span class="text-sky-400 font-semibold">${username}</span></p>
               </div>
               <div class="flex gap-1.5">
                 <button onclick="editAssignedSpecial('${s.__backendId}')" class="p-2 bg-black hover:bg-neutral-900 text-sky-400 border border-neutral-800 rounded transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
@@ -1504,7 +1409,30 @@
       lucide.createIcons();
     }
 
-    function showCreateSpecialTemplate() { showModal(`<h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">สร้างเทมเพลตสินค้าออเดอร์พิเศษ</h3><div class="space-y-3.5 text-left text-sm font-mono text-white"><div><label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label><input id="st-n" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="ระบุชื่อเรียก"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ราคาทุนระบบ (บาท)</label><input id="st-p" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" placeholder="ทุน"></div><div><label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">กำไรคอมมิชชัน (บาท)</label><input id="st-c" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" placeholder="กำไร"></div></div><div><label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ลิงก์ภาพสินค้า URL</label><input id="st-i" type="text" class="w-full px-4 py-2.5 bg-black border border-neutral-200 text-white rounded text-sm text-center" placeholder="วางลิงก์รูปภาพ"></div><button onclick="doCreateST()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition text-sm uppercase tracking-wider">บันทึกข้อมูลเทมเพลต</button></div>`); }
+    function showCreateSpecialTemplate() { showModal(`
+      <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">สร้างเทมเพลตสินค้าออเดอร์พิเศษ</h3>
+      <div class="space-y-3.5 text-left text-sm font-mono text-white">
+        <div>
+          <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
+          <input id="st-n" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-sm text-center" placeholder="ระบุชื่อเรียก">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ราคาทุนระบบ (บาท)</label>
+            <input id="st-p" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" placeholder="ทุน">
+          </div>
+          <div>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">กำไรคอมมิชชัน (บาท)</label>
+            <input id="st-c" type="number" class="w-full mt-1 px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold text-center" placeholder="กำไร">
+          </div>
+        </div>
+        <div>
+          <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ลิงก์ภาพสินค้า URL</label>
+          <input id="st-i" type="text" class="w-full px-4 py-2.5 bg-black border border-neutral-200 text-white rounded text-sm text-center" placeholder="วางลิงก์รูปภาพ">
+        </div>
+        <button onclick="doCreateST()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition text-sm uppercase tracking-wider">บันทึกข้อมูลเทมเพลต</button>
+      </div>`); 
+    }
     
     async function doCreateST() { 
       try {
@@ -1555,25 +1483,25 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ตั้งคิวออเดอร์พิเศษเจาะจงเป้าหมายบัญชี</h3>
         <div class="space-y-3.5 max-h-[75vh] overflow-y-auto px-1 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
             <input id="sa-name" type="text" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-semibold text-sm text-center" value="${t.productName}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-neutral-400 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
+              <label class="text-xs text-neutral-300 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
               <input id="sa-price" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-semibold text-sm text-center" value="${t.productPrice}">
             </div>
             <div>
-              <label class="text-xs text-neutral-400 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
+              <label class="text-xs text-neutral-300 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
               <input id="sa-comm" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-semibold text-sm text-center" value="${t.commission}">
             </div>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
             <input id="sa-user-search" type="text" oninput="filterAssignUsers(this.value)" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-neutral-400 placeholder-neutral-600 text-sm text-center" placeholder="พิมพ์ชื่อผู้ใช้ หรือเบอร์โทรเพื่อคัดกรอง...">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
             <select id="sa-user" class="w-full px-3.5 py-2 border border-neutral-800 rounded bg-black text-white font-semibold text-sm text-center">
               ${adminUsersData.map(u => {
                 const username = u.username || 'User';
@@ -1582,7 +1510,7 @@
             </select>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1 uppercase">ออเดอร์พิเศษนี้จะทำงานในการกดจับคู่คิวลำดับที่เท่าไร?</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">ออเดอร์พิเศษนี้จะทำงานในการกดจับคู่คิวลำดับที่เท่าไร?</label>
             <input id="sa-idx" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-amber-500 font-semibold text-center text-sm" value="1">
           </div>
           
@@ -1652,25 +1580,25 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงคิวออเดอร์พิเศษสำหรับล็อกสมาชิก</h3>
         <div class="space-y-3.5 max-h-[75vh] overflow-y-auto px-1 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-slate-400 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">ชื่อสินค้าทางเทคนิค</label>
             <input id="sa-edit-name" type="text" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-semibold text-sm text-center" value="${s.productName}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-slate-400 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
+              <label class="text-xs text-neutral-300 block mb-1 uppercase">ราคาทุนระบบ (฿)</label>
               <input id="sa-edit-price" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-semibold text-sm text-center" value="${s.productPrice}">
             </div>
             <div>
-              <label class="text-xs text-slate-400 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
+              <label class="text-xs text-neutral-300 block mb-1 uppercase">กำไรคอมมิชชัน (฿)</label>
               <input id="sa-edit-comm" type="number" class="w-full mt-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white font-mono font-semibold text-sm text-center" value="${s.commission}">
             </div>
           </div>
           <div>
-            <label class="text-xs text-slate-400 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">🔍 ค้นหาสมาชิกปลายทาง</label>
             <input id="sa-edit-user-search" type="text" oninput="filterEditAssignUsers(this.value)" class="w-full px-3.5 py-2 bg-black border border-neutral-800 text-white placeholder-slate-600 text-sm text-center" placeholder="พิมพ์คีย์เวิร์ดเพื่อค้นหา...">
           </div>
           <div>
-            <label class="text-xs text-slate-400 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">เลือกเป้าหมายบัญชีผู้รับ</label>
             <select id="sa-edit-user" class="w-full px-3.5 py-2 border border-neutral-800 rounded bg-black text-white font-semibold text-sm text-center">
               ${adminUsersData.map(u => {
                 const username = u.username || 'User';
@@ -1679,7 +1607,7 @@
             </select>
           </div>
           <div>
-            <label class="text-xs text-slate-400 block mb-1 uppercase">ทำงานเมื่อจับคู่ออเดอร์ลำดับที่เท่าไร</label>
+            <label class="text-xs text-neutral-300 block mb-1 uppercase">ทำงานเมื่อจับคู่ออเดอร์ลำดับที่เท่าไร</label>
             <input id="sa-edit-idx" type="number" class="w-full px-3.5 py-2 bg-black border border-neutral-800 rounded text-amber-500 font-semibold text-center text-sm" value="${s.targetIndex}">
           </div>
           
@@ -1801,13 +1729,13 @@
         } else {
           slipDisplay = `
             <p class="font-semibold text-white text-sm">${w.bankName || '-'}</p>
-            <p class="text-neutral-500 mt-0.5 text-xs">${w.bankNumber || '-'}</p>
+            <p class="text-neutral-300 mt-0.5 text-xs">${w.bankNumber || '-'}</p>
           `;
         }
         
         return `
-        <tr class="hover:bg-neutral-900 transition">
-          <td class="p-3.5 text-neutral-500 text-xs">${new Date(w.createdAt).toLocaleString()}</td>
+        <tr class="hover:bg-neutral-900 transition border-b border-neutral-900">
+          <td class="p-3.5 text-neutral-400 text-xs">${new Date(w.createdAt).toLocaleString()}</td>
           <td class="p-3.5 font-semibold text-white text-sm">${w.username}</td>
           <td class="p-3.5 text-sm text-neutral-300">${typeText}</td>
           <td class="p-3.5 font-semibold ${w.status === 'deposit' || w.status === 'deposit_pending' ? 'text-emerald-400' : 'text-white'} text-sm">฿${w.amount.toLocaleString()}</td>
@@ -1846,9 +1774,9 @@
           </div>
 
           <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
-            <table class="w-full text-left border-collapse text-sm font-mono">
+            <table class="w-full text-left border-collapse text-sm font-mono text-white">
               <thead>
-                <tr class="bg-black border-b border-neutral-900 text-neutral-400 font-semibold uppercase text-xs tracking-wider">
+                <tr class="bg-black border-b border-neutral-900 text-neutral-300 font-semibold uppercase text-xs tracking-wider">
                   <th class="p-3.5">วันเวลาทำรายการ</th>
                   <th class="p-3.5">ชื่อบัญชีสมาชิก</th>
                   <th class="p-3.5">ประเภทธุรกรรม</th>
@@ -1981,8 +1909,8 @@
       });
 
       const tableRowsHtml = filteredOrders.map(o => `
-        <tr class="hover:bg-neutral-900 transition">
-          <td class="p-3.5 text-neutral-500 text-xs">${new Date(o.createdAt).toLocaleString()}</td>
+        <tr class="hover:bg-neutral-900 transition border-b border-neutral-900">
+          <td class="p-3.5 text-neutral-400 text-xs">${new Date(o.createdAt).toLocaleString()}</td>
           <td class="p-3.5 font-semibold text-white text-sm">${o.username}</td>
           <td class="p-3.5 text-neutral-300 truncate max-w-[200px] text-sm" title="${o.productName}">${o.productName}</td>
           <td class="p-3.5 font-semibold text-neutral-300 text-sm">฿${o.productPrice.toLocaleString()}</td>
@@ -2011,9 +1939,9 @@
           </div>
 
           <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
-            <table class="w-full text-left border-collapse text-sm font-mono">
+            <table class="w-full text-left border-collapse text-sm font-mono text-white">
               <thead>
-                <tr class="bg-black border-b border-neutral-900 text-neutral-400 font-semibold uppercase text-xs tracking-wider">
+                <tr class="bg-black border-b border-neutral-900 text-neutral-300 font-semibold uppercase text-xs tracking-wider">
                   <th class="p-3.5">วันเวลาทำรายการ</th>
                   <th class="p-3.5">รหัสชื่อบัญชี</th>
                   <th class="p-3.5">ข้อมูลรายการสินค้า</th>
@@ -2044,11 +1972,11 @@
               <div class="flex items-center gap-3 bg-black p-3 rounded border border-neutral-800 text-sm text-white">
                 <div class="flex flex-col gap-1 flex-shrink-0">
                   <img src="${b.bannerUrl}" class="w-20 h-12 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเนอร์มือถือ" onerror="this.onerror=null;">
-                  ${b.bannerPcUrl ? `<img src="${b.bannerPcUrl}" class="w-20 h-10 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเนอร์ PC" onerror="this.onerror=null;">` : `<div class="w-20 h-10 bg-neutral-900 flex items-center justify-center rounded text-[10px] text-slate-600 border border-slate-800 font-semibold">ไม่มีภาพ PC</div>`}
+                  ${b.bannerPcUrl ? `<img src="${b.bannerPcUrl}" class="w-20 h-10 object-cover rounded border border-neutral-800" title="ภาพย่อแบนเน8ร์ PC" onerror="this.onerror=null;">` : `<div class="w-20 h-10 bg-neutral-900 flex items-center justify-center rounded text-[10px] text-slate-600 border border-slate-800 font-semibold">ไม่มีภาพ PC</div>`}
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-neutral-200 truncate font-semibold">Mobile: ${b.bannerUrl}</p>
-                  <p class="text-xs text-neutral-500 truncate font-mono mt-0.5">PC: ${b.bannerPcUrl || 'ไม่ระบุพารามิเตอร์'}</p>
+                  <p class="text-xs text-neutral-400 truncate font-mono mt-0.5">PC: ${b.bannerPcUrl || 'ไม่ระบุพารามิเตอร์'}</p>
                 </div>
                 <div class="flex gap-1.5">
                   <button onclick="editBanner('${b.__backendId}')" class="p-2 text-sky-400 hover:bg-neutral-900 rounded transition"><i data-lucide="edit" class="w-4 h-4"></i></button>
@@ -2063,7 +1991,7 @@
           <button onclick="showAddShowcaseProduct()" class="w-full py-2 bg-black hover:bg-neutral-900 text-white border border-neutral-800 rounded text-xs font-semibold transition mb-4 uppercase tracking-wider">+ เพิ่มสินค้าแนะนำหน้าหลัก</button>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             ${getShowcaseProducts().map(sp => `
-              <div class="bg-black p-3 rounded border border-neutral-800 relative flex flex-col justify-between text-sm shadow-inner">
+              <div class="bg-black p-3 rounded border border-neutral-800 relative flex flex-col justify-between text-sm shadow-inner text-white">
                 <span class="absolute top-2 left-2 bg-neutral-900 text-neutral-300 text-[10px] px-1.5 py-0.5 rounded">ลำดับ: ${sp.order || 1}</span>
                 <div class="w-full aspect-square bg-neutral-950 rounded overflow-hidden mb-2 mt-4 flex items-center justify-center p-1">
                   <img src="${sp.image}" class="w-full h-full object-contain" onerror="this.onerror=null;">
@@ -2071,11 +1999,11 @@
                 <div class="text-white">
                   <p class="text-sm font-semibold text-neutral-200 truncate">${sp.productName}</p>
                   <p class="text-xs text-emerald-400 font-semibold mt-0.5">${sp.price}</p>
-                  <div class="text-[11px] text-slate-400 space-y-0.5 mt-1">
+                  <div class="text-[11px] text-neutral-300 space-y-0.5 mt-1">
                     <p>ลด %: <span class="text-red-400 font-bold">${sp.discount || '-'}</span></p>
-                    <p>ราคาเดิม: <span class="text-slate-500 line-through">${sp.originalPrice || '-'}</span></p>
+                    <p>ราคาเดิม: <span class="text-neutral-400 line-through">${sp.originalPrice || '-'}</span></p>
                   </div>
-                  <p class="text-xs text-neutral-500 truncate mt-1">ลิงก์ภาพ: <span class="text-neutral-400 select-all hover:underline">${sp.image || ''}</span></p>
+                  <p class="text-xs text-neutral-400 truncate mt-1">ลิงก์ภาพ: <span class="text-neutral-300 select-all hover:underline">${sp.image || ''}</span></p>
                 </div>
                 <div class="flex gap-1.5 mt-2">
                   <button onclick="editShowcaseProduct('${sp.__backendId}')" class="flex-1 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-sky-400 rounded text-xs font-semibold transition text-center">แก้ไข</button>
@@ -2108,11 +2036,11 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">เพิ่มรูปภาพแบนเนอร์สไลด์</h3>
         <div class="space-y-3.5 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ภาพสำหรับแสดงผลบนมือถือ (สัดส่วน 5:3)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ภาพสำหรับแสดงผลบนมือถือ (สัดส่วน 5:3)</label>
             <input id="ab-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-sm text-white" placeholder="https://domain.com/mobile-image.jpg">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">ภาพสำหรับแสดงผลบนหน้าจอ PC (สัดส่วน 20:10)</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">ภาพสำหรับแสดงผลบนหน้าจอ PC (สัดส่วน 20:10)</label>
             <input id="ab-pc-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-sm text-white" placeholder="https://domain.com/pc-image.jpg">
           </div>
           <button id="btn-submit-banner" onclick="doAddBanner()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition mt-2 text-sm uppercase tracking-wider">นำส่งข้อมูลรูปแบนเนอร์</button>
@@ -2146,11 +2074,11 @@
         <h3 class="font-semibold text-sm mb-4 text-sky-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">ปรับปรุงรายละเอียดรูปภาพแบนเนอร์</h3>
         <div class="space-y-3.5 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">รูปเวอร์ชันมือถือ</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">รูปเวอร์ชันมือถือ</label>
             <input id="eb-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-sm font-semibold" value="${b.bannerUrl || ''}">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">รูปเวอร์ชัน PC</label>
+            <label class="text-xs text-neutral-300 font-semibold block mb-1 uppercase">รูปเวอร์ชัน PC</label>
             <input id="eb-pc-url" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white rounded text-sm font-semibold" value="${b.bannerPcUrl || ''}">
           </div>
           <button id="btn-edit-banner" onclick="doEditBanner('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition text-sm uppercase tracking-wider">อัปเดตข้อมูลแบนเนอร์</button>
@@ -2202,7 +2130,7 @@
       }
     }
     
-    function showAddGallery() { showModal(`<h3 class="font-semibold text-sm mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">เพิ่มรูปแกลเลอรีประดับ</h3><div class="space-y-3.5 text-left text-sm font-mono text-white"><div><label class="text-xs text-slate-400 block mb-1">หัวข้อระบุด้านบนรูป (เช่น VIP 1)</label><input id="ag-title" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" placeholder="ระบุหัวข้อสั้น"></div><div><label class="text-xs text-slate-400 block mb-1">ลิงก์ภาพ URL แกลเลอรี</label><input id="ag-url" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" placeholder="ระบุที่อยู่รูปภาพ URL"></div><button id="btn-submit-gallery" onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded transition text-sm uppercase tracking-wider font-mono">บันทึกรูปภาพ</button></div>`); }
+    function showAddGallery() { showModal(`<h3 class="font-semibold text-sm mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">เพิ่มรูปแกลเลอรีประดับ</h3><div class="space-y-3.5 text-left text-sm font-mono text-white"><div><label class="text-xs text-neutral-300 block mb-1">หัวข้อระบุด้านบนรูป (เช่น VIP 1)</label><input id="ag-title" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" placeholder="ระบุหัวข้อสั้น"></div><div><label class="text-xs text-neutral-300 block mb-1">ลิงก์ภาพ URL แกลเลอรี</label><input id="ag-url" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" placeholder="ระบุที่อยู่รูปภาพ URL"></div><button id="btn-submit-gallery" onclick="doAddGallery()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded transition text-sm uppercase tracking-wider font-mono">บันทึกรูปภาพ</button></div>`); }
     async function doAddGallery() { 
       const btn = $('btn-submit-gallery');
       if (btn) { btn.disabled = true; btn.textContent = 'กำลังดำเนินการ...'; }
@@ -2219,7 +2147,7 @@
       const g = publicData.galleries.find(d => d.__backendId === bid); 
       if (!g) return showToast('ไม่พบรูปภาพแกลเลอรีที่จะทำการแก้ไข', 'error');
 
-      showModal(`<h3 class="font-semibold text-sm mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">แก้ไขรูปภาพแกลเลอรี</h3><div class="space-y-3.5 text-left text-sm font-mono text-white"><div><label class="text-xs text-slate-400 block mb-1">หัวข้อระบุด้านบนรูป</label><input id="eg-title" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold" value="${g.galleryTitle||''}"></div><div><label class="text-xs text-slate-400 block mb-1">ที่อยู่รูปภาพ URL</label><input id="eg-url" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" value="${g.galleryUrl}"></div><button id="btn-edit-gallery" onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition text-sm uppercase tracking-wider">อัปเดตข้อมูล</button></div>`); 
+      showModal(`<h3 class="font-semibold text-sm mb-4 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider text-white">แก้ไขรูปภาพแกลเลอรี</h3><div class="space-y-3.5 text-left text-sm font-mono text-white"><div><label class="text-xs text-neutral-300 block mb-1">หัวข้อระบุด้านบนรูป</label><input id="eg-title" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-semibold" value="${g.galleryTitle||''}"></div><div><label class="text-xs text-neutral-300 block mb-1">ที่อยู่รูปภาพ URL</label><input id="eg-url" class="w-full px-4 py-2 bg-black border border-neutral-800 text-white rounded text-sm font-mono" value="${g.galleryUrl}"></div><button id="btn-edit-gallery" onclick="doEditGallery('${bid}')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition text-sm uppercase tracking-wider">อัปเดตข้อมูล</button></div>`); 
     }
     async function doEditGallery(bid) { 
       const g = publicData.galleries.find(d => d.__backendId === bid); 
@@ -2265,29 +2193,29 @@
         <h3 class="font-semibold text-sm mb-4 text-pink-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">เพิ่มสินค้าแนะนำโชว์หน้าหลัก</h3>
         <div class="space-y-3 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ลำดับโชว์ (1 - 8)</label>
+            <label class="text-xs text-neutral-300 block mb-1">ลำดับโชว์ (1 - 8)</label>
             <input id="asp-order" type="number" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="เช่น 1">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ชื่อสินค้าแนะนำ</label>
+            <label class="text-xs text-neutral-300 block mb-1">ชื่อสินค้าแนะนำ</label>
             <input id="asp-name" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="เช่น นาฬิกา MIDO Belluna">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ราคาที่แสดงผลจริง</label>
+            <label class="text-xs text-neutral-300 block mb-1">ราคาที่แสดงผลจริง</label>
             <input id="asp-price" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="เช่น 10,540.00 THB">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-neutral-400 block mb-1">ป้ายระบุส่วนลด (ระบุเพื่อโชว์)</label>
+              <label class="text-xs text-neutral-300 block mb-1">ป้ายระบุส่วนลด (ระบุเพื่อโชว์)</label>
               <input id="asp-discount" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="เช่น ลด 37%">
             </div>
             <div>
-              <label class="text-xs text-neutral-400 block mb-1">ราคาเก่าขีดทับ (ระบุเพื่อโชว์)</label>
+              <label class="text-xs text-neutral-300 block mb-1">ราคาเก่าขีดทับ (ระบุเพื่อโชว์)</label>
               <input id="asp-original" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="เช่น 16,940.00 THB">
             </div>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ลิงก์ URL รูปภาพสินค้า</label>
+            <label class="text-xs text-neutral-300 block mb-1">ลิงก์ URL รูปภาพสินค้า</label>
             <input id="asp-image" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" placeholder="วางลิงก์รูปภาพ">
           </div>
           <button id="btn-submit-showcase" onclick="doAddShowcaseProduct()" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-semibold rounded transition uppercase tracking-wider">บันทึกสินค้าแนะนำ</button>
@@ -2336,29 +2264,29 @@
         <h3 class="font-semibold text-sm mb-4 text-pink-400 border-b border-neutral-800 pb-2 font-mono uppercase tracking-wider">แก้ไขสินค้าแนะนำหน้าหลัก</h3>
         <div class="space-y-3 text-left text-sm font-mono text-white">
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ลำดับโชว์ (1 - 8)</label>
+            <label class="text-xs text-neutral-300 block mb-1">ลำดับโชว์ (1 - 8)</label>
             <input id="esp-order" type="number" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.order || 1}">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ชื่อสินค้าแนะนำ</label>
+            <label class="text-xs text-neutral-300 block mb-1">ชื่อสินค้าแนะนำ</label>
             <input id="esp-name" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.productName || ''}">
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ราคาโชว์จริง</label>
+            <label class="text-xs text-neutral-300 block mb-1">ราคาโชว์จริง</label>
             <input id="esp-price" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.price || ''}">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-neutral-400 block mb-1">ป้ายระบุส่วนลด (ลด %)</label>
+              <label class="text-xs text-neutral-300 block mb-1">ป้ายระบุส่วนลด (ลด %)</label>
               <input id="esp-discount" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.discount || ''}">
             </div>
             <div>
-              <label class="text-xs text-neutral-400 block mb-1">ราคาเก่าขีดทับ</label>
+              <label class="text-xs text-neutral-300 block mb-1">ราคาเก่าขีดทับ</label>
               <input id="esp-original" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.originalPrice || ''}">
             </div>
           </div>
           <div>
-            <label class="text-xs text-neutral-400 block mb-1">ที่อยู่ URL รูปภาพสินค้า</label>
+            <label class="text-xs text-neutral-300 block mb-1">ที่อยู่ URL รูปภาพสินค้า</label>
             <input id="esp-image" type="text" class="w-full px-3 py-2 bg-black border border-neutral-800 text-white rounded" value="${sp.image || ''}">
           </div>
           <button id="btn-edit-showcase" onclick="doEditShowcaseProduct('${bid}')" class="w-full py-2.5 bg-pink-600 hover:bg-pink-500 text-white font-semibold rounded transition uppercase tracking-wider">บันทึกแก้ไขสินค้าแนะนำ</button>
@@ -2449,7 +2377,6 @@
       const scheduleText = cfg.scheduleText || 'เปิดทำการ 10:00-22:00 น.';
       const rewardsList = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
       
-      // ดึงตัวแปรและข้อมูลแคชภาพพื้นหลังมาเก็บไว้เพื่อหลีกเลี่ยงการ Error บล็อกการทำหน้าที่ของโค้ด
       const loginBgUrl = cfg.loginBgUrl || '';
       const loginBgUrlMobile = cfg.loginBgUrlMobile || '';
       const userBgUrl = cfg.userBgUrl || '';
@@ -2458,6 +2385,51 @@
       c.innerHTML = `
         <div class="space-y-4 max-w-4xl mx-auto font-mono text-sm text-left text-white">
           
+          <!-- แผงปรับแต่งชุดสีพื้นหลังระบบของบ้านผู้ใช้ -->
+          <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
+            <button onclick="toggleSettingsSection('sec-theme-colors', this)" class="w-full px-5 py-4 bg-black flex justify-between items-center text-sky-400 font-semibold uppercase tracking-wider">
+              <span class="flex items-center gap-2">🎨 แผงปรับแต่งสีระบบของบ้านผู้ใช้ (User UI Color Theme)</span>
+              <i data-lucide="play" class="w-4 h-4 transition-transform duration-200 fill-current text-sky-400" style="transform: rotate(0deg);"></i>
+            </button>
+            <div id="sec-theme-colors" class="hidden p-5 border-t border-neutral-900 space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase font-semibold">สีหลักของระบบ (Primary Color)</label>
+                  <div class="flex gap-2">
+                    <input id="cfg-theme-primary" type="color" oninput="$('cfg-theme-primary-text').value = this.value" class="w-12 h-10 bg-black border border-neutral-800 rounded cursor-pointer p-1" value="${cfg.themePrimary || '#ffffff'}">
+                    <input id="cfg-theme-primary-text" type="text" oninput="$('cfg-theme-primary').value = this.value" class="flex-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm font-mono text-center" value="${cfg.themePrimary || '#ffffff'}">
+                  </div>
+                </div>
+                <div>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase font-semibold">สีรองของระบบ (Secondary Color)</label>
+                  <div class="flex gap-2">
+                    <input id="cfg-theme-secondary" type="color" oninput="$('cfg-theme-secondary-text').value = this.value" class="w-12 h-10 bg-black border border-neutral-800 rounded cursor-pointer p-1" value="${cfg.themeSecondary || '#4f46e5'}">
+                    <input id="cfg-theme-secondary-text" type="text" oninput="$('cfg-theme-secondary').value = this.value" class="flex-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm font-mono text-center" value="${cfg.themeSecondary || '#4f46e5'}">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase font-semibold">ประเภทการแสดงสีพื้นหลัง</label>
+                  <select id="cfg-theme-type" class="w-full px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm font-semibold">
+                    <option value="gradient" ${cfg.themeType === 'gradient' ? 'selected' : ''}>สีไล่เฉด Gradient (สีหลัก -> สีรอง)</option>
+                    <option value="single" ${cfg.themeType === 'single' ? 'selected' : ''}>สีพื้นหลังสีเดี่ยว (สีหลัก)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase font-semibold">สีพื้นหลังแถบวิ่งประกาศ (Marquee BG Color)</label>
+                  <div class="flex gap-2">
+                    <input id="cfg-theme-marquee-bg" type="color" oninput="$('cfg-theme-marquee-bg-text').value = this.value" class="w-12 h-10 bg-black border border-neutral-800 rounded cursor-pointer p-1" value="${cfg.themeMarqueeBg || '#eb2f96'}">
+                    <input id="cfg-theme-marquee-bg-text" type="text" oninput="$('cfg-theme-marquee-bg').value = this.value" class="flex-1 px-3 py-2 bg-black border border-neutral-800 rounded text-white text-sm font-mono text-center" value="${cfg.themeMarqueeBg || '#eb2f96'}">
+                  </div>
+                </div>
+              </div>
+              
+              <button onclick="saveAdminSettings('theme_colors')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold text-sm rounded transition uppercase tracking-wider">บันทึกโทนสีระบบ</button>
+            </div>
+          </div>
+
           <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
             <button onclick="toggleSettingsSection('sec-browser', this)" class="w-full px-5 py-4 bg-black flex justify-between items-center text-sky-400 font-semibold uppercase tracking-wider">
               <span class="flex items-center gap-2">🌐 ระบบตั้งชื่อเว็บแอปพลิเคชัน (Browser Configuration)</span>
@@ -2465,11 +2437,11 @@
             </button>
             <div id="sec-browser" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ชื่อแถบหัวเรื่องประจำเว็บ (Browser Tab Name)</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ชื่อแถบหัวเรื่องประจำเว็บ (Browser Tab Name)</label>
                 <input id="cfg-tab-title" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-sm text-center" placeholder="เช่น Shopping" value="${getTabTitle()}">
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ลิงก์ไอคอนเว็บหน้าบ้าน (Favicon URL)</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ลิงก์ไอคอนเว็บหน้าบ้าน (Favicon URL)</label>
                 <input id="cfg-tab-favicon" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-sm font-mono text-center" placeholder="ระบุที่อยู่ URL สำหรับรูปไอคอน" value="${getTabFavicon()}">
               </div>
               <button onclick="saveAdminSettings('tab_config')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold rounded transition uppercase tracking-wider">บันทึกข้อมูลชื่อเบราว์เซอร์</button>
@@ -2483,7 +2455,7 @@
             </button>
             <div id="sec-menu-icons" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div class="flex justify-between items-center">
-                <p class="text-xs text-neutral-400 font-semibold">รายการปุ่มข้อมูลเมนูช่วยเหลือ ยินดีต้อนรับ / กฎบริษัท / รายการรางวัล / ภาษีรายได้</p>
+                <p class="text-xs text-neutral-300 font-semibold">รายการปุ่มข้อมูลเมนูช่วยเหลือ ยินดีต้อนรับ / กฎบริษัท / รายการรางวัล / ภาษีรายได้</p>
                 <button onclick="showAddMenuIcon()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-black font-bold rounded text-xs transition uppercase tracking-wider">+ เพิ่มหัวข้อคู่มือใหม่</button>
               </div>
               
@@ -2498,7 +2470,7 @@
                       </div>
                       <div class="min-w-0 text-left">
                         <p class="text-sm font-bold text-white truncate">${m.menuLabel}</p>
-                        <p class="text-xs text-neutral-500 truncate font-mono">${m.menuContent ? m.menuContent.substring(0, 30) + '...' : 'ไม่มีเนื้อหา'}</p>
+                        <p class="text-xs text-neutral-300 truncate font-mono">${m.menuContent ? m.menuContent.substring(0, 30) + '...' : 'ไม่มีเนื้อหา'}</p>
                       </div>
                     </div>
                     <div class="flex gap-1.5 ml-2 flex-shrink-0">
@@ -2519,7 +2491,7 @@
             <div id="sec-wallpapers" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div class="bg-neutral-900 p-3 rounded border border-neutral-800/80 mb-2">
                 <p class="text-sm text-sky-400 font-bold mb-1">💡 คำแนะนำความกว้างรูปภาพ</p>
-                <p class="text-xs text-neutral-400 leading-relaxed">
+                <p class="text-xs text-neutral-300 leading-relaxed">
                   • จอ PC / Desktop: แนะนำใช้ขนาดสัดส่วน 16:9 เช่น 1920 x 1080 พิกเซล<br>
                   • จอมือถือ / Mobile: แนะนำใช้ขนาดสัดส่วน 9:16 เช่น 1080 x 1920 พิกเซล
                 </p>
@@ -2528,11 +2500,11 @@
               <div class="space-y-3">
                 <p class="text-sm font-bold text-sky-500 uppercase border-b border-neutral-900 pb-1">1. วอลเปเปอร์หน้าล็อกอิน (Login Screen Wallpaper)</p>
                 <div>
-                  <label class="text-xs text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอ PC / Desktop)</label>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอ PC / Desktop)</label>
                   <input id="cfg-login-bg" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-sm text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Desktop" value="${loginBgUrl}">
                 </div>
                 <div>
-                  <label class="text-xs text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอมือถือ / Mobile)</label>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase">ภาพพื้นหลังสำหรับกรอบล็อกอิน (จอมือถือ / Mobile)</label>
                   <input id="cfg-login-bg-mobile" class="w-full px-4 py-2.5 bg-black border border-neutral-800 text-white text-sm text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Mobile" value="${loginBgUrlMobile}">
                 </div>
               </div>
@@ -2540,11 +2512,11 @@
               <div class="space-y-3 pt-3 border-t border-neutral-900">
                 <p class="text-sm font-bold text-sky-500 uppercase border-b border-neutral-900 pb-1">2. วอลเปเปอร์แดชบอร์ดด้านใน (Dashboard Wallpaper)</p>
                 <div>
-                  <label class="text-xs text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านใน (จอ PC / Desktop)</label>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านใน (จอ PC / Desktop)</label>
                   <input id="cfg-user-bg" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Desktop" value="${userBgUrl}">
                 </div>
                 <div>
-                  <label class="text-xs text-neutral-400 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านใน (จอมือถือ / Mobile)</label>
+                  <label class="text-xs text-neutral-300 block mb-1 uppercase">ภาพพื้นหลังสำหรับแดชบอร์ดด้านใน (จอมือถือ / Mobile)</label>
                   <input id="cfg-user-bg-mobile" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center font-mono" placeholder="วางลิงก์รูปภาพสำหรับ Mobile" value="${userBgUrlMobile}">
                 </div>
               </div>
@@ -2560,11 +2532,11 @@
             </button>
             <div id="sec-marquee" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ข้อความวิ่งประกาศด่วนหน้าหลัก</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ข้อความวิ่งประกาศด่วนหน้าหลัก</label>
                 <input id="cfg-marquee" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" value="${marqueeText}">
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1">ตารางเวลาเปิดทำการ (โชว์ที่หน้าหลักยูสเซอร์)</label>
+                <label class="text-xs text-neutral-300 block mb-1">ตารางเวลาเปิดทำการ (โชว์ที่หน้าหลักยูสเซอร์)</label>
                 <input id="cfg-schedule" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" placeholder="เปิดทำการ 10:00-22:00 น." value="${scheduleText}">
               </div>
               <button onclick="saveAdminSettings('marquee')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold text-sm rounded transition uppercase tracking-wider">บันทึกประกาศและตารางงาน</button>
@@ -2578,11 +2550,11 @@
             </button>
             <div id="sec-support" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ลิงก์อิมเมจ QR CODE ช่องทางติดต่อ LINE แอดมิน</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ลิงก์อิมเมจ QR CODE ช่องทางติดต่อ LINE แอดมิน</label>
                 <input id="cfg-line-qr" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center font-mono" placeholder="วางที่อยู่ลิงก์รูปภาพ QR CODE" value="${lineQrUrl}">
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">บัญชีไอดี LINE ซัพพอร์ต (LINE ID)</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">บัญชีไอดี LINE ซัพพอร์ต (LINE ID)</label>
                 <input id="cfg-line-id" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" placeholder="เช่น @tossupport" value="${lineId}">
               </div>
               <button onclick="saveAdminSettings('line')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold text-sm rounded transition uppercase tracking-wider">บันทึกช่องทางช่วยเหลือ</button>
@@ -2596,20 +2568,20 @@
             </button>
             <div id="sec-finances" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ลิสต์ธนาคารรองรับ (คั่นด้วยเครื่องหมายคอมมา , )</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ลิสต์ธนาคารรองรับ (คั่นด้วยเครื่องหมายคอมมา , )</label>
                 <textarea id="cfg-banks" class="w-full px-4 py-2 bg-black border border-neutral-800 rounded text-white text-sm h-16 text-center" placeholder="เช่น KBank,SCB,BBL">${banks}</textarea>
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ลิงก์ภาพ QR CODE รับฝากเงินสลิป</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ลิงก์ภาพ QR CODE รับฝากเงินสลิป</label>
                 <input id="cfg-topup-qr" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm font-mono text-center" placeholder="วางลิงก์รูปภาพ QR CODE รับเงิน" value="${topupQrUrl}">
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">ข้อมูลรายละเอียดบัญชีรับโอนฝากเงิน</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">ข้อมูลรายละเอียดบัญชีรับโอนฝากเงิน</label>
                 <textarea id="cfg-topup-acc" class="w-full px-4 py-2 bg-black border border-neutral-800 rounded text-white h-16 text-sm font-semibold text-center">${topupAccount}</textarea>
               </div>
               
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 font-semibold">รายการเบอร์โทรศัพท์คู่เงินรางวัลสลับวนโชว์หน้าบ้าน (คั่นรายการด้วยคอมมา , และแบ่งค่าด้วย : )</label>
+                <label class="text-xs text-neutral-300 block mb-1 font-semibold">รายการเบอร์โทรศัพท์คู่เงินรางวัลสลับวนโชว์หน้าบ้าน (คั่นรายการด้วยคอมมา , และแบ่งค่าด้วย : )</label>
                 <textarea id="cfg-rewards-list" class="w-full px-4 py-2 bg-black border border-neutral-800 rounded text-white text-sm h-20 text-center" placeholder="เช่น 095***567:433,000,095***091:2,050,000">${rewardsList}</textarea>
               </div>
 
@@ -2624,11 +2596,11 @@
             </button>
             <div id="sec-credentials" class="hidden p-5 border-t border-neutral-900 space-y-4">
               <div>
-                <label class="text-xs text-neutral-400 block mb-1">ลิงก์ URL อัปโหลดรูปโลโก้ประจำเว็บแอปพลิเคชัน</label>
+                <label class="text-xs text-neutral-300 block mb-1">ลิงก์ URL อัปโหลดรูปโลโก้ประจำเว็บแอปพลิเคชัน</label>
                 <input id="cfg-logo" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center font-mono" value="${logoUrl}">
               </div>
               <div>
-                <label class="text-xs text-neutral-400 block mb-1 uppercase">รหัสเชิญสมัครเข้าระบบระบบความปลอดภัย</label>
+                <label class="text-xs text-neutral-300 block mb-1 uppercase">รหัสเชิญสมัครเข้าระบบระบบความปลอดภัย</label>
                 <input id="cfg-invite" class="w-full px-4 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center font-semibold tracking-widest font-mono" value="${inviteCode}">
               </div>
               <button onclick="saveAdminSettings('logo_invite')" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-black font-semibold text-sm rounded transition uppercase tracking-wider">บันทึกข้อมูลรหัสเชิญและโลโก้หลัก</button>
@@ -2674,6 +2646,12 @@
       else if (type === 'tab_config') { 
         updatePayload.tabTitle = $('cfg-tab-title').value.trim(); 
         updatePayload.tabFaviconUrl = $('cfg-tab-favicon').value.trim(); 
+      }
+      else if (type === 'theme_colors') {
+        updatePayload.themePrimary = $('cfg-theme-primary-text').value.trim();
+        updatePayload.themeSecondary = $('cfg-theme-secondary-text').value.trim();
+        updatePayload.themeType = $('cfg-theme-type').value;
+        updatePayload.themeMarqueeBg = $('cfg-theme-marquee-bg-text').value.trim();
       }
 
       publicData.configs = [updatePayload];
