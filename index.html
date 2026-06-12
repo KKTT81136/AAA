@@ -35,7 +35,6 @@
       var loginBgMobile = '';
       var userBg = '';
       var userBgMobile = '';
-      var loaderBg = '#f8fafc';
 
       if (cached) {
         try {
@@ -49,10 +48,6 @@
           loginBgMobile = cfg.loginBgUrlMobile || '';
           userBg = cfg.userBgUrl || '';
           userBgMobile = cfg.userBgUrlMobile || '';
-          
-          if (primary && primary.indexOf('#') === 0) {
-            loaderBg = primary;
-          }
         } catch(e) {}
       }
 
@@ -68,8 +63,7 @@
         "  --color-secondary: " + secondary + ";",
         "  --color-marquee-bg: " + marqueeBg + ";",
         "}",
-        "body { background-color: " + loaderBg + " !important; }",
-        "#app-loader { background-color: " + loaderBg + " !important; }",
+        "body { background-color: #f8fafc !important; }",
         ".text-primary { color: " + primary + " !important; }",
         ".bg-primary { background-color: " + primary + " !important; }",
         ".border-primary { border-color: " + primary + " !important; }",
@@ -87,7 +81,7 @@
       if (userBg) {
         cssRules.push("#dash-outer-container { background-image: url('" + userBg + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }");
       } else {
-        cssRules.push("#dash-outer-container { background-color: " + loaderBg + " !important; }");
+        cssRules.push("#dash-outer-container { background-color: #f8fafc !important; }");
       }
       if (userBgMobile) {
         cssRules.push("@media (max-width: 767px) { #dash-outer-container { background-image: url('" + userBgMobile + "') !important; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; } }");
@@ -272,7 +266,7 @@
   <!-- โครงสร้างแอปพลิเคชันหลัก -->
   <div id="app" class="h-full w-full relative flex flex-col">
     <!-- ตัวโหลดจำลองตอนเริ่มระบบเพื่อหลีกเลี่ยงการกะพริบซ้อน -->
-    <div id="app-loader" class="absolute inset-0 flex flex-col items-center justify-center z-[9999] transition-opacity duration-300">
+    <div id="app-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-[#f8fafc] z-[9999] transition-opacity duration-300">
       <div class="dot-anim"><span></span><span></span><span></span></div>
     </div>
   </div>
@@ -298,7 +292,7 @@
 
     const appInstance = initializeApp(firebaseConfig);
     const db = getFirestore(appInstance);
-    const auth = getAuth(appInstance);
+    const auth = getAuth(auth);
 
     // ==========================================
     // STATE ENGINE & DICTIONARY
@@ -335,7 +329,7 @@
       const cachedUserStr = localStorage.getItem('tos_cached_user');
       if (cachedUserStr) {
         currentUser = JSON.parse(cachedUserStr);
-        lastUserLevel = currentUser.userLevel || '1';
+        lastUserLevel = currentUser.userLevel || '0';
         lastUsername = currentUser.username || '';
         lastUserCredit = currentUser.credit || 0;
       }
@@ -473,7 +467,9 @@
         unknown: "ไม่ทราบสถานะ",
         changeLangBtn: "เลือกภาษา / Select Language",
         vipFixturn: "ซ่อมยอดเทิร์น",
-        vipAllowwd: "ปลดล็อกแล้ว"
+        vipAllowwd: "ปลดล็อกแล้ว",
+        noVipTitle: "รอสุ่มสินค้าอัตโนมัติ",
+        noVipSub: "คุณยังไม่ได้กำหนด VIP โปรดติดต่อผู้ดูแลระบบของคุณ"
       },
       en: {
         signIn: "Sign In",
@@ -577,7 +573,9 @@
         unknown: "Unknown status",
         changeLangBtn: "Select Language",
         vipFixturn: "Turnover Repair",
-        vipAllowwd: "Unblocked"
+        vipAllowwd: "Unblocked",
+        noVipTitle: "Pending Automatic Product Matching",
+        noVipSub: "You have not been assigned a VIP tier yet. Please contact your administrator."
       }
     };
 
@@ -839,12 +837,8 @@
       }
       refreshTimeout = setTimeout(() => {
         if (currentUser && $('dash-content')) {
-          if (currentTab === 'history') {
-            renderTabContent();
-          } else {
-            updateDynamicValues();
-            applyDynamicStyles();
-          }
+          renderTabContent();
+          applyDynamicStyles();
         }
       }, 20); 
     }
@@ -923,8 +917,6 @@
         if (lastSerialized.banners !== serialized) {
           lastSerialized.banners = serialized;
           publicData.banners = banners;
-          localStorage.setItem('tos_cached_banners', serialized);
-          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -936,8 +928,6 @@
         if (lastSerialized.galleries !== serialized) {
           lastSerialized.galleries = serialized;
           publicData.galleries = galleries;
-          localStorage.setItem('tos_cached_galleries', serialized);
-          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -950,8 +940,6 @@
         if (lastSerialized.menuIcons !== serialized) {
           lastSerialized.menuIcons = serialized;
           publicData.menuIcons = sortedIcons;
-          localStorage.setItem('tos_cached_menu_icons', serialized);
-          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -964,8 +952,6 @@
         if (lastSerialized.products !== serialized) {
           lastSerialized.products = serialized;
           publicData.products = sortedProds;
-          localStorage.setItem('tos_cached_products', serialized);
-          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -978,8 +964,6 @@
         if (lastSerialized.showcaseProducts !== serialized) {
           lastSerialized.showcaseProducts = serialized;
           publicData.showcaseProducts = sortedShowcase;
-          localStorage.setItem('tos_cached_showcase', serialized);
-          lastRenderedTab = ''; 
           refreshUI();
         }
       }, (err) => console.warn(err));
@@ -1004,10 +988,10 @@
       activeListeners.userDoc = onSnapshot(doc(db, "users", userId), (docSnap) => {
         if (docSnap.exists()) {
           const uData = docSnap.data();
-          const levelChanged = String(uData.userLevel || '1') !== String(lastUserLevel);
+          const levelChanged = String(uData.userLevel || '0') !== String(lastUserLevel);
           const nameChanged = (uData.username || '') !== lastUsername;
 
-          lastUserLevel = uData.userLevel || '1';
+          lastUserLevel = uData.userLevel || '0';
           lastUsername = uData.username || '';
           lastUserCredit = uData.credit || 0;
 
@@ -1432,7 +1416,7 @@
           password: hashedPassword,
           withdrawPassword: hashedPin,
           credit: 0,
-          userLevel: '1',
+          userLevel: '0', // เริ่มต้นแบบไม่มี VIP
           runIndex: 0,
           creditScore: 100,
           bankName: '',
@@ -1559,15 +1543,13 @@
       else if (currentTab === 'history') renderHistory(tempDiv); 
       else if (currentTab === 'profile') renderProfile(tempDiv);
       
-      const savedScrollTop = c.scrollTop;
-
       if (lastRenderedTab !== currentTab) {
         c.innerHTML = tempDiv.innerHTML;
         lastRenderedTab = currentTab;
-        const storedScroll = sessionStorage.getItem('tos_scroll_top_' + currentTab);
-        c.scrollTop = storedScroll ? parseInt(storedScroll) : 0;
+        c.scrollTop = 0;
       } else {
         if (c.innerHTML !== tempDiv.innerHTML) {
+          const savedScrollTop = c.scrollTop;
           c.innerHTML = tempDiv.innerHTML;
           c.scrollTop = savedScrollTop;
         }
@@ -1582,20 +1564,13 @@
       }
     }
 
-    // ติดตามการเลื่อนหน้าจอเพื่อจดจำตำแหน่งในแต่ละแท็บ ป้องกันการเด้งขึ้นไปด้านบนสุด
-    document.addEventListener('scroll', function(e) {
-      if (e.target && e.target.id === 'dash-content') {
-        sessionStorage.setItem('tos_scroll_top_' + currentTab, e.target.scrollTop);
-      }
-    }, true);
-
     function updateDynamicValues() {
       const u = currentUser;
       if (!u) return;
 
       const creditVal = u.credit || 0;
       const done = u.runIndex || 0;
-      const userLevel = u.userLevel || '1';
+      const userLevel = u.userLevel || '0';
       const formatted = "฿" + safeFormatNumber(creditVal);
 
       ['home-credit-display', 'prod-credit-display', 'hist-credit-display', 'prof-credit-display'].forEach(id => {
@@ -1852,8 +1827,8 @@
 
             return `
             <div class="showcase-card ${animationTypeClass} bg-slate-50 border border-slate-100 rounded-xl p-2 flex flex-col justify-between text-left relative overflow-hidden shadow-inner">
-              <div class="w-full aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center p-1 mb-2 bg-slate-100 animate-pulse">
-                <img src="${pImg}" class="w-full h-full object-contain opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.src='${fallbackImg}'; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">
+              <div class="w-full aspect-square bg-white rounded-lg overflow-hidden flex items-center justify-center p-1 mb-2">
+                <img src="${pImg}" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='${fallbackImg}';">
               </div>
               <p class="text-[9px] font-bold text-slate-700 line-clamp-2 leading-tight">${pName}</p>
               <div class="mt-2">
@@ -1907,7 +1882,7 @@
               <div class="gallery-item w-full aspect-square rounded-[24px] border-2 border-[#ca9eff] bg-white p-2 flex items-center justify-center relative shadow-sm">
                 ${titleContainerHtml}
                 <div class="w-full h-full rounded-[18px] overflow-hidden bg-slate-50 flex items-center justify-center">
-                  <img src="${safeImgUrl(g.galleryUrl)}" class="w-full h-full object-cover opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0');" onerror="this.onerror=null; this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; this.classList.remove('opacity-0');">
+                  <img src="${safeImgUrl(g.galleryUrl)}" class="w-full h-full object-cover" onerror="this.onerror=null;">
                 </div>
               </div>`;
             }).join('')}
@@ -1951,7 +1926,7 @@
         c.innerHTML = '';
         return;
       }
-      const userLevel = u.userLevel || '1';
+      const userLevel = u.userLevel || '0';
       const creditVal = u.credit || 0;
       const done = u.runIndex || 0;
       
@@ -1966,8 +1941,10 @@
       let levelText = 'VIP ' + userLevel; 
       if(userLevel === 'fixturn') levelText = t('vipFixturn'); 
       if(userLevel === 'allowwd') levelText = t('vipAllowwd');
+      if(userLevel === '0' || !userLevel) levelText = t('noVipTitle');
 
-      const levelSubtextHtml = (userLevel === 'allowwd') 
+      // ปล่อยถอน (allowwd) หรือไม่มี VIP (0) จะไม่แสดงสถานะ Subtext VIP สีขาวใต้หัวข้อ
+      const levelSubtextHtml = (userLevel === 'allowwd' || userLevel === '0' || !userLevel) 
         ? '' 
         : `<p class="text-center text-white/80 mt-1 font-medium text-sm">(${levelText})</p>`;
 
@@ -2019,30 +1996,28 @@
       }
       const u = currentUser;
       if (!u) return;
+      
+      const userLevel = u.userLevel || '0';
       const creditVal = u.credit || 0;
       const done = u.runIndex || 0;
-      const userLevel = u.userLevel || '1';
 
-      // ตรวจสอบข้อจำกัดสิทธิ์ของ VIP 1 (ผู้สมัครใหม่จะยังกดออเดอร์ไม่ได้)
-      if (String(userLevel) === '1') {
+      // ตรวจสอบว่ายูสเซอร์ไม่มี VIP (เป็น '0' หรือค่าว่าง)
+      if (!userLevel || userLevel === '0') {
         showModal(`
-          <div class="text-center py-4 relative font-sans">
-            <!-- ปุ่มกากบาทมุมขวาบน -->
-            <button onclick="closeModal()" class="absolute -top-2 -right-2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors">
+          <div class="text-center py-4 font-sans relative">
+            <button onclick="closeModal()" class="absolute -top-2 -right-2 text-slate-400 hover:text-slate-600 focus:outline-none">
               <i data-lucide="x" class="w-6 h-6"></i>
             </button>
-            
-            <!-- ข้อความแจ้งเตือนเลียนแบบต้นฉบับ -->
-            <h3 class="text-lg font-bold text-slate-700 mb-2 mt-4">รอสุ่มสินค้าอัตโนมัติ</h3>
-            <p class="text-slate-500 text-sm leading-relaxed">คุณยังไม่ได้กำหนด VIP โปรดติดต่อผู้ดูแลและระบบของคุณ</p>
-          </div>
-        `);
-        if(btnElement) { 
+            <div class="w-20 h-20 bg-amber-50 text-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-amber-100"><i data-lucide="alert-circle" class="w-10 h-10"></i></div>
+            <h3 class="text-lg font-bold text-slate-800 font-semibold">${t('noVipTitle')}</h3>
+            <p class="text-slate-600 text-sm mt-2 leading-relaxed">${t('noVipSub')}</p>
+            <button onclick="closeModal()" class="mt-6 w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 font-mono">${t('close')}</button>
+          </div>`);
+        if (btnElement) { 
           btnElement.disabled = false; 
           btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; 
+          safeCreateIcons(); 
         }
-        isOrderProcessing = false;
-        safeCreateIcons();
         return;
       }
 
@@ -2092,9 +2067,9 @@
         if(btnElement) { btnElement.disabled = false; btnElement.innerHTML = `<i data-lucide="play-circle"></i> ${t('startMatch')}`; safeCreateIcons(); }
         showModal(`
           <div class="text-center font-mono">
-            <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative bg-slate-100 animate-pulse">
+            <div class="w-full h-72 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative">
               ${isSpecial ? `<div class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full z-10">${t('specialOrder')}</div>` : ''}
-              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
+              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-24 h-24 text-slate-300"></i>`}
             </div>
             <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
             <div class="mt-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/60 font-mono">
@@ -2152,8 +2127,8 @@
         }
         showModal(`
           <div class="text-center font-mono">
-            <div class="w-full h-64 bg-slate-100 rounded-2xl mb-4 overflow-hidden border border-slate-200 flex items-center justify-center p-4 relative bg-slate-100 animate-pulse">
-              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain relative z-0 opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
+            <div class="w-full h-64 bg-slate-100 rounded-2xl mb-4 overflow-hidden border border-slate-200 flex items-center justify-center p-4">
+              ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300 relative z-0"></i>`}
             </div>
             <p class="text-xs text-rose-500 font-bold mt-4">${t('insufficientShortfall')} ฿${((p.productPrice || 0) - creditVal).toLocaleString()}</p>
             <button onclick="closeModal(); showTopupModal();" class="mt-4 w-full py-3.5 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 transition shadow-md text-base flex justify-center items-center gap-2"><span>${t('deposit')}</span></button>
@@ -2164,8 +2139,8 @@
 
       showModal(`
         <div class="text-center font-mono">
-          <div class="w-full h-64 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-100 flex items-center justify-center shadow-inner p-4 bg-slate-100 animate-pulse">
-            ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300"></i>`}
+          <div class="w-full h-64 bg-white rounded-2xl mb-5 overflow-hidden border border-slate-100 flex items-center justify-center p-4">
+            ${p.productImage ? `<img src="${safeImgUrl(p.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-20 h-20 text-slate-300"></i>`}
           </div>
           <h3 class="text-sm font-bold text-slate-800 leading-snug line-clamp-2">${p.productName}</h3>
           <div class="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 mt-5 text-sm text-left shadow-inner">
@@ -2277,7 +2252,7 @@
       
       let listHtml = '';
       const done = u.runIndex || 0;
-      const userLevel = u.userLevel || '1';
+      const userLevel = u.userLevel || '0';
       const creditVal = u.credit || 0;
       
       if (historyTab === 'orders') {
@@ -2302,8 +2277,8 @@
           <div class="bg-amber-50/50 p-5 rounded-[28px] shadow-sm border border-amber-200/60 mb-5 relative overflow-hidden font-mono text-left">
             <div class="absolute top-0 right-0 bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-bl-2xl">${t('pendingPayment')}</div>
             <div class="flex items-center gap-4 mb-4 mt-2">
-              <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1 bg-slate-100 animate-pulse">
-                ${pendingOrder.productImage ? `<img src="${safeImgUrl(pendingOrder.productImage)}" class="w-full h-full object-contain opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
+              <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 overflow-hidden border border-slate-100 p-1">
+                ${pendingOrder.productImage ? `<img src="${safeImgUrl(pendingOrder.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-8 h-8 text-slate-300"></i>`}
               </div>
               <div class="flex-1 min-w-0">
                 <p class="font-bold text-slate-800 line-clamp-2 text-sm leading-snug">${pendingOrder.productName}</p>
@@ -2332,8 +2307,8 @@
             const statusConfig = isAllDone ? { text: t('completed'), bg: 'bg-emerald-500/15 text-emerald-600 border border-emerald-100' } : { text: t('processingStatus'), bg: 'bg-amber-500/15 text-amber-600 border border-amber-100' }; 
             return `
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 mb-3 relative hover:shadow-md transition bg-slate-50 border border-slate-100 font-mono">
-              <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100 bg-slate-100 animate-pulse">
-                ${o.productImage ? `<img src="${safeImgUrl(o.productImage)}" class="w-full h-full object-contain opacity-0 transition-opacity duration-300" onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');" onerror="this.onerror=null; this.classList.remove('opacity-0'); this.parentElement.classList.remove('animate-pulse');">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
+              <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center flex-shrink-0 overflow-hidden p-1 border border-slate-100">
+                ${o.productImage ? `<img src="${safeImgUrl(o.productImage)}" class="w-full h-full object-contain" onerror="this.onerror=null;">` : `<i data-lucide="package" class="w-6 h-6 text-slate-300"></i>`}
               </div>
               <div class="flex-1 min-w-0 pr-12 text-left">
                 <p class="font-bold text-slate-800 truncate text-xs">${o.productName}</p>
@@ -2405,14 +2380,16 @@
       }
       const creditVal = u.credit || 0;
       const usernameVal = u.username || 'User';
-      const userLevel = u.userLevel || '1';
+      const userLevel = u.userLevel || '0';
       
       const logoUrl = getLogoUrl(); 
       let levelText = 'VIP ' + userLevel; 
       if(userLevel === 'fixturn') levelText = t('vipFixturn'); 
       if(userLevel === 'allowwd') levelText = t('vipAllowwd');
+      if(userLevel === '0' || !userLevel) levelText = t('noVipTitle');
 
-      const levelBadgeHtml = (userLevel === 'allowwd')
+      // ปล่อยถอน (allowwd) หรือไม่มี VIP (0) จะไม่แสดง Badge แถบดาวสีเหลืองใต้โปรไฟล์
+      const levelBadgeHtml = (userLevel === 'allowwd' || userLevel === '0' || !userLevel)
         ? ''
         : `<span class="inline-block mt-3 px-4 py-1.5 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-200 shadow-sm font-mono font-semibold">⭐ ${levelText}</span>`;
 
