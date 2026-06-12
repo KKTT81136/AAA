@@ -88,13 +88,12 @@
       font-family: 'Kanit', sans-serif; 
       -webkit-font-smoothing: antialiased; 
       box-sizing: border-box;
-      font-weight: 400; /* ปรับระดับความหนาตัวอักษรให้อ่านง่าย สบายตา */
+      font-weight: 400;
     }
     b, strong, h1, h2, h3, h4, th, .font-bold, .font-black, .font-semibold {
-      font-weight: 600 !important; /* ปรับระดับตัวหนาให้ออกมาคมชัดสูง */
+      font-weight: 600 !important;
     }
     
-    /* ปรับแต่งแผงควบคุมหลังบ้านเป็นพื้นหลังสีดำ-เทา ตัวอักษรสีขาวสว่าง */
     html, body { 
       min-height: 100%; 
       margin: 0; 
@@ -102,15 +101,14 @@
       color: #ffffff !important;
     }
     
-    /* ตัวปรับแต่งสไตล์ (Theme Color Override) จาก Slate เป็น Black-Gray */
     .bg-slate-900 {
-      background-color: #16161a !important; /* สีเทาเข้ม */
+      background-color: #16161a !important;
     }
     .bg-slate-950 {
-      background-color: #0d0d0f !important; /* สีดำสลัว */
+      background-color: #0d0d0f !important;
     }
     .border-slate-800 {
-      border-color: #242429 !important; /* ขอบสีเทาหม่น */
+      border-color: #242429 !important;
     }
     .text-slate-200 {
       color: #f3f4f6 !important;
@@ -263,7 +261,6 @@
     const getInviteCode = () => { const c = getConfig(); return String(c.inviteCode || '').trim(); };
     const getLogoUrl = () => { const c = getConfig(); return (c.logoUrl && c.logoUrl.trim() !== '') ? c.logoUrl : 'https://cdn.phototourl.com/free/2026-06-08-5695c487-1846-42dc-af3d-b4752a81489c.png'; };
     const getMarqueeText = () => { const c = getConfig(); return c.marqueeText || ''; };
-    // ปรับแก้ไขคีย์ตัวแปรให้ตรงกับ Context ป้องกันปัญหาระบบล่มจนพารามิเตอร์หลักว่างเปล่า
     const getLineQrUrl = () => { const c = getConfig(); return c.lineQrUrl || ''; };
     const getLineId = () => { const c = getConfig(); return c.lineId || ''; };
     const getTopupQrUrl = () => { const c = getConfig(); return c.topupQrUrl || ''; };
@@ -278,7 +275,6 @@
       return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     }
 
-    // ฟังก์ชันช่วยสำหรับการแฮชรหัสแบบ SHA-256 ป้องกันความเสี่ยงรหัสหน้าบ้านถูกเปิดเผย
     async function hashValue(string) {
       if (!string) return '';
       try {
@@ -468,6 +464,7 @@
             if (document.title !== targetTitle) {
               document.title = targetTitle;
             }
+            debouncedRenderAdminTab();
           }
         }
         updateHeaderStats();
@@ -662,12 +659,11 @@
     }
 
     // ==========================================
-    // ADMIN PANEL LAYOUT (โครงแบบ SPA ไร้รอยต่อ ป้องกันการกะพริบเวลากดเปลี่ยนเมนู)
+    // ADMIN PANEL LAYOUT
     // ==========================================
     function renderAdminFrame() {
       const app = $('app');
       
-      // ตรวจสอบว่ามีโครงของแผงหลักอยู่ใน DOM อยู่แล้วหรือไม่ เพื่อข้ามการสร้างใหม่ทับซ้ำ (ป้องกันหน้าจอระคายสายตา)
       if (app.querySelector('#admin-skeleton-wrapper')) {
         updateActiveSidebar();
         debouncedRenderAdminTab();
@@ -755,7 +751,6 @@
               </div>
             </div>
 
-            <!-- กล่องแท็บเนื้อหาที่ถูกสับเปลี่ยนข้อมูลแบบไดนามิก -->
             <div id="admin-content" class="flex-1 p-6 overflow-auto scrollbar-none"></div>
           </div>
         </div>
@@ -809,6 +804,8 @@
 
     function renderAdminTab() {
       const c = $('admin-content'); if(!c) return;
+      const savedScrollTop = c.scrollTop; // บันทึกตำแหน่ง Scroll ป้องกันหน้าจอกระตุก
+      
       if (adminTab === 'users') renderAdminUsers(c); 
       else if (adminTab === 'products') renderAdminProducts(c); 
       else if (adminTab === 'special') renderAdminSpecial(c); 
@@ -816,6 +813,8 @@
       else if (adminTab === 'media') renderAdminMedia(c); 
       else if (adminTab === 'settings') renderAdminSettings(c);
       else if (adminTab === 'orders') renderAdminOrders(c);
+      
+      c.scrollTop = savedScrollTop; // คืนค่าตำแหน่ง Scroll เดิม
       lucide.createIcons();
     }
 
@@ -910,7 +909,7 @@
     function showAddUserModal() {
       showModal(`
         <h3 class="font-semibold text-sm mb-4 text-sky-400 flex items-center gap-1.5 border-b border-neutral-800 pb-2 uppercase tracking-wider"><i data-lucide="user-plus" class="text-sky-400"></i> ลงทะเบียนบัญชีสมาชิกใหม่</h3>
-        <div id="add-user-form" class="space-y-4 text-left text-sm font-mono">
+        <div id="add-user-form" class="space-y-4 text-left text-sm font-mono sandbox">
           <div>
             <label class="text-xs text-neutral-400 font-semibold block mb-1 uppercase">เบอร์โทรศัพท์ (ใช้เข้าระบบ)</label>
             <input id="an-phone" class="w-full px-3.5 py-2.5 bg-black border border-neutral-800 rounded text-white text-sm text-center" placeholder="เช่น 0812345678">
@@ -954,7 +953,6 @@
       }
 
       try {
-        // แฮชรหัสเข้าใช้งานและ PIN ของสมาชิกที่เพิ่มเข้ามาใหม่เพื่อความปลอดภัยตามมาตรฐานหน้าบ้าน
         const hashedPassword = await hashValue(pw);
         const hashedPin = await hashValue(pin);
 
@@ -1186,7 +1184,6 @@
         const enteredPass = $('eu-pass').value.trim();
         const enteredPin = $('eu-pin').value.trim();
 
-        // ตรวจสอบโครงสร้าง: หากรหัสผ่านที่ป้อนเข้ามาใหม่ไม่ใช่ Hash (ความยาว 64 ตัวอักษรฐาน 16) ให้ทำการแฮชก่อนอัปเดตเพื่อความปลอดภัย
         const isSha256 = (str) => /^[a-f0-9]{64}$/i.test(str);
         const targetPassword = isSha256(enteredPass) ? enteredPass : await hashValue(enteredPass);
         const targetPin = isSha256(enteredPin) ? enteredPin : await hashValue(enteredPin);
@@ -1212,7 +1209,6 @@
       }
     }
 
-    // ลบผู้ใช้งานแบบ Cascade
     async function deleteAdminUser(bid) { 
       const u = adminUsersData.find(d => d.__backendId === bid); 
       if(!u) return showToast('ไม่พบข้อมูลบัญชีผู้ใช้งานที่จะลบในสารบบ', 'error');
@@ -2440,12 +2436,25 @@
     // TABS: 7. SYSTEM SETTINGS
     // ==========================================
     function renderAdminSettings(c) {
-      const cfg = getConfig() || {}; const logoUrl = getLogoUrl(); const inviteCode = getInviteCode(); const marqueeText = getMarqueeText(); const lineQrUrl = getLineQrUrl(); const lineId = getLineId(); const topupQrUrl = getTopupQrUrl(); const topupAccount = getTopupAccount(); 
+      const cfg = getConfig() || {}; 
+      const logoUrl = getLogoUrl(); 
+      const inviteCode = getInviteCode(); 
+      const marqueeText = getMarqueeText(); 
+      const lineQrUrl = getLineQrUrl(); 
+      const lineId = getLineId(); 
+      const topupQrUrl = getTopupQrUrl(); 
+      const topupAccount = getTopupAccount(); 
       const banks = cfg.supportedBanks || 'KBank,SCB,BBL,KTB,Krungsri,GSB,TrueMoney';
 
       const scheduleText = cfg.scheduleText || 'เปิดทำการ 10:00-22:00 น.';
       const rewardsList = cfg.rewardsList || '095***567:433,000,095***091:2,050,000,088***324:120,500';
       
+      // ดึงตัวแปรและข้อมูลแคชภาพพื้นหลังมาเก็บไว้เพื่อหลีกเลี่ยงการ Error บล็อกการทำหน้าที่ของโค้ด
+      const loginBgUrl = cfg.loginBgUrl || '';
+      const loginBgUrlMobile = cfg.loginBgUrlMobile || '';
+      const userBgUrl = cfg.userBgUrl || '';
+      const userBgUrlMobile = cfg.userBgUrlMobile || '';
+
       c.innerHTML = `
         <div class="space-y-4 max-w-4xl mx-auto font-mono text-sm text-left text-white">
           
@@ -2502,7 +2511,6 @@
             </div>
           </div>
 
-          <!-- ระบบเลือกจัดการภาพพื้นหลังวอลเปเปอร์แยกขนาด จอพีซี และจอมือถือ -->
           <div class="bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-sm">
             <button onclick="toggleSettingsSection('sec-wallpapers', this)" class="w-full px-5 py-4 bg-black flex justify-between items-center text-sky-400 font-semibold uppercase tracking-wider">
               <span class="flex items-center gap-2">🖼️ ระบบเลือกจัดการภาพพื้นหลังวอลเปเปอร์ (Wallpaper Settings)</span>
@@ -2764,7 +2772,7 @@
         isAdmin = true;
         adminTab = sessionStorage.getItem('tos_admin_tab') || 'users'; 
         startAdminSubscriptions();
-        renderAdminFrame(); // เรียกแสดงผลผ่านเฟรม SPA เพื่อความราบรื่นนุ่มนวล
+        renderAdminFrame(); 
       } else {
         isAdmin = false;
         renderAdminLogin();
